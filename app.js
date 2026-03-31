@@ -18,15 +18,15 @@ function loadDay(day) {
     container.innerHTML = workoutPlan[day].map((ex, idx) => `
         <div class="ex-card">
             <div style="display: flex; gap: 15px; align-items: center;">
-                <img src="${ex.img}" style="width: 70px; height: 70px; border-radius: 10px; background: #333;" alt="${ex.n}">
+                <img src="${ex.img}" style="width: 75px; height: 75px; border-radius: 10px; background: #333;" onerror="this.src='https://via.placeholder.com/75?text=GYM'">
                 <div style="flex: 1;">
                     <span class="ex-title">${ex.n}</span>
                     <div class="ex-info">${ex.i}</div>
                 </div>
             </div>
             <div class="inputs">
-                <div>Peso (kg) <input type="number" id="w-${idx}" step="0.5" placeholder="0"></div>
-                <div>Reps <input type="number" id="r-${idx}" placeholder="0"></div>
+                <div class="input-group">Peso (kg) <input type="number" id="w-${idx}" step="0.5" placeholder="0"></div>
+                <div class="input-group">Reps <input type="number" id="r-${idx}" placeholder="0"></div>
             </div>
         </div>
     `).join('');
@@ -36,12 +36,10 @@ function loadDay(day) {
 function saveData() {
     let logs =;
     const saved = localStorage.getItem('gymLogs');
-    if (saved) {
-        logs = JSON.parse(saved);
-    }
+    if (saved) logs = JSON.parse(saved);
     
     const session = {
-        date: new Date().toLocaleDateString(),
+        date: new Date().toLocaleDateString('it-IT'),
         day: currentDay,
         data: workoutPlan.map((ex, idx) => ({
             name: ex.n,
@@ -63,13 +61,12 @@ function saveData() {
 function updateChart() {
     const saved = localStorage.getItem('gymLogs');
     if (!saved) return;
-    
     const logs = JSON.parse(saved);
     const filtered = logs.filter(l => l.day === currentDay);
     if (filtered.length < 1) return;
 
     document.getElementById('chartBox').style.display = 'block';
-    const mainEx = workoutPlan.n;
+    const mainEx = workoutPlan.n; // Prende il primo esercizio del giorno
     
     const labels = filtered.map(l => l.date);
     const weights = filtered.map(l => {
