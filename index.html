@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="it"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;GymTracker v4 - Pro&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="manifest" href="manifest.json"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>:root { --primary: #2ecc71; --dark: #2c3e50; --light: #ecf0f1; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: -apple-system, sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">       </span>.day-nav { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">       </span>.day-btn { background: #34495e; border: none; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; white-space: nowrap; }</p>
+<p class="p1"><span class="Apple-converted-space">       </span>.day-btn.active { background: var(--primary); }</p>
+<p class="p1"><span class="Apple-converted-space">       </span>.exercise-card { background: #34495e; border-radius: 10px; padding: 15px; margin-bottom: 15px; }</p>
+<p class="p1"><span class="Apple-converted-space">       </span>.exercise-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }</p>
+<p class="p1"><span class="Apple-converted-space">       </span>.thumb { width: 60px; height: 60px; background: #95a5a6; border-radius: 5px; object-fit: cover; }</p>
+<p class="p1"><span class="Apple-converted-space">       </span>.sets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>input { background: var(--dark); border: 1px solid #7f8c8d; color: white; padding: 8px; border-radius: 5px; width: 80%; }</p>
+<p class="p1"><span class="Apple-converted-space">       </span>.save-btn { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; margin-top: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#chart-container { background: white; border-radius: 10px; padding: 10px; margin-top: 30px; display: none; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Gym Progress v4&lt;/h1&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="day-nav" id="dayNav"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="day-btn active" onclick="showDay(1)"&gt;1: PUSH&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="day-btn" onclick="showDay(2)"&gt;2: PULL&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="day-btn" onclick="showDay(3)"&gt;3: LEGS&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="day-btn" onclick="showDay(4)"&gt;4: UPPER&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="workoutArea"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="save-btn" onclick="saveWorkout()"&gt;SALVA SESSIONE&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="chart-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 style="color: black"&gt;Progresso Carichi (kg)&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;canvas id="progressChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="app.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if ('serviceWorker' in navigator) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>navigator.serviceWorker.register('sw.js');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
