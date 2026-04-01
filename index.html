@@ -28,6 +28,7 @@
 <body class="pt-safe">
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden">
         
+        <!-- VISTA HOME -->
         <div id="view-home" class="view p-6 pb-32 animate-slide">
             <header class="flex justify-between items-end mb-8">
                 <div>
@@ -49,8 +50,8 @@
             <section class="space-y-4">
                 <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">I Tuoi Programmi</h2>
                 
-                <div onclick="openWorkout(1)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98]">
-                    <img src="img/panca_piana.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.src=''">
+                <div onclick="openWorkout(1)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-blue-900/20">
+                    <img src="img/panca_piana.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop'">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 1</p>
@@ -62,8 +63,8 @@
                     </div>
                 </div>
 
-                <div onclick="openWorkout(2)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98]">
-                    <img src="img/trazioni.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.src=''">
+                <div onclick="openWorkout(2)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-purple-900/20">
+                    <img src="img/trazioni.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1598971441775-802521e15610?q=80&w=800&auto=format&fit=crop'">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-purple-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 2</p>
@@ -75,8 +76,8 @@
                     </div>
                 </div>
 
-                <div onclick="openWorkout(3)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98]">
-                    <img src="img/hack_squat.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.src=''">
+                <div onclick="openWorkout(3)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-green-900/20">
+                    <img src="img/hack_squat.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800&auto=format&fit=crop'">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-green-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 3</p>
@@ -88,8 +89,8 @@
                     </div>
                 </div>
 
-                <div onclick="openWorkout(4)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98]">
-                    <img src="img/chest_press.jpg" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.src=''">
+                <div onclick="openWorkout(4)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-orange-900/20">
+                    <img src="img/chest_press.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1581009146145-b5ef03a94e77?q=80&w=800&auto=format&fit=crop'">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 4</p>
@@ -103,6 +104,7 @@
             </section>
         </div>
 
+        <!-- VISTA WORKOUT -->
         <div id="view-workout" class="view hidden pb-32">
             <header class="p-6 sticky top-0 z-50 glass border-b border-white/5 pt-12">
                 <div class="flex items-center justify-between">
@@ -138,43 +140,50 @@
 
         const workoutPlan = {
             1: { title: 'PUSH (G1)', items: [
-                { id: 'panca_piana', name: 'Panca Piana', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.jpg', note: '8 reps prima di passare a 35kg.', alt: { name: 'Chest Press', target: '35kg', rest: 180, img: 'img/chest_press.jpg', note: 'Alternativa se la panca è occupata.' }},
-                { id: 'lento_avanti', name: 'Lento Avanti', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.jpg', note: 'Schiena dritta.', alt: { name: 'Shoulder Press Machine', target: '30kg', rest: 120, img: 'img/shoulder_press.jpg', note: 'Versione guidata.' }},
-                { id: 'spinte_inc', name: 'Spinte Inclinata', sets: '4x8-10', target: '26kg', rest: 90, img: 'img/spinte_inc.jpg', note: 'Focus petto alto.' },
-                { id: 'alzate_lat', name: 'Alzate Laterali', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.jpg', note: 'Esecuzione pulita.', alt: { name: 'Alzate Laterali Cavi', target: '7.5kg', rest: 75, img: 'img/alzate_cavi.jpg', note: 'Tensione costante.' }},
-                { id: 'skullcrusher', name: 'Skullcrusher', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.jpg', note: 'Gomiti fermi.' },
-                { id: 'pushdown', name: 'Pushdown Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.jpg', note: 'Contrazione 1s.' }
+                { id: 'panca_piana', name: 'Panca Piana', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', note: '8 reps prima di passare a 35kg.', alt: { name: 'Chest Press', target: '35kg', rest: 180, img: 'img/chest_press.png', note: 'Alternativa se la panca è occupata.' }},
+                { id: 'lento_avanti', name: 'Lento Avanti', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', note: 'Schiena dritta.', alt: { name: 'Shoulder Press Machine', target: '30kg', rest: 120, img: 'img/shoulder_press.png', note: 'Versione guidata.' }},
+                { id: 'spinte_inc', name: 'Spinte Inclinata', sets: '4x8-10', target: '26kg', rest: 90, img: 'img/spinte_inc.png', note: 'Focus petto alto.' },
+                { id: 'alzate_lat', name: 'Alzate Laterali', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.png', note: 'Esecuzione pulita.', alt: { name: 'Alzate Laterali Cavi', target: '7.5kg', rest: 75, img: 'img/alzate_cavi.png', note: 'Tensione costante.' }},
+                { id: 'skullcrusher', name: 'Skullcrusher', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png', note: 'Gomiti fermi.' },
+                { id: 'pushdown', name: 'Pushdown Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png', note: 'Contrazione 1s.' }
             ]},
             2: { title: 'PULL (G2)', items: [
-                { id: 'trazioni', name: 'Trazioni Sbarra', sets: '5x6-8', target: 'Zavorra', rest: 120, img: 'img/trazioni.jpg', note: 'Petto alla sbarra.' },
-                { id: 'tbar_row', name: 'Rematore T-Bar', sets: '4x8-10', target: '30kg', rest: 120, img: 'img/tbar_row.jpg', note: 'Spremi scapole.', alt: { name: 'Rematore Manubrio', target: '28kg', rest: 120, img: 'img/rematore_manubrio.jpg', note: 'Un braccio alla volta.' }},
-                { id: 'curl_ez', name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', rest: 90, img: 'img/curl_ez.jpg', note: 'Schiena ferma.' },
-                { id: 'alzate_90', name: 'Alzate a 90°', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_90.jpg', note: 'Deltoidi post.' },
-                { id: 'hammer_curl', name: 'Hammer Curl', sets: '3x8-10', target: '14kg', rest: 75, img: 'img/hammer_curl.jpg', note: 'Brachiale.' },
-                { id: 'russian_twist', name: 'Russian Twist', sets: '3x15-20', target: '10kg', rest: 60, img: 'img/russian_twist.jpg', note: 'Addome obliquo.' }
+                { id: 'trazioni', name: 'Trazioni Sbarra', sets: '5x6-8', target: 'Zavorra', rest: 120, img: 'img/trazioni.png', note: 'Petto alla sbarra.' },
+                { id: 'tbar_row', name: 'Rematore T-Bar', sets: '4x8-10', target: '30kg', rest: 120, img: 'img/tbar_row.png', note: 'Spremi scapole.', alt: { name: 'Rematore Manubrio', target: '28kg', rest: 120, img: 'img/rematore_manubrio.png', note: 'Un braccio alla volta.' }},
+                { id: 'curl_ez', name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', rest: 90, img: 'img/curl_ez.png', note: 'Schiena ferma.' },
+                { id: 'alzate_90', name: 'Alzate a 90°', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_90.png', note: 'Deltoidi post.' },
+                { id: 'hammer_curl', name: 'Hammer Curl', sets: '3x8-10', target: '14kg', rest: 75, img: 'img/hammer_curl.png', note: 'Brachiale.' },
+                { id: 'russian_twist', name: 'Russian Twist', sets: '3x15-20', target: '10kg', rest: 60, img: 'img/russian_twist.png', note: 'Addome obliquo.' }
             ]},
             3: { title: 'LEGS (G3)', items: [
-                { id: 'hack_squat', name: 'Hack Squat', sets: '4x10-12', target: '65kg', rest: 120, img: 'img/hack_squat.jpg', note: 'Profondità.', alt: { name: 'Belt Squat', target: '65kg', rest: 120, img: 'img/belt_squat.jpg', note: 'Focus gambe senza carico schiena.' }},
-                { id: 'hip_thrust', name: 'Hip Thrust', sets: '4x10-12', target: '30kg', rest: 90, img: 'img/hip_thrust.jpg', note: 'Contrazione glutei.' },
-                { id: 'leg_press', name: 'Leg Press 45°', sets: '3x15-20', target: '120kg', rest: 90, img: 'img/leg_press.jpg', note: 'Piedi bassi.' },
-                { id: 'leg_ext', name: 'Leg Extension', sets: '3x15-20', target: '30kg', rest: 60, img: 'img/leg_ext.jpg', note: 'Drop Set.' },
-                { id: 'polpacci', name: 'Calf Pressa', sets: '4x15-20', target: '70kg', rest: 60, img: 'img/polpacci.jpg', note: 'Pausa 2s.' },
-                { id: 'hanging_leg', name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', rest: 60, img: 'img/hanging_leg.jpg', note: 'Addome basso.' }
+                { id: 'hack_squat', name: 'Hack Squat', sets: '4x10-12', target: '65kg', rest: 120, img: 'img/hack_squat.png', note: 'Profondità.', alt: { name: 'Belt Squat', target: '65kg', rest: 120, img: 'img/belt_squat.png', note: 'Focus gambe senza carico schiena.' }},
+                { id: 'hip_thrust', name: 'Hip Thrust', sets: '4x10-12', target: '30kg', rest: 90, img: 'img/hip_thrust.png', note: 'Contrazione glutei.' },
+                { id: 'leg_press', name: 'Leg Press 45°', sets: '3x15-20', target: '120kg', rest: 90, img: 'img/leg_press.png', note: 'Piedi bassi.' },
+                { id: 'leg_ext', name: 'Leg Extension', sets: '3x15-20', target: '30kg', rest: 60, img: 'img/leg_ext.png', note: 'Drop Set.' },
+                { id: 'polpacci', name: 'Calf Pressa', sets: '4x15-20', target: '70kg', rest: 60, img: 'img/polpacci.png', note: 'Pausa 2s.' },
+                { id: 'hanging_leg', name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', rest: 60, img: 'img/hanging_leg.png', note: 'Addome basso.' }
             ]},
             4: { title: 'UPPER (G4)', items: [
-                { id: 'chest_press', name: 'Chest Press Bassa', sets: '4x12-15', target: '35kg', rest: 75, img: 'img/chest_press.jpg', note: 'Sedile basso per petto alto.' },
-                { id: 'pectoral', name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', rest: 75, img: 'img/pectoral.jpg', note: 'Picco contrazione.' },
-                { id: 'lat_neutra', name: 'Lat Machine', sets: '4x12-15', target: '45kg', rest: 75, img: 'img/lat_neutra.jpg', note: 'Presa neutra.', alt: { name: 'Lat Machine Larga', target: '40kg', rest: 75, img: 'img/lat_larga.jpg', note: 'Focus ampiezza dorsali.' }},
-                { id: 'alzate_cavi', name: 'Alzate Laterali Cavi', sets: '4x15-20', target: '10kg', rest: 60, img: 'img/alzate_cavi.jpg', note: 'Cavo dietro schiena.' },
-                { id: 'tirate_mento', name: 'Tirate al Mento', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/tirate_mento.jpg', note: 'Presa larga.' },
-                { id: 'crossover', name: 'Crossover Cavi', sets: '3x15-20', target: '15kg', rest: 60, img: 'img/crossover.jpg', note: 'Focus petto basso.' }
+                { id: 'chest_press', name: 'Chest Press Bassa', sets: '4x12-15', target: '35kg', rest: 75, img: 'img/chest_press.png', note: 'Sedile basso per petto alto.' },
+                { id: 'pectoral', name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', rest: 75, img: 'img/pectoral.png', note: 'Picco contrazione.' },
+                { id: 'lat_neutra', name: 'Lat Machine', sets: '4x12-15', target: '45kg', rest: 75, img: 'img/lat_neutra.png', note: 'Presa neutra.', alt: { name: 'Lat Machine Larga', target: '40kg', rest: 75, img: 'img/lat_larga.png', note: 'Focus ampiezza dorsali.' }},
+                { id: 'alzate_cavi', name: 'Alzate Laterali Cavi', sets: '4x15-20', target: '10kg', rest: 60, img: 'img/alzate_cavi.png', note: 'Cavo dietro schiena.' },
+                { id: 'tirate_mento', name: 'Tirate al Mento', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/tirate_mento.png', note: 'Presa larga.' },
+                { id: 'crossover', name: 'Crossover Cavi', sets: '3x15-20', target: '15kg', rest: 60, img: 'img/crossover.png', note: 'Focus petto basso.' },
+                { id: 'pushdown_corda', name: 'SS1: Push Down Corda', sets: '3x12-15', target: '20kg', rest: 0, img: 'img/pushdown_corda.png', note: 'No recupero, passa al curl.' },
+                { id: 'curl_cavi', name: 'SS1: Curl ai Cavi', sets: '3x12-15', target: '15kg', rest: 90, img: 'img/curl_cavi.png', note: 'Recupera 90s e ripeti SS1.' },
+                { id: 'estensioni_testa', name: 'SS2: Estensioni Manubrio', sets: '3x12-15', target: '10kg', rest: 0, img: 'img/estensioni_testa.png', note: 'No recupero, passa al curl.' },
+                { id: 'curl_concentrazione', name: 'SS2: Curl Concentrazione', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/curl_concentrazione.png', note: 'Recupera 90s e ripeti SS2.' }
             ]}
         };
 
-        const activeVariants = {}; // Per tracciare se stiamo visualizzando la variante
-        const activeTimers = {}; // Memorizza gli ID dei timer
+        const activeVariants = {}; 
+        const activeTimers = {}; 
 
-        function getHistory(exId) { return JSON.parse(localStorage.getItem(`h_${exId}`)) || []; }
+        function getHistory(exId) {
+            try { return JSON.parse(localStorage.getItem(`h_${exId}`)) || []; } 
+            catch(e) { return []; }
+        }
         
         function saveWeight(exId, weight) {
             const h = getHistory(exId);
@@ -185,7 +194,6 @@
             renderDashboardCharts();
         }
 
-        // --- SISTEMA CRONOMETRO ---
         function clearAllTimers() {
             for (let id in activeTimers) {
                 clearInterval(activeTimers[id].interval);
@@ -197,7 +205,6 @@
             const btn = document.getElementById(`timer-btn-${exId}`);
             if (!btn) return;
 
-            // Se il timer è già attivo, fermalo e resettalo
             if (activeTimers[exId]) {
                 clearInterval(activeTimers[exId].interval);
                 delete activeTimers[exId];
@@ -205,7 +212,6 @@
                 return;
             }
 
-            // Altrimenti avvialo
             let remaining = durationInSeconds;
             btn.classList.remove('text-gray-400', 'bg-white/5', 'text-green-500', 'bg-green-500/20');
             btn.classList.add('text-orange-500', 'bg-orange-500/20');
@@ -217,7 +223,7 @@
                 lucide.createIcons();
             };
 
-            updateUI(); // Aggiornamento immediato al click
+            updateUI();
 
             activeTimers[exId] = {
                 interval: setInterval(() => {
@@ -231,7 +237,6 @@
                         if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]);
                         lucide.createIcons();
 
-                        // Resetta il bottone automaticamente dopo 5 secondi
                         setTimeout(() => {
                             const currentBtn = document.getElementById(`timer-btn-${exId}`);
                             if (currentBtn && !activeTimers[exId]) {
@@ -251,7 +256,6 @@
             btn.innerHTML = `<i data-lucide="timer" class="w-3.5 h-3.5 mr-1"></i> ${durationInSeconds}s`;
             lucide.createIcons();
         }
-        // ------------------------
 
         function toggleVariant(exId) {
             activeVariants[exId] = !activeVariants[exId];
@@ -266,14 +270,14 @@
         }
 
         function goHome() {
-            clearAllTimers(); // Ferma i timer attivi tornando alla home
+            clearAllTimers(); 
             document.getElementById('view-workout').classList.add('hidden');
             document.getElementById('view-home').classList.remove('hidden');
             renderDashboardCharts();
         }
 
         function renderWorkout(id) {
-            clearAllTimers(); // Ferma i timer della visualizzazione precedente
+            clearAllTimers(); 
             const container = document.getElementById('exercise-list');
             const items = workoutPlan[id].items;
             
@@ -283,9 +287,11 @@
                 const history = getHistory(ex.id + (isAlt ? '_alt' : ''));
                 const last = history.length > 0 ? history.slice(-1)[0].w : '--';
                 
+                const fallbackImg = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop';
+                
                 return `
                     <div class="apple-card overflow-hidden animate-slide">
-                        <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400&h=250&fit=crop'">
+                        <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.onerror=null; this.src='${fallbackImg}'">
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-4">
                                 <div>
