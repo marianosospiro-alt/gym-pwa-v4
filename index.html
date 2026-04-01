@@ -15,23 +15,23 @@
         .apple-card { background-color: var(--apple-card); border-radius: 24px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
         .btn-primary { background-color: var(--apple-blue); border-radius: 14px; font-weight: 600; }
         
-        /* Design Pulsante CAMBIA Migliorato */
+        /* Design Pulsante CAMBIA Ultra-Visibile */
         .btn-variant { 
-            background-color: rgba(0, 122, 255, 0.15); 
-            border: 1px solid rgba(0, 122, 255, 0.3);
+            background-color: var(--apple-blue); 
             border-radius: 8px; 
             font-size: 10px; 
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 800; 
-            color: var(--apple-blue); 
-            padding: 6px 12px; 
+            color: #ffffff; 
+            padding: 8px 14px; 
             display: inline-flex; 
             align-items: center; 
             gap: 6px; 
             transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
         }
-        .btn-variant:active { transform: scale(0.95); background-color: rgba(0, 122, 255, 0.3); }
+        .btn-variant:active { transform: scale(0.95); background-color: #005bb5; }
         
         .horizontal-scroll-container { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 12px; scroll-snap-type: x mandatory; margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
         .horizontal-scroll-container > div { flex: 0 0 140px; scroll-snap-align: start; }
@@ -334,10 +334,10 @@
                 
                 const fallbackImg = '';
                 
-                // LOGICA PULSANTE: Se ci sono alternative per questo esercizio, disegna il pulsante.
+                // LOGICA PULSANTE: Se ci sono alternative per questo esercizio, disegna il pulsante ben visibile in blu.
                 const variantButton = (ex.alts && ex.alts.length > 0) ? 
-                    `<button onclick="toggleVariant('${ex.id}', ${ex.alts.length})" class="btn-variant">
-                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> CAMBIA
+                    `<button type="button" onclick="toggleVariant('${ex.id}', ${ex.alts.length})" class="btn-variant">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> CAMBIA
                     </button>` : '';
 
                 return `
