@@ -228,12 +228,26 @@
         }
         
         function saveWeight(exId, weight) {
+            // Controllo anti-errore: se il peso è vuoto, nullo, o non è un numero, non fa nulla!
+            if (!weight || weight.trim() === '' || isNaN(weight)) return; 
+            
             const h = getHistory(exId);
             h.push({ d: new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}), w: parseFloat(weight) });
             if (h.length > 15) h.shift();
             localStorage.setItem(`h_${exId}`, JSON.stringify(h));
             renderWorkout(window.currentWorkoutId);
             renderDashboardCharts();
+        }
+
+        // Funzione per annullare l'ultimo peso inserito
+        function undoLastWeight(exId) {
+            const h = getHistory(exId);
+            if (h.length > 0) {
+                h.pop(); // Rimuove l'ultimo elemento
+                localStorage.setItem(`h_${exId}`, JSON.stringify(h));
+                renderWorkout(window.currentWorkoutId);
+                renderDashboardCharts();
+            }
         }
 
         function clearAllTimers() {
@@ -334,10 +348,15 @@
                 
                 const fallbackImg = '';
                 
-                // LOGICA PULSANTE: Se ci sono alternative per questo esercizio, disegna il pulsante ben visibile in blu.
                 const variantButton = (ex.alts && ex.alts.length > 0) ? 
                     `<button type="button" onclick="toggleVariant('${ex.id}', ${ex.alts.length})" class="btn-variant">
                         <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> CAMBIA
+                    </button>` : '';
+
+                // Pulsante Annulla visibile solo se c'è storico
+                const undoButton = history.length > 0 ? 
+                    `<button onclick="undoLastWeight('${currentId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl flex items-center justify-center transition-all active:scale-95" title="Annulla Ultimo Peso">
+                        <i data-lucide="undo" class="w-4 h-4"></i>
                     </button>` : '';
 
                 return `
@@ -360,7 +379,15 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5">
-                                <div class="flex-1"><label class="text-[9px] font-bold text-gray-500 block mb-2 px-1 uppercase">Peso Odierno</label><div class="flex gap-2"><input type="number" id="in-${currentId}" placeholder="${last !== '--' ? last : '0'}"><button onclick="saveWeight('${currentId}', document.getElementById('in-${currentId}').value)" class="btn-primary px-5 text-xs text-white">OK</button></div></div>
+                                <div class="flex-1">
+                                    <label class="text-[9px] font-bold text-gray-500 block mb-2 px-1 uppercase">Peso Odierno</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" id="in-${currentId}" placeholder="${last !== '--' ? last : '0'}" 
+                                               oninput="const btn = document.getElementById('btn-ok-${currentId}'); if(this.value.trim()){btn.removeAttribute('disabled'); btn.classList.remove('opacity-50');}else{btn.setAttribute('disabled', 'true'); btn.classList.add('opacity-50');}">
+                                        <button id="btn-ok-${currentId}" disabled onclick="saveWeight('${currentId}', document.getElementById('in-${currentId}').value)" class="btn-primary px-4 text-xs text-white transition-all active:scale-95 opacity-50">OK</button>
+                                        ${undoButton}
+                                    </div>
+                                </div>
                                 <div class="w-[1px] h-10 bg-white/10"></div>
                                 <div class="text-center px-2"><label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Ultimo</label><span class="text-xl font-black italic text-white">${last}</span></div>
                             </div>
@@ -385,6 +412,7 @@
                     labels: h.map(i => i.d),
                     datasets: [{
                         data: h.map(i => i.w),
+                        spanGaps: true, // Collega la spezzata anche se mancano giorni
                         borderColor: '#007AFF',
                         borderWidth: 4,
                         pointBackgroundColor: '#007AFF',
@@ -425,7 +453,7 @@
                 const h = getHistory(groups[g][0]);
                 const data = h.length > 0 ? h.map(i => i.w) : [0,0,0,0,0];
                 homeCharts[g] = new Chart(document.getElementById(`chart-${g}`), {
-                    type: 'line', data: { labels: data.map((_, i) => i), datasets: [{ data, borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
+                    type: 'line', data: { labels: data.map((_, i) => i), datasets: [{ data, spanGaps: true, borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
                     options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } }
                 });
             });
