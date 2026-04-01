@@ -89,6 +89,25 @@
             <div id="calendar-selection" class="space-y-4"></div>
         </div>
 
+        <!-- VISTA IMPOSTAZIONI -->
+        <div id="view-settings" class="view hidden p-6 pb-32 animate-slide">
+            <h1 class="text-3xl font-extrabold text-white mb-8">Impostazioni</h1>
+            <div class="apple-card p-6 mb-6">
+                <h3 class="font-bold mb-2">Gestione Dati</h3>
+                <p class="text-xs text-gray-400 mb-4">Esporta i tuoi progressi o importa un backup (JSON).</p>
+                <div class="flex flex-col gap-3">
+                    <button onclick="exportData()" class="btn-primary py-3 flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> ESPORTA JSON</button>
+                    <button onclick="document.getElementById('importFile').click()" class="bg-white/10 rounded-2xl py-3 flex items-center justify-center gap-2 font-bold text-sm"><i data-lucide="upload" class="w-4 h-4"></i> IMPORTA JSON</button>
+                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+                </div>
+            </div>
+            <div class="apple-card p-6 border border-red-500/20">
+                <h3 class="font-bold text-red-500 mb-2">Area Pericolo</h3>
+                <p class="text-xs text-gray-400 mb-4">Attenzione: l'app non salva dati online. Se fai il reset, perderai tutto definitivamente.</p>
+                <button onclick="resetAllData()" class="text-red-500 text-xs font-bold uppercase tracking-widest bg-red-500/10 w-full py-3 rounded-xl border border-red-500/30">Reset Totale App</button>
+            </div>
+        </div>
+
         <!-- MODALE LIBRERIA -->
         <div id="modal-library" class="modal-sheet" onclick="closeLibrary()">
             <div class="sheet-content" onclick="event.stopPropagation()">
@@ -101,14 +120,15 @@
         </div>
 
         <!-- NAVBAR -->
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-6 py-4 flex justify-around items-center z-50 pb-safe">
             <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold">Home</span></button>
             <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold">Diario</span></button>
+            <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="settings" class="w-6 h-6"></i><span class="text-[10px] font-bold">Impostazioni</span></button>
         </nav>
     </div>
 
     <script>
-        // --- LIBRERIA MODULARE (Focus Braccia aggiunto) ---
+        // --- LIBRERIA MODULARE ---
         const exerciseLibrary = {
             petto: [
                 { id: 'dips_petto', name: 'Dips alle Parallele (Petto)', target: 'C.L.', rest: 120, img: 'img/dips_petto.png', note: 'Inclinati in avanti.' },
@@ -221,11 +241,11 @@
                 <div onclick="swapExercise('${ex.id}')" class="apple-card p-4 flex items-center gap-4 border border-white/5 active:bg-blue-500/20 cursor-pointer">
                     <img src="${ex.img}" class="w-16 h-16 rounded-xl object-cover" onerror="this.src=''">
                     <div class="flex-1 text-left">
-                        <h4 class="font-bold text-sm">${ex.name}</h4>
+                        <h4 class="font-bold text-sm text-white">${ex.name}</h4>
                         <p class="text-[10px] text-gray-400">${ex.note}</p>
                     </div>
                     <i data-lucide="plus-circle" class="text-blue-500"></i>
-                </div>`).join('') + `<p class="text-center text-[10px] text-gray-500 uppercase py-4">Fine della selezione modulare</p>`;
+                </div>`).join('') + `<p class="text-center text-[10px] text-gray-500 uppercase py-4">Fine selezione</p>`;
             document.getElementById('modal-library').style.display = 'flex';
             lucide.createIcons();
         }
@@ -262,6 +282,7 @@
                 delete activeSession[exId];
                 localStorage.setItem('active_session_buffer', JSON.stringify(activeSession));
                 renderWorkout(currentWorkoutId);
+                renderDashboardCharts();
             }
         }
 
@@ -305,6 +326,17 @@
         function openSettings() {
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-settings').classList.remove('hidden');
+            updateNav('settings');
+        }
+
+        function updateNav(active) {
+            ['home', 'calendar', 'settings'].forEach(n => {
+                const btn = document.getElementById(`nav-${n}`);
+                if (btn) {
+                    btn.classList.toggle('text-blue-500', active === n);
+                    btn.classList.toggle('text-gray-500', active !== n);
+                }
+            });
         }
 
         function renderWorkout(id, isHistory = false, historyData = null) {
@@ -338,14 +370,14 @@
                                 <div class="flex-1">
                                     <div class="flex gap-2">
                                         <input type="number" id="in-${exId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}" class="on-input">
-                                        <button onclick="saveWeight('${exId}', document.getElementById('in-${exId}').value)" class="btn-primary px-5 text-xs">OK</button>
+                                        <button onclick="saveWeight('${exId}', document.getElementById('in-${exId}').value)" class="btn-primary px-5 text-xs text-white">OK</button>
                                         ${todayVal ? `<button onclick="undoLastWeight('${exId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl"><i data-lucide="undo" class="w-4 h-4"></i></button>` : ''}
                                     </div>
                                 </div>
                                 <div class="w-[1px] h-10 bg-white/10"></div>
                                 <div class="text-center px-2 cursor-pointer" onclick="showChart('${exId}', '${ex.name}')">
                                     <label class="text-[9px] font-bold text-gray-500 block uppercase">Ultimo</label>
-                                    <span class="text-xl font-black italic underline decoration-blue-500/30">${last}</span>
+                                    <span class="text-xl font-black italic underline decoration-blue-500/30 text-white">${last}</span>
                                 </div>
                             </div>
                         `}
@@ -362,37 +394,37 @@
                     <img src="${p.img}" class="absolute inset-0 w-full h-full object-cover opacity-30">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent p-6 flex flex-col justify-center">
                         <p class="text-[10px] font-black uppercase mb-1" style="color: ${p.color}">Giorno ${id}</p>
-                        <h3 class="text-2xl font-extrabold">${p.title}</h3>
+                        <h3 class="text-2xl font-extrabold text-white">${p.title}</h3>
                     </div>
                 </div>`).join('');
         }
 
-        function updateNav(active) {
-            ['home', 'calendar'].forEach(n => {
-                const btn = document.getElementById(`nav-${n}`);
-                if (btn) {
-                    btn.classList.toggle('text-blue-500', active === n);
-                    btn.classList.toggle('text-gray-500', active !== n);
-                }
-            });
-        }
-
+        // --- BACKUP & CALENDAR ---
         function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                data[k] = localStorage.getItem(k);
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
             const dl = document.createElement('a'); dl.href = dataStr; dl.download = "powerlog_backup.json"; dl.click();
         }
 
         function importData(e) {
             const reader = new FileReader();
             reader.onload = (ev) => {
-                const data = JSON.parse(ev.target.result);
-                Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
-                location.reload();
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (confirm("Sovrascrivere tutti i dati con questo backup?")) {
+                        Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+                        location.reload();
+                    }
+                } catch(err) { alert("Errore nel file."); }
             };
             reader.readAsText(e.target.files[0]);
         }
 
-        function resetAllData() { if(confirm("Reset totale?")) { localStorage.clear(); location.reload(); } }
+        function resetAllData() { if(confirm("RESET TOTALE? Perderai tutti i tuoi pesi.")) { localStorage.clear(); location.reload(); } }
 
         function renderCalendar() {
             const container = document.getElementById('calendar-days');
@@ -408,7 +440,7 @@
                 const workout = journal[key];
                 container.innerHTML += `
                     <div onclick="selectDate('${key}')" class="calendar-day cursor-pointer hover:bg-white/10 ${new Date().toISOString().split('T')[0] === key ? 'bg-blue-500' : ''}">
-                        ${d}${workout ? `<div class="day-workout-dot" style="background-color: ${workoutPlan[workout.id]?.color || '#fff'}"></div>` : ''}
+                        ${d}${workout ? `<div class="day-workout-dot" style="background-color: ${defaultPlan[workout.id]?.color || '#fff'}"></div>` : ''}
                     </div>`;
             }
         }
@@ -418,8 +450,15 @@
             const display = document.getElementById('calendar-selection');
             if(!workout) return display.innerHTML = `<div class="apple-card p-8 text-center text-gray-500">Nessun allenamento</div>`;
             display.innerHTML = `
-                <div onclick="viewPastWorkout(${workout.id}, '${key}')" class="apple-card p-5 flex flex-col cursor-pointer border-l-4" style="border-left-color: ${workoutPlan[workout.id]?.color || '#fff'}">
-                    <div class="flex justify-between"><div><h3 class="text-xl font-black">${workout.title}</h3><p class="text-xs text-gray-400">${workout.volume || 0} kg</p></div><i data-lucide="chevron-right"></i></div>
+                <div onclick="viewPastWorkout(${workout.id}, '${key}')" class="apple-card p-5 flex flex-col cursor-pointer border-l-4" style="border-left-color: ${defaultPlan[workout.id]?.color || '#fff'}">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-black text-white">${workout.title}</h3>
+                            <p class="text-xs text-gray-400">${workout.volume || 0} kg complessivi</p>
+                        </div>
+                        <i data-lucide="chevron-right"></i>
+                    </div>
+                    ${workout.note ? `<p class="mt-2 text-xs italic text-blue-400 border-t border-white/5 pt-2">"${workout.note}"</p>` : ''}
                 </div>`;
             lucide.createIcons();
         }
@@ -431,6 +470,7 @@
         }
 
         function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); renderCalendar(); }
+        
         let myChart = null;
         function showChart(id, name) {
             document.getElementById('chart-modal').classList.remove('hidden');
