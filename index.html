@@ -25,7 +25,7 @@
         .sheet-content { background: #1C1C1E; width: 100%; border-top-left-radius: 32px; border-top-right-radius: 32px; padding: 24px; max-height: 85vh; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.1); }
         input[type="number"], textarea { background: #2C2C2E; border: none; border-radius: 12px; color: white; padding: 12px; text-align: center; font-size: 18px; font-weight: 700; width: 100%; }
         textarea { text-align: left; font-size: 14px; font-weight: 400; resize: none; }
-        .img-box { background: #2C2C2E; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .img-box { background: #2C2C2E; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 56px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -42,7 +42,7 @@
             </header>
 
             <section class="mb-10">
-                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Andamento</h2>
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1 text-center">Andamento</h2>
                 <div class="flex overflow-x-auto gap-3 no-scrollbar -mx-6 px-6">
                     <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase text-center mb-2">Volume Sessione</p><div class="h-14"><canvas id="chart-volume"></canvas></div></div>
                     <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase text-center mb-2">Panca Piana</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
@@ -56,9 +56,9 @@
         <!-- VISTA WORKOUT -->
         <div id="view-workout" class="view hidden pb-32">
             <header class="p-6 glass pt-12 flex justify-between items-center sticky top-0 z-50">
-                <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm"><i data-lucide="chevron-left" class="w-5 h-5"></i> Esci</button>
+                <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm transition-all active:scale-90"><i data-lucide="chevron-left" class="w-5 h-5"></i> Esci</button>
                 <h2 id="workout-title-text" class="font-bold text-sm uppercase tracking-widest text-white">Allenamento</h2>
-                <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-2 rounded-full shadow-lg">CONCLUDI</button>
+                <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-2 rounded-full shadow-lg active:scale-90 transition-all">CONCLUDI</button>
             </header>
             <main id="exercise-list" class="p-4 space-y-8 mt-4 animate-slide"></main>
             <div id="notes-area" class="p-4 pt-0">
@@ -118,10 +118,10 @@
         </div>
 
         <!-- NAVBAR -->
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-8 py-4 flex justify-around items-center z-50 pb-safe">
-            <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold">Home</span></button>
-            <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold">Diario</span></button>
-            <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="settings" class="w-6 h-6"></i><span class="text-[10px] font-bold">Opzioni</span></button>
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
+            <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Home</span></button>
+            <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Diario</span></button>
+            <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="settings" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Opzioni</span></button>
         </nav>
     </div>
 
@@ -288,17 +288,21 @@
                 .filter(([id, data]) => data.category === category && id !== currentExId)
                 .map(([id, data]) => ({ id, ...data }));
             
-            list.innerHTML = alternatives.map(ex => `
-                <div onclick="swapExercise('${ex.id}')" class="apple-card p-4 flex items-center gap-4 border border-white/5 active:bg-blue-500/20 cursor-pointer transition-all">
-                    <div class="w-14 h-14 rounded-xl overflow-hidden img-box flex-shrink-0">
-                        <img src="${ex.img}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i data-lucide=\'dumbbell\' class=\'w-6 h-6 text-gray-600\'></i>'; lucide.createIcons();">
-                    </div>
-                    <div class="flex-1 text-left">
-                        <h4 class="font-bold text-sm text-white">${ex.name}</h4>
-                        <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">${ex.sets} • ${ex.target}</p>
-                    </div>
-                    <i data-lucide="refresh-cw" class="text-blue-500 w-5 h-5"></i>
-                </div>`).join('') + `<p class="text-center text-[10px] text-gray-700 uppercase py-6 tracking-widest">Fine delle alternative per ${category}</p>`;
+            if (alternatives.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-gray-500">Nessuna alternativa trovata per ${category}.</div>`;
+            } else {
+                list.innerHTML = alternatives.map(ex => `
+                    <div onclick="swapExercise('${ex.id}')" class="apple-card p-4 flex items-center gap-4 border border-white/5 active:bg-blue-500/20 cursor-pointer transition-all">
+                        <div class="w-14 h-14 rounded-xl overflow-hidden img-box flex-shrink-0">
+                            <img src="${ex.img}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i data-lucide=\'dumbbell\' class=\'w-6 h-6 text-gray-600\'></i>'; lucide.createIcons();">
+                        </div>
+                        <div class="flex-1 text-left">
+                            <h4 class="font-bold text-sm text-white">${ex.name}</h4>
+                            <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">${ex.sets} • ${ex.target}</p>
+                        </div>
+                        <i data-lucide="refresh-cw" class="text-blue-500 w-5 h-5"></i>
+                    </div>`).join('') + `<p class="text-center text-[10px] text-gray-700 uppercase py-6 tracking-widest">Fine delle alternative per ${category}</p>`;
+            }
             
             document.getElementById('modal-library').style.display = 'flex';
             lucide.createIcons();
