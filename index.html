@@ -78,7 +78,7 @@
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-orange-500 font-black text-[10px] uppercase mb-1">Giorno 4</p>
-                        <h3 class="font-extrabold text-2xl text-white">UPPER</h3>
+                        <h3 class="font-extrabold text-2xl text-white">IPERTROFIA</h3>
                     </div>
                 </div>
             </section>
@@ -132,6 +132,7 @@
     </div>
 
     <script>
+        // --- DATABASE ---
         const groups = {
             petto: ['panca_piana', 'spinte_inc', 'chest_press', 'pectoral', 'crossover'],
             dorso: ['trazioni', 'tbar_row', 'lat_neutra', 'lat_iper', 'lat_larga', 'rematore_manubrio'],
@@ -141,10 +142,10 @@
 
         const workoutPlan = {
             1: { title: 'PUSH', color: '#007AFF', items: [
-                { id: 'panca_piana', name: 'Panca Piana (Bilanciere)', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', note: '8 reps prima di passare a 35kg.', alts: [{ id: 'chest_press_g1', name: 'Chest Press', target: '35kg', rest: 180, img: 'img/chest_press_g1.png' }]},
-                { id: 'lento_avanti', name: 'Lento Avanti (Bilanciere)', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', alts: [{id:'lento_manubri', name:'Lento Manubri', target:'12kg', rest:120, img:'img/lento_manubri.png'},{id:'arnold_press', name:'Arnold Press', target:'10kg', rest:120, img:'img/arnold_press.png'}]},
+                { id: 'panca_piana', name: 'Panca Piana (Bilanciere)', sets: '5x5-8', target: '32.5kg', rest: 120, img: 'img/panca_piana.png', note: '8 reps prima di passare a 35kg.', alts: [{ id: 'chest_press_g1', name: 'Chest Press', target: '35kg', rest: 120, img: 'img/chest_press_g1.png' }]},
+                { id: 'lento_avanti', name: 'Lento Avanti (Bilanciere)', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', alts: [{id:'lento_manubri', name:'Lento Manubri', target:'12kg', rest:120, img:'img/lento_manubri.png'},{id:'arnold_press', name:'Arnold Press', target:'10kg', rest:120, img:'img/arnold_press.png'},{id:'landmine_press', name:'Landmine Press', target:'15kg', rest:120, img:'img/landmine_press.png'},{id:'tirate_larga', name:'Tirate al Mento Larga', target:'20kg', rest:120, img:'img/tirate_larga.png'}]},
                 { id: 'spinte_inc', name: 'Spinte Inc. 30° Manubri', sets: '4x8-10', target: '26kg', rest: 90, img: 'img/spinte_inc.png' },
-                { id: 'alzate_lat', name: 'Alzate Laterali in Piedi', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.png', alts: [{id:'alzate_cavi_dietro', name:'Alzate Cavi Dietro', target:'7.5kg', rest:75, img:'img/alzate_cavi_dietro.png'}]},
+                { id: 'alzate_lat', name: 'Alzate Laterali in Piedi', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.png', alts: [{id:'alzate_inclinata', name:'Alzate Inclinata', target:'6kg', rest:75, img:'img/alzate_inclinata.png'}, {id:'alzate_cavi_dietro', name:'Alzate Cavi Dietro', target:'7.5kg', rest:75, img:'img/alzate_cavi_dietro.png'}, {id:'alzate_lean_away', name:'Alzate Lean-Away', target:'8kg', rest:75, img:'img/alzate_lean_away.png'}, {id:'alzate_seduto', name:'Alzate Laterali Seduto', target:'8kg', rest:75, img:'img/alzate_seduto.png'}]},
                 { id: 'skullcrusher', name: 'Skullcrusher Manubri', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png' },
                 { id: 'pushdown', name: 'Push Down Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png' }
             ]},
@@ -164,7 +165,7 @@
                 { id: 'polpacci', name: 'Calf Raise Pressa', sets: '4x15-20', target: '70kg', rest: 60, img: 'img/polpacci.png' },
                 { id: 'hanging_leg', name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', rest: 60, img: 'img/hanging_leg.png' }
             ]},
-            4: { title: 'UPPER', color: '#FF9500', items: [
+            4: { title: 'IPERTROFIA', color: '#FF9500', items: [
                 { id: 'chest_press', name: 'Chest Press Bassa', sets: '4x12-15', target: '35kg', rest: 75, img: 'img/chest_press.png' },
                 { id: 'pectoral', name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', rest: 75, img: 'img/pectoral.png' },
                 { id: 'lat_neutra', name: 'Lat Machine Neutra', sets: '4x12-15', target: '45kg', rest: 75, img: 'img/lat_neutra.png', alts: [{id:'lat_larga', name:'Lat Machine Larga', target:'40kg', rest:75, img:'img/lat_larga.png'}]},
@@ -178,11 +179,17 @@
             ]}
         };
 
+        // --- STATO ---
         let currentWorkoutId = null;
-        let activeVariants = {};
-        let currentSessionData = {}; 
         let calendarDate = new Date();
+        
+        // Memoria varianti (caricata da storage)
+        let activeVariants = JSON.parse(localStorage.getItem('persistent_variants')) || {};
+        
+        // Sessione corrente (caricata da storage per evitare perdite accidentali)
+        let currentSessionData = JSON.parse(localStorage.getItem('active_session_buffer')) || {};
 
+        // --- STORAGE UTILS ---
         const getHistory = (id) => JSON.parse(localStorage.getItem(`h_${id}`)) || [];
         const getJournal = () => JSON.parse(localStorage.getItem('workout_journal')) || {};
 
@@ -192,10 +199,14 @@
             const h = getHistory(exId);
             const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'});
             
+            // Salva nello storico globale
             h.push({ d: todayStr, w: val });
             localStorage.setItem(`h_${exId}`, JSON.stringify(h.slice(-15)));
             
+            // Aggiorna sessione attiva e buffer
             currentSessionData[exId] = val;
+            localStorage.setItem('active_session_buffer', JSON.stringify(currentSessionData));
+            
             renderWorkout(currentWorkoutId);
             renderDashboardCharts();
         }
@@ -206,6 +217,7 @@
                 h.pop();
                 localStorage.setItem(`h_${exId}`, JSON.stringify(h));
                 delete currentSessionData[exId];
+                localStorage.setItem('active_session_buffer', JSON.stringify(currentSessionData));
                 renderWorkout(currentWorkoutId);
                 renderDashboardCharts();
             }
@@ -221,11 +233,16 @@
                 exercises: { ...currentSessionData }
             };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
+            
+            // Pulisci buffer sessione
+            currentSessionData = {};
+            localStorage.removeItem('active_session_buffer');
+            
             goHome();
         }
 
+        // --- INTERFACCIA ---
         function goHome() {
-            currentSessionData = {};
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-home').classList.remove('hidden');
             updateNav('home');
@@ -254,6 +271,12 @@
             document.getElementById('nav-calendar').classList.toggle('text-gray-500', active !== 'calendar');
         }
 
+        function toggleVariant(id, len) {
+            activeVariants[id] = ((activeVariants[id] || 0) + 1) % (len + 1);
+            localStorage.setItem('persistent_variants', JSON.stringify(activeVariants));
+            renderWorkout(currentWorkoutId);
+        }
+
         function renderWorkout(id, isHistory = false, historyData = null) {
             const container = document.getElementById('exercise-list');
             const items = workoutPlan[id].items;
@@ -270,7 +293,7 @@
 
                 return `
                 <div class="apple-card overflow-hidden animate-slide">
-                    <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=500&q=60'">
+                    <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.src=''">
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex-1 pr-2">
@@ -290,12 +313,12 @@
                                 <div class="flex-1">
                                     <label class="text-[9px] font-bold text-gray-500 block mb-2 uppercase">Peso Odierno</label>
                                     <div class="flex gap-2">
-                                        <input type="number" id="in-${cId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}" 
-                                               oninput="const b = document.getElementById('ok-${cId}'); if(this.value.trim()){b.removeAttribute('disabled'); b.classList.remove('opacity-50')}else{b.setAttribute('disabled','true'); b.classList.add('opacity-50')}">
-                                        <button id="ok-${cId}" ${todayVal?'':'disabled'} onclick="saveWeight('${cId}', document.getElementById('in-${cId}').value)" class="btn-primary px-4 text-xs text-white ${todayVal?'':'opacity-50'}">OK</button>
+                                        <input type="number" id="in-${cId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}" class="w-full bg-[#2C2C2E] border-none rounded-xl text-center text-white font-bold p-2">
+                                        <button id="ok-${cId}" onclick="saveWeight('${cId}', document.getElementById('in-${cId}').value)" class="btn-primary px-4 text-xs text-white">OK</button>
+                                        ${todayVal ? `
                                         <button onclick="undoLastWeight('${cId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl flex items-center justify-center transition-all active:scale-95">
                                             <i data-lucide="undo" class="w-4 h-4"></i>
-                                        </button>
+                                        </button>` : ''}
                                     </div>
                                 </div>
                                 <div class="w-[1px] h-10 bg-white/10"></div>
@@ -305,18 +328,14 @@
                                 </div>
                             </div>
                         `}
-                        <p class="mt-4 text-[10px] text-gray-500 italic">"${current.note || ex.note || ''}"</p>
+                        <p class="mt-4 text-[10px] text-gray-400 italic">"${current.note || ex.note || ''}"</p>
                     </div>
                 </div>`;
             }).join('');
             lucide.createIcons();
         }
 
-        function toggleVariant(id, len) {
-            activeVariants[id] = ((activeVariants[id] || 0) + 1) % (len + 1);
-            renderWorkout(currentWorkoutId);
-        }
-
+        // --- CALENDARIO ---
         function renderCalendar() {
             const container = document.getElementById('calendar-days');
             const monthLabel = document.getElementById('calendar-month');
@@ -381,6 +400,7 @@
             renderWorkout(workoutId, true, workoutData.exercises);
         }
 
+        // --- GRAFICI ---
         let myChart = null;
         function showChart(id, name) {
             document.getElementById('chart-modal').classList.remove('hidden');
