@@ -14,6 +14,7 @@
         .glass { background: rgba(28, 28, 30, 0.7); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); }
         .apple-card { background-color: var(--apple-card); border-radius: 24px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
         .btn-primary { background-color: var(--apple-blue); border-radius: 14px; font-weight: 600; }
+        .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
         .btn-variant { background-color: var(--apple-blue); border-radius: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; color: #ffffff; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-size: 13px; font-weight: 600; position: relative; }
@@ -27,6 +28,7 @@
 <body class="pt-safe">
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden">
         
+        <!-- VISTA HOME -->
         <div id="view-home" class="view p-6 pb-32 animate-slide">
             <header class="flex justify-between items-end mb-8">
                 <div>
@@ -82,11 +84,12 @@
             </section>
         </div>
 
+        <!-- VISTA CALENDARIO -->
         <div id="view-calendar" class="view hidden p-6 pb-32 animate-slide">
             <h1 class="text-3xl font-extrabold tracking-tight text-white mb-8">Calendario</h1>
             <div class="apple-card p-5 mb-8">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 id="calendar-month" class="font-bold text-lg">Mese Anno</h3>
+                    <h3 id="calendar-month" class="font-bold text-lg text-white">Mese Anno</h3>
                     <div class="flex gap-4">
                         <button onclick="changeMonth(-1)" class="text-blue-500"><i data-lucide="chevron-left"></i></button>
                         <button onclick="changeMonth(1)" class="text-blue-500"><i data-lucide="chevron-right"></i></button>
@@ -102,6 +105,7 @@
             </div>
         </div>
 
+        <!-- VISTA WORKOUT -->
         <div id="view-workout" class="view hidden pb-32">
             <header class="p-6 sticky top-0 z-50 glass border-b border-white/5 pt-12 flex justify-between items-center">
                 <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm"><i data-lucide="chevron-left" class="w-5 h-5"></i> Esci</button>
@@ -111,12 +115,14 @@
             <main id="exercise-list" class="p-4 space-y-8 mt-4 animate-slide"></main>
         </div>
 
+        <!-- NAVBAR -->
         <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
             <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Home</span></button>
             <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Diario</span></button>
         </nav>
     </div>
 
+    <!-- MODAL GRAFICI -->
     <div id="chart-modal" class="fixed inset-0 bg-black z-[100] hidden flex flex-col p-6 animate-slide">
         <div class="flex justify-between items-center mb-8 pt-12">
             <h3 id="chart-title" class="text-2xl font-bold">Andamento</h3>
@@ -126,7 +132,13 @@
     </div>
 
     <script>
-        // --- DATABASE & STATO ---
+        const groups = {
+            petto: ['panca_piana', 'spinte_inc', 'chest_press', 'pectoral', 'crossover'],
+            dorso: ['trazioni', 'tbar_row', 'lat_neutra', 'lat_iper', 'lat_larga', 'rematore_manubrio'],
+            gambe: ['hack_squat', 'hip_thrust', 'leg_press', 'leg_ext', 'polpacci', 'belt_squat'],
+            braccia: ['skullcrusher', 'pushdown', 'curl_ez', 'hammer_curl', 'curl_alt', 'pushdown_corda', 'curl_cavi', 'estensioni_testa', 'curl_concentrazione']
+        };
+
         const workoutPlan = {
             1: { title: 'PUSH', color: '#007AFF', items: [
                 { id: 'panca_piana', name: 'Panca Piana (Bilanciere)', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', note: '8 reps prima di passare a 35kg.', alts: [{ id: 'chest_press_g1', name: 'Chest Press', target: '35kg', rest: 180, img: 'img/chest_press_g1.png' }]},
@@ -168,23 +180,24 @@
 
         let currentWorkoutId = null;
         let activeVariants = {};
-        let currentSessionData = {}; // Salva pesi inseriti oggi prima della chiusura
+        let currentSessionData = {}; 
         let calendarDate = new Date();
 
-        // --- STORAGE ---
         const getHistory = (id) => JSON.parse(localStorage.getItem(`h_${id}`)) || [];
         const getJournal = () => JSON.parse(localStorage.getItem('workout_journal')) || {};
 
         function saveWeight(exId, weight) {
-            if (!weight || isNaN(weight)) return;
+            if (!weight || weight.trim() === "" || isNaN(weight)) return;
             const val = parseFloat(weight);
-            // 1. Salva nello storico globale (per i grafici)
             const h = getHistory(exId);
-            h.push({ d: new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}), w: val });
+            const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'});
+            
+            h.push({ d: todayStr, w: val });
             localStorage.setItem(`h_${exId}`, JSON.stringify(h.slice(-15)));
-            // 2. Salva nella sessione attiva (per il calendario)
+            
             currentSessionData[exId] = val;
             renderWorkout(currentWorkoutId);
+            renderDashboardCharts();
         }
 
         function undoLastWeight(exId) {
@@ -194,14 +207,12 @@
                 localStorage.setItem(`h_${exId}`, JSON.stringify(h));
                 delete currentSessionData[exId];
                 renderWorkout(currentWorkoutId);
+                renderDashboardCharts();
             }
         }
 
         function finishWorkout() {
-            if (Object.keys(currentSessionData).length === 0) {
-                alert("Inserisci almeno un peso prima di concludere!");
-                return;
-            }
+            if (Object.keys(currentSessionData).length === 0) return;
             const journal = getJournal();
             const today = new Date().toISOString().split('T')[0];
             journal[today] = {
@@ -210,11 +221,9 @@
                 exercises: { ...currentSessionData }
             };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
-            alert("Allenamento salvato nel diario!");
             goHome();
         }
 
-        // --- INTERFACCIA ---
         function goHome() {
             currentSessionData = {};
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
@@ -239,8 +248,10 @@
         }
 
         function updateNav(active) {
-            document.getElementById('nav-home').classList.replace(active==='home'?'text-gray-500':'text-blue-500', active==='home'?'text-blue-500':'text-gray-500');
-            document.getElementById('nav-calendar').classList.replace(active==='calendar'?'text-gray-500':'text-blue-500', active==='calendar'?'text-blue-500':'text-gray-500');
+            document.getElementById('nav-home').classList.toggle('text-blue-500', active === 'home');
+            document.getElementById('nav-home').classList.toggle('text-gray-500', active !== 'home');
+            document.getElementById('nav-calendar').classList.toggle('text-blue-500', active === 'calendar');
+            document.getElementById('nav-calendar').classList.toggle('text-gray-500', active !== 'calendar');
         }
 
         function renderWorkout(id, isHistory = false, historyData = null) {
@@ -280,15 +291,21 @@
                                     <label class="text-[9px] font-bold text-gray-500 block mb-2 uppercase">Peso Odierno</label>
                                     <div class="flex gap-2">
                                         <input type="number" id="in-${cId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}" 
-                                               oninput="const b = document.getElementById('ok-${cId}'); if(this.value){b.removeAttribute('disabled'); b.classList.remove('opacity-50')}else{b.setAttribute('disabled','true'); b.classList.add('opacity-50')}">
+                                               oninput="const b = document.getElementById('ok-${cId}'); if(this.value.trim()){b.removeAttribute('disabled'); b.classList.remove('opacity-50')}else{b.setAttribute('disabled','true'); b.classList.add('opacity-50')}">
                                         <button id="ok-${cId}" ${todayVal?'':'disabled'} onclick="saveWeight('${cId}', document.getElementById('in-${cId}').value)" class="btn-primary px-4 text-xs text-white ${todayVal?'':'opacity-50'}">OK</button>
-                                        ${todayVal ? `<button onclick="undoLastWeight('${cId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl"><i data-lucide="undo" class="w-4 h-4"></i></button>` : ''}
+                                        <button onclick="undoLastWeight('${cId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl flex items-center justify-center transition-all active:scale-95">
+                                            <i data-lucide="undo" class="w-4 h-4"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="w-[1px] h-10 bg-white/10"></div>
-                                <div class="text-center px-2"><label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Ultimo</label><span class="text-xl font-black italic text-white">${last}</span></div>
+                                <div class="text-center px-2 cursor-pointer" onclick="showChart('${cId}', '${current.name.replace(/'/g, "\\'")}')">
+                                    <label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Ultimo</label>
+                                    <span class="text-xl font-black italic text-white underline decoration-blue-500/30">${last}</span>
+                                </div>
                             </div>
                         `}
+                        <p class="mt-4 text-[10px] text-gray-500 italic">"${current.note || ex.note || ''}"</p>
                     </div>
                 </div>`;
             }).join('');
@@ -300,7 +317,6 @@
             renderWorkout(currentWorkoutId);
         }
 
-        // --- CALENDARIO LOGICA ---
         function renderCalendar() {
             const container = document.getElementById('calendar-days');
             const monthLabel = document.getElementById('calendar-month');
@@ -323,7 +339,7 @@
                 const isToday = new Date().toISOString().split('T')[0] === dateKey;
                 
                 container.innerHTML += `
-                    <div onclick="selectDate('${dateKey}')" class="calendar-day ${isToday ? 'bg-blue-500 text-white' : 'text-white hover:bg-white/10'} cursor-pointer">
+                    <div onclick="selectDate('${dateKey}')" class="calendar-day ${isToday ? 'bg-blue-500 text-white shadow-lg' : 'text-white hover:bg-white/10'} cursor-pointer">
                         ${d}
                         ${workout ? `<div class="day-workout-dot" style="background-color: ${workoutPlan[workout.id].color}"></div>` : ''}
                     </div>`;
@@ -350,7 +366,7 @@
                     <div>
                         <p class="text-[10px] font-bold text-gray-500 uppercase">${new Date(key).toLocaleDateString('it-IT', {weekday:'long'})}</p>
                         <h3 class="text-xl font-black">${workout.title}</h3>
-                        <p class="text-xs text-gray-400">${Object.keys(workout.exercises).length} esercizi completati</p>
+                        <p class="text-xs text-gray-400">${Object.keys(workout.exercises).length} pesi registrati</p>
                     </div>
                     <i data-lucide="chevron-right" class="text-gray-600"></i>
                 </div>`;
@@ -365,14 +381,53 @@
             renderWorkout(workoutId, true, workoutData.exercises);
         }
 
-        // --- GRAFICI ---
+        let myChart = null;
+        function showChart(id, name) {
+            document.getElementById('chart-modal').classList.remove('hidden');
+            document.getElementById('chart-title').innerText = name;
+            const h = getHistory(id);
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: h.map(i => i.d),
+                    datasets: [{
+                        data: h.map(i => i.w),
+                        spanGaps: true,
+                        borderColor: '#007AFF',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#007AFF',
+                        pointRadius: 6,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } },
+                        x: { grid: { display: false }, ticks: { color: '#8E8E93' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function closeChart() { document.getElementById('chart-modal').classList.add('hidden'); }
+
+        let homeCharts = {};
         function renderDashboardCharts() {
+            Object.values(homeCharts).forEach(c => c.destroy());
             ['petto', 'dorso', 'gambe', 'braccia'].forEach(g => {
-                const ctx = document.getElementById(`chart-${g}`).getContext('2d');
                 const h = getHistory(groups[g][0]);
                 const data = h.length > 0 ? h.map(i => i.w) : [0,0,0,0,0];
-                new Chart(ctx, {
-                    type: 'line', data: { labels: data.map((_, i) => i), datasets: [{ data, spanGaps: true, borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
+                const ctx = document.getElementById(`chart-${g}`).getContext('2d');
+                homeCharts[g] = new Chart(ctx, {
+                    type: 'line', 
+                    data: { labels: data.map((_, i) => i), datasets: [{ data, spanGaps: true, borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
                     options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } }
                 });
             });
