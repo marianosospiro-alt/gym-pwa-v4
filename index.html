@@ -2,43 +2,583 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scheda palestra v4</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2ecc71">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PowerLog Pro AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --primary: #2ecc71; --dark: #121212; --card: #1e1e1e; --text: #ffffff; }
-        body { font-family: -apple-system, sans-serif; background: var(--dark); color: var(--text); margin: 0; padding: 15px; }
-        h1 { color: var(--primary); text-align: center; font-size: 1.4rem; margin-bottom: 20px; }
-       .day-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
-       .day-btn { background: var(--card); border: 2px solid transparent; color: #888; padding: 12px 20px; border-radius: 25px; cursor: pointer; white-space: nowrap; font-weight: bold; }
-       .day-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-       .ex-card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--primary); }
-       .ex-title { font-weight: bold; font-size: 1.1rem; display: block; margin-bottom: 5px; }
-       .ex-info { font-size: 0.85rem; color: #aaa; line-height: 1.3; margin-bottom: 10px; }
-       .inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        input { background: #2d2d2d; border: 1px solid #444; color: white; padding: 12px; border-radius: 8px; font-size: 1rem; width: 85%; }
-       .save-btn { background: var(--primary); color: white; border: none; padding: 20px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.1rem; margin-top: 20px; cursor: pointer; }
-        #chartBox { background: #fff; border-radius: 15px; padding: 10px; margin-top: 30px; display: none; height: 300px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --apple-blue: #007AFF;
+            --apple-bg: #000000;
+            --apple-card: #1C1C1E;
+            --apple-gray: #8E8E93;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: var(--apple-bg); 
+            color: white; 
+            -webkit-font-smoothing: antialiased;
+            overscroll-behavior: none;
+        }
+
+        .glass {
+            background: rgba(28, 28, 30, 0.7);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+        }
+
+        .apple-card {
+            background-color: var(--apple-card);
+            border-radius: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .apple-card:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--apple-blue);
+            border-radius: 14px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .nav-active { color: var(--apple-blue); }
+
+        ::-webkit-scrollbar { display: none; }
+        
+        .animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
+        .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .horizontal-scroll-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 12px;
+            scroll-snap-type: x mandatory;
+            margin: 0 -24px;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        .horizontal-scroll-container > div {
+            flex: 0 0 140px;
+            scroll-snap-align: start;
+        }
+
+        .mini-chart-container { height: 60px; width: 100%; }
+
+        .image-container {
+            position: relative;
+            height: 180px;
+            width: 100%;
+            background-color: #121214;
+        }
+
+        .badge-type {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        input[type="number"] {
+            background: #2C2C2E;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            width: 100%;
+        }
+
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .pt-safe { padding-top: env(safe-area-inset-top); }
     </style>
 </head>
-<body>
-    <h1>STRATEGIA V4 PRO</h1>
-    <div class="day-nav">
-        <button class="day-btn active" onclick="loadDay(1)">1: PUSH</button>
-        <button class="day-btn" onclick="loadDay(2)">2: PULL</button>
-        <button class="day-btn" onclick="loadDay(3)">3: LEGS</button>
-        <button class="day-btn" onclick="loadDay(4)">4: UPPER</button>
+<body class="pt-safe">
+    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden">
+        
+        <!-- Vista HOME -->
+        <div id="view-home" class="view p-6 pb-32 animate-slide-in">
+            <header class="flex justify-between items-end mb-8">
+                <div>
+                    <p id="date-label" class="text-blue-500 font-bold text-xs uppercase tracking-widest mb-1"></p>
+                    <h1 class="text-3xl font-extrabold tracking-tight">Riepilogo</h1>
+                </div>
+                <div class="bg-blue-600/10 p-2 rounded-full border border-blue-600/20">
+                    <i data-lucide="user" class="w-6 h-6 text-blue-500"></i>
+                </div>
+            </header>
+
+            <!-- Dashboard Grafici -->
+            <section class="mb-10">
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Andamento Distretti</h2>
+                <div class="horizontal-scroll-container no-scrollbar">
+                    <div class="apple-card p-4">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">Petto</p>
+                        <div class="mini-chart-container"><canvas id="chart-petto"></canvas></div>
+                    </div>
+                    <div class="apple-card p-4">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">Dorso</p>
+                        <div class="mini-chart-container"><canvas id="chart-dorso"></canvas></div>
+                    </div>
+                    <div class="apple-card p-4">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">Gambe</p>
+                        <div class="mini-chart-container"><canvas id="chart-gambe"></canvas></div>
+                    </div>
+                    <div class="apple-card p-4">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">Braccia</p>
+                        <div class="mini-chart-container"><canvas id="chart-braccia"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Programma Settimanale -->
+            <section>
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">I tuoi Allenamenti</h2>
+                <div class="space-y-4">
+                    <div onclick="openWorkout(1)" class="apple-card p-5 flex items-center justify-between cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-blue-600/20 rounded-2xl flex items-center justify-center">
+                                <i data-lucide="zap" class="text-blue-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold">Giorno 1: PUSH</h3>
+                                <p class="text-xs text-gray-500 font-medium">Petto, Spalle, Tricipiti</p>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="text-gray-600"></i>
+                    </div>
+                    <div onclick="openWorkout(2)" class="apple-card p-5 flex items-center justify-between cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-purple-600/20 rounded-2xl flex items-center justify-center">
+                                <i data-lucide="arrow-down" class="text-purple-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold">Giorno 2: PULL</h3>
+                                <p class="text-xs text-gray-500 font-medium">Dorso, Bicipiti, Addome</p>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="text-gray-600"></i>
+                    </div>
+                    <div onclick="openWorkout(3)" class="apple-card p-5 flex items-center justify-between cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-green-600/20 rounded-2xl flex items-center justify-center">
+                                <i data-lucide="activity" class="text-green-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold">Giorno 3: LEGS</h3>
+                                <p class="text-xs text-gray-500 font-medium">Gambe, Glutei, Addome</p>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="text-gray-600"></i>
+                    </div>
+                    <div onclick="openWorkout(4)" class="apple-card p-5 flex items-center justify-between cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-orange-600/20 rounded-2xl flex items-center justify-center">
+                                <i data-lucide="target" class="text-orange-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold">Giorno 4: UPPER</h3>
+                                <p class="text-xs text-gray-500 font-medium">Ipertrofia Pettorali e Spalle</p>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="text-gray-600"></i>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Vista WORKOUT -->
+        <div id="view-workout" class="view hidden pb-32">
+            <header class="p-6 sticky top-0 z-50 glass border-b border-white/5 pt-12">
+                <div class="flex items-center justify-between">
+                    <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i> Indietro
+                    </button>
+                    <h2 id="workout-title" class="font-bold text-center">Allenamento</h2>
+                    <div class="w-12"></div>
+                </div>
+            </header>
+            <main id="exercise-list" class="p-4 space-y-8 mt-4 animate-slide-in">
+                <!-- Esercizi iniettati qui -->
+            </main>
+        </div>
+
+        <!-- Barra Navigazione Inferiore -->
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-8 py-4 flex justify-around items-center z-50 pb-safe">
+            <button onclick="goHome()" class="flex flex-col items-center gap-1 nav-active">
+                <i data-lucide="layout-grid" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">Home</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-500 opacity-30">
+                <i data-lucide="history" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">Crono</span>
+            </button>
+        </nav>
     </div>
-    <div id="workoutArea"></div>
-    <button class="save-btn" onclick="saveData()">SALVA SESSIONE</button>
-    <div id="chartBox"><canvas id="progressChart"></canvas></div>
-    <script src="app.js"></script>
+
+    <!-- Chart Modal -->
+    <div id="chart-modal" class="fixed inset-0 bg-black z-[100] hidden flex flex-col p-6 animate-fadeIn">
+        <div class="flex justify-between items-center mb-8 pt-12">
+            <div>
+                <h3 id="chart-title" class="text-2xl font-bold italic">Andamento</h3>
+                <p class="text-gray-400 text-sm">Carico massimo sollevato</p>
+            </div>
+            <button onclick="closeChart()" class="bg-white/10 p-2 rounded-full">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div class="flex-1 bg-white/5 rounded-3xl p-4 border border-white/5">
+            <canvas id="progressChart"></canvas>
+        </div>
+    </div>
+
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
+        // Database locale per salvare le immagini AI generate
+        const dbName = "PowerLogAI";
+        let db;
+        
+        const initDB = () => new Promise((resolve, reject) => {
+            const req = indexedDB.open(dbName, 1);
+            req.onupgradeneeded = (e) => {
+                e.target.result.createObjectStore("images");
+            };
+            req.onsuccess = (e) => { db = e.target.result; resolve(); };
+            req.onerror = (e) => reject(e);
+        });
+
+        const saveImage = (id, data) => new Promise((resolve) => {
+            const tx = db.transaction("images", "readwrite");
+            tx.objectStore("images").put(data, id);
+            tx.oncomplete = () => resolve();
+        });
+
+        const getImage = (id) => new Promise((resolve) => {
+            const tx = db.transaction("images", "readonly");
+            const req = tx.objectStore("images").get(id);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+        });
+
+        // Configurazione Esercizi con Prompt IA specifici
+        const groups = {
+            petto: ['panca_piana', 'spinte_inc', 'chest_press', 'pectoral', 'crossover'],
+            dorso: ['trazioni', 'tbar_row', 'lat_neutra', 'lat_iper'],
+            gambe: ['hack_squat', 'hip_thrust', 'leg_press', 'leg_ext', 'polpacci'],
+            braccia: ['skullcrusher', 'pushdown', 'curl_ez', 'hammer_curl', 'curl_alt']
+        };
+
+        const workoutPlan = {
+            1: { title: 'PUSH (G1)', items: [
+                { id: 'panca_piana', type: 'Forza', name: 'Panca Piana', sets: '5x5-8', target: '32.5/35kg', note: 'Progressione Doppia: 8 reps prima di passare a 35kg.',
+                  prompt: 'A muscular athlete performing a heavy barbell bench press, premium dark gym environment, neon blue lighting, cinematic photography, hyperrealistic' },
+                { id: 'lento_avanti', type: 'Forza', name: 'Lento Avanti', sets: '4x6-8', target: '22.5kg', note: 'Schiena dritta, core attivo.',
+                  prompt: 'A muscular athlete performing a standing barbell overhead press, premium dark gym environment, cinematic lighting' },
+                { id: 'spinte_inc', type: 'Ipertrofia', name: 'Spinte Panca Inclinata', sets: '4x8-10', target: '26kg', note: 'Manubri. Focus petto alto.',
+                  prompt: 'A muscular athlete performing an incline dumbbell chest press on a 30 degree bench, premium dark gym environment' },
+                { id: 'alzate_lat', type: 'Isolamento', name: 'Alzate Laterali', sets: '3x10-12', target: '10kg', note: 'Esecuzione pulita, niente slancio.',
+                  prompt: 'A muscular athlete performing standing dumbbell lateral raises, premium dark gym environment, focus on shoulder deltoids' },
+                { id: 'skullcrusher', type: 'Braccia', name: 'Skullcrusher', sets: '3x8-10', target: '14kg', note: 'Manubri. Gomiti fermi.',
+                  prompt: 'A muscular athlete performing lying triceps skullcrushers with an EZ curl bar, dark premium gym setting' },
+                { id: 'pushdown', type: 'Braccia', name: 'Pushdown Sbarra', sets: '3x10-12', target: '25kg', note: 'Contrazione di picco 1 sec.',
+                  prompt: 'A muscular athlete performing cable triceps pushdown with a straight bar, dark premium gym' }
+            ]},
+            2: { title: 'PULL (G2)', items: [
+                { id: 'trazioni', type: 'Forza', name: 'Trazioni Sbarra', sets: '5x6-8', target: 'Zavorra', note: 'Focus ampiezza dorsale.',
+                  prompt: 'A muscular athlete doing wide grip pull-ups on a bar, shot from behind showing wide lat muscles, dark premium gym' },
+                { id: 'tbar_row', type: 'Dorso', name: 'Rematore T-Bar', sets: '4x8-10', target: '30kg', note: 'Appoggio petto. Spremi le scapole.',
+                  prompt: 'A muscular athlete performing a chest-supported T-bar row in a premium dark gym, pulling the weight up, back muscles flexing' },
+                { id: 'curl_ez', type: 'Braccia', name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', note: 'Carico pesante, schiena ferma.',
+                  prompt: 'A muscular athlete performing standing bicep curls with an EZ bar, dark premium gym setting' },
+                { id: 'alzate_90', type: 'Spalle', name: 'Alzate a 90°', sets: '3x12-15', target: '8kg', note: 'Deltoidi posteriori.',
+                  prompt: 'A muscular athlete bent over performing reverse dumbbell flyes for rear delts, dark premium gym' },
+                { id: 'hammer_curl', type: 'Braccia', name: 'Hammer Curl', sets: '3x8-10', target: '14kg', note: 'Brachiale e avambraccio.',
+                  prompt: 'A muscular athlete performing hammer curls with heavy dumbbells, focus on biceps, dark premium gym' },
+                { id: 'russian_twist', type: 'Core', name: 'Russian Twist', sets: '3x15-20', target: '10kg', note: 'Addome: Obliqui.',
+                  prompt: 'A muscular athlete sitting on the floor performing a russian twist with a weight plate, dark premium gym' }
+            ]},
+            3: { title: 'LEGS (G3)', items: [
+                { id: 'hack_squat', type: 'Gambe', name: 'Hack Squat / Belt', sets: '4x10-12', target: '65kg', note: 'Massima profondità.',
+                  prompt: 'A muscular athlete performing hack squat on a machine, quadriceps flexing, heavy weight, dark premium gym' },
+                { id: 'hip_thrust', type: 'Glutei', name: 'Hip Thrust', sets: '4x10-12', target: '30kg', note: 'Contrazione di picco glutei.',
+                  prompt: 'A muscular athlete doing heavy barbell hip thrusts on a bench, dark premium gym, side profile' },
+                { id: 'leg_press', type: 'Gambe', name: 'Leg Press 45°', sets: '3x15-20', target: '120kg', note: 'Piedi bassi per quadricipiti.',
+                  prompt: 'A muscular athlete pushing heavy weight on a 45 degree leg press machine, premium dark gym' },
+                { id: 'leg_ext', type: 'Gambe', name: 'Leg Extension', sets: '3x15-20', target: '30kg', note: 'Sull\'ultima serie: Drop Set.',
+                  prompt: 'Close up of a muscular athlete using a leg extension machine, intense quadricep focus, dark gym' },
+                { id: 'polpacci', type: 'Gambe', name: 'Calf alla Pressa', sets: '4x15-20', target: '70kg', note: 'Pausa 2s in allungamento.',
+                  prompt: 'Close up of muscular calves doing calf raises on a leg press machine, dark gym setting' },
+                { id: 'hanging_leg', type: 'Core', name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', note: 'Addome basso.',
+                  prompt: 'A muscular athlete hanging from a pullup bar doing straight leg raises for abs, dark gym setting' }
+            ]},
+            4: { title: 'UPPER (G4)', items: [
+                { id: 'chest_press', type: 'Upper', name: 'Chest Press Bassa', sets: '4x12-15', target: '35kg', note: 'Sedile basso per colpire il petto alto.',
+                  prompt: 'A muscular athlete pushing the chest press machine handles, seated, dark premium gym' },
+                { id: 'pectoral', type: 'Upper', name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', note: 'Chiusura lenta, picco contrazione.',
+                  prompt: 'A muscular athlete using a peck deck fly machine, arms squeezing together in front of the chest, dark gym' },
+                { id: 'lat_neutra', type: 'Upper', name: 'Lat Machine Neutra', sets: '4x12-15', target: '45kg', note: 'Tira i gomiti verso le tasche.',
+                  prompt: 'A muscular athlete pulling down a lat pulldown bar with neutral grip, dark premium gym' },
+                { id: 'alzate_cavi', type: 'Upper', name: 'Alzate Laterali Cavi', sets: '4x15-20', target: '10kg', note: 'Cavo dietro la schiena.',
+                  prompt: 'A muscular athlete doing single arm standing cable lateral raises from a low pulley, squeezing shoulder, dark premium gym' },
+                { id: 'tirate_mento', type: 'Upper', name: 'Tirate al Mento', sets: '3x12-15', target: '20kg', note: 'Presa larga per deltoidi.',
+                  prompt: 'A muscular athlete performing upright rows with an EZ curl bar, dark premium gym' },
+                { id: 'crossover', type: 'Upper', name: 'Crossover Cavi', sets: '3x15-20', target: '15kg', note: 'Focus parte bassa petto.',
+                  prompt: 'A muscular athlete doing standing cable crossovers from high pulleys, squeezing chest, dark premium gym' }
+            ]}
+        };
+
+        // Generazione AI delle immagini tramite API integrata
+        async function handleGenerateImage(exId, promptText) {
+            const container = document.getElementById(`img-box-${exId}`);
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-blue-500 bg-gray-900 rounded-t-3xl">
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-center px-4">L'AI sta disegnando<br>l'esercizio...</span>
+                </div>
+            `;
+
+            const apiKey = "AIzaSyAdDBOKVmXOHEoQ-2LHslxGmti4C27mvTQ"; // La chiave viene iniettata dall'ambiente
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+            const payload = {
+                instances: { prompt: promptText + " - extremely realistic fitness photography, cinematic dramatic lighting, highly detailed" },
+                parameters: { sampleCount: 1 }
+            };
+
+            let retries = 5;
+            let delay = 1000;
+            let success = false;
+            let base64Image = null;
+
+            while(retries > 0 && !success) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('API Error');
+                    const result = await response.json();
+                    if(result.predictions && result.predictions[0]) {
+                         base64Image = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                         success = true;
+                    } else { throw new Error('No image'); }
+                } catch (e) {
+                    retries--;
+                    if(retries === 0) {
+                        container.innerHTML = `
+                            <div class="flex flex-col items-center justify-center h-full text-red-500 bg-gray-900 p-4 text-center cursor-pointer rounded-t-3xl" onclick="handleGenerateImage('${exId}', '${promptText}')">
+                                <i data-lucide="alert-triangle" class="w-6 h-6 mb-2"></i>
+                                <span class="text-[10px] font-bold uppercase">Errore di rete</span>
+                                <span class="text-[8px] text-gray-400 mt-1">Riprova (richiede l'esecuzione nella preview)</span>
+                            </div>
+                        `;
+                        lucide.createIcons();
+                        return;
+                    }
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+
+            if(success && base64Image) {
+                await saveImage(exId, base64Image);
+                container.innerHTML = `
+                    <img src="${base64Image}" class="w-full h-full object-cover opacity-90 animate-fadeIn rounded-t-3xl">
+                    <span class="badge-type text-blue-400 border border-blue-500/30">Generata AI</span>
+                `;
+            }
         }
+
+        function getHistory(exId) {
+            try { return JSON.parse(localStorage.getItem(`h_${exId}`)) || []; } catch(e) { return []; }
+        }
+
+        function saveWeight(exId, weight) {
+            const h = getHistory(exId);
+            const dateStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'});
+            h.push({ d: dateStr, w: parseFloat(weight) });
+            if (h.length > 10) h.shift();
+            localStorage.setItem(`h_${exId}`, JSON.stringify(h));
+            renderWorkout(window.currentWorkoutId);
+            renderDashboardCharts();
+        }
+
+        function openWorkout(id) {
+            window.currentWorkoutId = id;
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-workout').classList.remove('hidden');
+            document.getElementById('workout-title').innerText = workoutPlan[id].title;
+            renderWorkout(id);
+        }
+
+        function goHome() {
+            document.getElementById('view-workout').classList.add('hidden');
+            document.getElementById('view-home').classList.remove('hidden');
+            renderDashboardCharts();
+        }
+
+        async function renderWorkout(id) {
+            const container = document.getElementById('exercise-list');
+            const workout = workoutPlan[id];
+            
+            let html = '';
+            for (let i = 0; i < workout.items.length; i++) {
+                const ex = workout.items[i];
+                const history = getHistory(ex.id);
+                const last = history.length > 0 ? history[history.length - 1].w : '--';
+                
+                let imgContent = `
+                    <div class="flex flex-col items-center justify-center h-full cursor-pointer text-blue-500 hover:text-blue-400 bg-gray-900 transition rounded-t-3xl" onclick="handleGenerateImage('${ex.id}', '${ex.prompt}')">
+                        <i data-lucide="sparkles" class="w-8 h-8 mb-2"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-2 text-center">Tocca per generare<br>l'immagine con AI</span>
+                    </div>
+                `;
+
+                if(db) {
+                    const savedImg = await getImage(ex.id);
+                    if(savedImg) {
+                        imgContent = `<img src="${savedImg}" class="w-full h-full object-cover opacity-90 rounded-t-3xl">
+                                      <span class="badge-type">${ex.type}</span>`;
+                    }
+                }
+
+                html += `
+                    <div class="apple-card overflow-hidden animate-slide-in" style="animation-delay: ${i * 60}ms">
+                        <div class="image-container" id="img-box-${ex.id}">
+                            ${imgContent}
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="text-xl font-bold tracking-tight text-white">${ex.name}</h3>
+                                    <p class="text-xs font-semibold text-blue-500 uppercase tracking-widest mt-1">${ex.sets} • <span class="text-gray-500">Target ${ex.target}</span></p>
+                                </div>
+                                <button onclick="showChart('${ex.id}', '${ex.name}')" class="bg-white/5 p-2 rounded-full text-blue-500">
+                                    <i data-lucide="line-chart" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5">
+                                <div class="flex-1">
+                                    <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-2 px-1">PESO ODIERNO</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" id="in-${ex.id}" class="w-full h-10" placeholder="${last !== '--' ? last : '0'}">
+                                        <button onclick="handleSave('${ex.id}')" class="btn-primary px-5 text-xs text-white">OK</button>
+                                    </div>
+                                </div>
+                                <div class="w-[1px] h-10 bg-white/10"></div>
+                                <div class="text-center px-2">
+                                    <label class="text-[9px] font-black text-gray-500 uppercase tracking-widest block mb-1">ULTIMO</label>
+                                    <span class="text-xl font-black italic text-white">${last} <small class="text-[10px] text-gray-500 font-bold">KG</small></span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-3 bg-white/5 rounded-xl border border-white/5 flex items-start gap-2">
+                                <i data-lucide="info" class="w-3.5 h-3.5 text-blue-500 mt-0.5"></i>
+                                <p class="text-[11px] text-gray-400 font-medium italic">"${ex.note}"</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        let myChart = null;
+        function showChart(id, name) {
+            const h = getHistory(id);
+            if (h.length < 1) return;
+            document.getElementById('chart-modal').classList.remove('hidden');
+            document.getElementById('chart-title').innerText = name;
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: h.map(i => i.d),
+                    datasets: [{
+                        data: h.map(i => i.w),
+                        borderColor: '#007AFF',
+                        borderWidth: 6,
+                        pointBackgroundColor: '#007AFF',
+                        pointBorderColor: '#000',
+                        pointBorderWidth: 4,
+                        pointRadius: 8,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: (c) => {
+                            const g = c.chart.ctx.createLinearGradient(0, 0, 0, 400);
+                            g.addColorStop(0, 'rgba(0, 122, 255, 0.5)');
+                            g.addColorStop(1, 'rgba(0, 122, 255, 0)');
+                            return g;
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function closeChart() { document.getElementById('chart-modal').classList.add('hidden'); }
+
+        function createMiniChart(id, muscleGroup) {
+            const ctx = document.getElementById(id).getContext('2d');
+            const mainEx = groups[muscleGroup][0]; 
+            const h = getHistory(mainEx);
+            let data = h.length > 0 ? h.map(i => i.w) : [0, 0, 0, 0, 0];
+            return new Chart(ctx, {
+                type: 'line',
+                data: { labels: data.map((_, i) => i), datasets: [{ data: data, borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: (c) => { const g = c.chart.ctx.createLinearGradient(0, 0, 0, 60); g.addColorStop(0, 'rgba(0, 122, 255, 0.2)'); g.addColorStop(1, 'rgba(0, 122, 255, 0)'); return g; } }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        let homeCharts = {};
+        function renderDashboardCharts() {
+            if (Object.keys(homeCharts).length > 0) { Object.values(homeCharts).forEach(c => c.destroy()); }
+            homeCharts.petto = createMiniChart('chart-petto', 'petto');
+            homeCharts.dorso = createMiniChart('chart-dorso', 'dorso');
+            homeCharts.gambe = createMiniChart('chart-gambe', 'gambe');
+            homeCharts.braccia = createMiniChart('chart-braccia', 'braccia');
+        }
+
+        window.onload = async () => {
+            try { await initDB(); } catch(e) { console.error("Errore DB", e); }
+            const d = new Date();
+            document.getElementById('date-label').innerText = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+            renderDashboardCharts();
+            lucide.createIcons();
+        };
     </script>
 </body>
 </html>
