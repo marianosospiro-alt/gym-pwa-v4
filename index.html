@@ -23,6 +23,8 @@
         .pt-safe { padding-top: env(safe-area-inset-top); }
         .animate-slide { animation: slide 0.3s ease-out; }
         @keyframes slide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        input[type="number"] { background: #2C2C2E; border: none; border-radius: 12px; color: white; padding: 10px; text-align: center; font-size: 18px; font-weight: 700; width: 100%; }
+        input[type="number"]::placeholder { color: #555; }
     </style>
 </head>
 <body class="pt-safe">
@@ -183,10 +185,10 @@
         let currentWorkoutId = null;
         let calendarDate = new Date();
         
-        // Memoria varianti (caricata da storage)
+        // Carica varianti salvate o inizializza
         let activeVariants = JSON.parse(localStorage.getItem('persistent_variants')) || {};
         
-        // Sessione corrente (caricata da storage per evitare perdite accidentali)
+        // Sessione corrente (per il calendario)
         let currentSessionData = JSON.parse(localStorage.getItem('active_session_buffer')) || {};
 
         // --- STORAGE UTILS ---
@@ -199,11 +201,11 @@
             const h = getHistory(exId);
             const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'});
             
-            // Salva nello storico globale
+            // Salva nello storico globale (grafici)
             h.push({ d: todayStr, w: val });
             localStorage.setItem(`h_${exId}`, JSON.stringify(h.slice(-15)));
             
-            // Aggiorna sessione attiva e buffer
+            // Aggiorna sessione attiva
             currentSessionData[exId] = val;
             localStorage.setItem('active_session_buffer', JSON.stringify(currentSessionData));
             
@@ -224,7 +226,10 @@
         }
 
         function finishWorkout() {
-            if (Object.keys(currentSessionData).length === 0) return;
+            if (Object.keys(currentSessionData).length === 0) {
+                alert("Inserisci almeno un peso prima di concludere!");
+                return;
+            }
             const journal = getJournal();
             const today = new Date().toISOString().split('T')[0];
             journal[today] = {
@@ -273,6 +278,7 @@
 
         function toggleVariant(id, len) {
             activeVariants[id] = ((activeVariants[id] || 0) + 1) % (len + 1);
+            // Salva la scelta per il futuro
             localStorage.setItem('persistent_variants', JSON.stringify(activeVariants));
             renderWorkout(currentWorkoutId);
         }
@@ -293,7 +299,7 @@
 
                 return `
                 <div class="apple-card overflow-hidden animate-slide">
-                    <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.src=''">
+                    <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=500&q=60'">
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex-1 pr-2">
@@ -313,12 +319,12 @@
                                 <div class="flex-1">
                                     <label class="text-[9px] font-bold text-gray-500 block mb-2 uppercase">Peso Odierno</label>
                                     <div class="flex gap-2">
-                                        <input type="number" id="in-${cId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}" class="w-full bg-[#2C2C2E] border-none rounded-xl text-center text-white font-bold p-2">
-                                        <button id="ok-${cId}" onclick="saveWeight('${cId}', document.getElementById('in-${cId}').value)" class="btn-primary px-4 text-xs text-white">OK</button>
-                                        ${todayVal ? `
+                                        <input type="number" id="in-${cId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}" 
+                                               oninput="const b = document.getElementById('ok-${cId}'); if(this.value.trim()){b.removeAttribute('disabled'); b.classList.remove('opacity-50')}else{b.setAttribute('disabled','true'); b.classList.add('opacity-50')}">
+                                        <button id="ok-${cId}" ${todayVal?'':'disabled'} onclick="saveWeight('${cId}', document.getElementById('in-${cId}').value)" class="btn-primary px-4 text-xs text-white ${todayVal?'':'opacity-50'}">OK</button>
                                         <button onclick="undoLastWeight('${cId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl flex items-center justify-center transition-all active:scale-95">
                                             <i data-lucide="undo" class="w-4 h-4"></i>
-                                        </button>` : ''}
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="w-[1px] h-10 bg-white/10"></div>
