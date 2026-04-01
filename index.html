@@ -14,7 +14,7 @@
         .glass { background: rgba(28, 28, 30, 0.7); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); }
         .apple-card { background-color: var(--apple-card); border-radius: 24px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
         .btn-primary { background-color: var(--apple-blue); border-radius: 14px; font-weight: 600; }
-        .btn-variant { background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; font-size: 11px; font-weight: 700; color: #007AFF; padding: 6px 12px; }
+        .btn-variant { background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; font-size: 11px; font-weight: 700; color: #007AFF; padding: 6px 12px; display: inline-flex; align-items: center; gap: 4px; }
         .horizontal-scroll-container { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 12px; scroll-snap-type: x mandatory; margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
         .horizontal-scroll-container > div { flex: 0 0 140px; scroll-snap-align: start; }
         .mini-chart-container { height: 60px; width: 100%; }
@@ -48,10 +48,10 @@
             </section>
 
             <section class="space-y-4">
-                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">I Tuoi Programmi</h2>
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">I Tuoi Programmi (v3.0)</h2>
                 
                 <div onclick="openWorkout(1)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-blue-900/20">
-                    <img src="img/panca_piana.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop'">
+                    <img src="img/panca_piana.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src=''">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 1</p>
@@ -64,7 +64,7 @@
                 </div>
 
                 <div onclick="openWorkout(2)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-purple-900/20">
-                    <img src="img/trazioni.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1598971441775-802521e15610?q=80&w=800&auto=format&fit=crop'">
+                    <img src="img/trazioni.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src=''">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-purple-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 2</p>
@@ -77,7 +77,7 @@
                 </div>
 
                 <div onclick="openWorkout(3)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-green-900/20">
-                    <img src="img/hack_squat.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800&auto=format&fit=crop'">
+                    <img src="img/hack_squat.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src=''">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-green-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 3</p>
@@ -90,12 +90,12 @@
                 </div>
 
                 <div onclick="openWorkout(4)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-orange-900/20">
-                    <img src="img/chest_press.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1581009146145-b5ef03a94e77?q=80&w=800&auto=format&fit=crop'">
+                    <img src="img/chest_press.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src=''">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
                         <p class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 4</p>
                         <h3 class="font-extrabold text-2xl text-white drop-shadow-lg tracking-tight">UPPER</h3>
-                        <p class="text-[11px] text-gray-300 font-medium mt-1">Ipertrofia Petto e Spalle</p>
+                        <p class="text-[11px] text-gray-300 font-medium mt-1">Ipertrofia Petto/Dorso/Spalle + Braccia</p>
                     </div>
                     <div class="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
                         <i data-lucide="play" class="w-5 h-5 text-white ml-1"></i>
@@ -133,51 +133,75 @@
     <script>
         const groups = {
             petto: ['panca_piana', 'spinte_inc', 'chest_press', 'pectoral', 'crossover'],
-            dorso: ['trazioni', 'tbar_row', 'lat_neutra', 'lat_iper'],
-            gambe: ['hack_squat', 'hip_thrust', 'leg_press', 'leg_ext', 'polpacci'],
-            braccia: ['skullcrusher', 'pushdown', 'curl_ez', 'hammer_curl', 'curl_alt']
+            dorso: ['trazioni', 'tbar_row', 'lat_neutra', 'lat_iper', 'lat_larga', 'rematore_manubrio'],
+            gambe: ['hack_squat', 'hip_thrust', 'leg_press', 'leg_ext', 'polpacci', 'belt_squat'],
+            braccia: ['skullcrusher', 'pushdown', 'curl_ez', 'hammer_curl', 'curl_alt', 'pushdown_corda', 'curl_cavi', 'estensioni_testa', 'curl_concentrazione']
         };
 
+        // Database degli allenamenti (Multi-Variante Definitivo con Tutte le Immagini)
         const workoutPlan = {
             1: { title: 'PUSH (G1)', items: [
-                { id: 'panca_piana', name: 'Panca Piana', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', note: '8 reps prima di passare a 35kg.', alt: { name: 'Chest Press', target: '35kg', rest: 180, img: 'img/chest_press.png', note: 'Alternativa se la panca è occupata.' }},
-                { id: 'lento_avanti', name: 'Lento Avanti', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', note: 'Schiena dritta.', alt: { name: 'Shoulder Press Machine', target: '30kg', rest: 120, img: 'img/shoulder_press.png', note: 'Versione guidata.' }},
-                { id: 'spinte_inc', name: 'Spinte Inclinata', sets: '4x8-10', target: '26kg', rest: 90, img: 'img/spinte_inc.png', note: 'Focus petto alto.' },
-                { id: 'alzate_lat', name: 'Alzate Laterali', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.png', note: 'Esecuzione pulita.', alt: { name: 'Alzate Laterali Cavi', target: '7.5kg', rest: 75, img: 'img/alzate_cavi.png', note: 'Tensione costante.' }},
-                { id: 'skullcrusher', name: 'Skullcrusher', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png', note: 'Gomiti fermi.' },
-                { id: 'pushdown', name: 'Pushdown Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png', note: 'Contrazione 1s.' }
+                { id: 'panca_piana', name: 'Panca Piana (Bilanciere)', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', note: '8 reps prima di passare a 35kg.', 
+                  alts: [{ id: 'chest_press_g1', name: 'Chest Press', target: '35kg', rest: 180, img: 'img/chest_press_g1.png', note: 'Alternativa se la panca è occupata.' }]
+                },
+                { id: 'lento_avanti', name: 'Lento Avanti (Bilanciere)', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', note: 'Forza pura. Core contratto, niente slancio di gambe.',
+                  alts: [
+                      { id: 'lento_manubri', name: 'Lento Avanti Manubri', target: '12kg', rest: 120, img: 'img/lento_manubri.png', note: 'ROM più naturale. Richiede stabilizzazione.' },
+                      { id: 'arnold_press', name: 'Arnold Press', target: '10kg', rest: 120, img: 'img/arnold_press.png', note: 'Focus rotondità della spalla (3 capi).' },
+                      { id: 'landmine_press', name: 'Landmine Press (Monolat.)', target: '15kg', rest: 120, img: 'img/landmine_press.png', note: 'Protegge la schiena e le spalle.' },
+                      { id: 'tirate_larga', name: 'Tirate al Mento Larga', target: '20kg', rest: 120, img: 'img/tirate_larga.png', note: 'Isola brutalmente il deltoide laterale.' }
+                  ]
+                },
+                { id: 'spinte_inc', name: 'Spinte Inclinata 30° Manubri', sets: '4x8-10', target: '26kg', rest: 90, img: 'img/spinte_inc.png', note: 'Focus petto alto. Eccentrica 3 sec.' },
+                { id: 'alzate_lat', name: 'Alzate Laterali in Piedi', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.png', note: 'Qualità sopra il carico. Niente cheating.', 
+                  alts: [
+                      { id: 'alzate_inclinata', name: 'Alzate su Panca Inclinata', target: '6kg', rest: 75, img: 'img/alzate_inclinata.png', note: 'Sul fianco a 30-45°. Elimina lo slancio, tensione in allungamento.' },
+                      { id: 'alzate_cavi_dietro', name: 'Alzate ai Cavi (Dietro Schiena)', target: '7.5kg', rest: 75, img: 'img/alzate_cavi_dietro.png', note: 'Tensione costante con cavo che passa dietro la schiena.' },
+                      { id: 'alzate_lean_away', name: 'Alzate Lean-Away', target: '8kg', rest: 75, img: 'img/alzate_lean_away.png', note: 'Inclinati tenendoti a un palo. Aumenta il ROM senza trapezio.' },
+                      { id: 'alzate_seduto', name: 'Alzate Laterali da Seduto', target: '8kg', rest: 75, img: 'img/alzate_seduto.png', note: 'Impedisce l\'uso delle gambe e della schiena.' }
+                  ]
+                },
+                { id: 'skullcrusher', name: 'Skullcrusher Manubri', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png', note: 'Gomiti chiusi e fermi.' },
+                { id: 'pushdown', name: 'Push Down Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png', note: 'Sull\'ultima serie: Drop Set.' }
             ]},
             2: { title: 'PULL (G2)', items: [
-                { id: 'trazioni', name: 'Trazioni Sbarra', sets: '5x6-8', target: 'Zavorra', rest: 120, img: 'img/trazioni.png', note: 'Petto alla sbarra.' },
-                { id: 'tbar_row', name: 'Rematore T-Bar', sets: '4x8-10', target: '30kg', rest: 120, img: 'img/tbar_row.png', note: 'Spremi scapole.', alt: { name: 'Rematore Manubrio', target: '28kg', rest: 120, img: 'img/rematore_manubrio.png', note: 'Un braccio alla volta.' }},
-                { id: 'curl_ez', name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', rest: 90, img: 'img/curl_ez.png', note: 'Schiena ferma.' },
-                { id: 'alzate_90', name: 'Alzate a 90°', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_90.png', note: 'Deltoidi post.' },
-                { id: 'hammer_curl', name: 'Hammer Curl', sets: '3x8-10', target: '14kg', rest: 75, img: 'img/hammer_curl.png', note: 'Brachiale.' },
-                { id: 'russian_twist', name: 'Russian Twist', sets: '3x15-20', target: '10kg', rest: 60, img: 'img/russian_twist.png', note: 'Addome obliquo.' }
+                { id: 'trazioni', name: 'Trazioni Sbarra (Zavorrate)', sets: '5x6-8', target: 'Zavorra', rest: 120, img: 'img/trazioni.png', note: 'Focus ampiezza. Petto verso la sbarra.' },
+                { id: 'tbar_row', name: 'Rematore T-Bar (Appoggio)', sets: '4x8-10', target: '30kg', rest: 120, img: 'img/tbar_row.png', note: 'Tira i gomiti indietro, non staccare il petto.',
+                  alts: [{ id: 'rematore_manubrio', name: 'Rematore Manubrio Singolo', target: '28kg', rest: 120, img: 'img/rematore_manubrio.png', note: 'Un braccio alla volta.' }]
+                },
+                { id: 'curl_ez', name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', rest: 90, img: 'img/curl_ez.png', note: 'Schiena ferma, estensione completa.' },
+                { id: 'alzate_90', name: 'Alzate a 90° (Reverse Fly)', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_90.png', note: 'Per la rotondità posteriore della spalla.' },
+                { id: 'hammer_curl', name: 'Curl a Martello', sets: '3x8-10', target: '14kg', rest: 75, img: 'img/hammer_curl.png', note: 'Spessore braccio e avambraccio.' },
+                { id: 'russian_twist', name: 'Russian Twist', sets: '3x15-20', target: '10kg', rest: 60, img: 'img/russian_twist.png', note: 'Addome: Obliqui.' }
             ]},
             3: { title: 'LEGS (G3)', items: [
-                { id: 'hack_squat', name: 'Hack Squat', sets: '4x10-12', target: '65kg', rest: 120, img: 'img/hack_squat.png', note: 'Profondità.', alt: { name: 'Belt Squat', target: '65kg', rest: 120, img: 'img/belt_squat.png', note: 'Focus gambe senza carico schiena.' }},
-                { id: 'hip_thrust', name: 'Hip Thrust', sets: '4x10-12', target: '30kg', rest: 90, img: 'img/hip_thrust.png', note: 'Contrazione glutei.' },
-                { id: 'leg_press', name: 'Leg Press 45°', sets: '3x15-20', target: '120kg', rest: 90, img: 'img/leg_press.png', note: 'Piedi bassi.' },
-                { id: 'leg_ext', name: 'Leg Extension', sets: '3x15-20', target: '30kg', rest: 60, img: 'img/leg_ext.png', note: 'Drop Set.' },
-                { id: 'polpacci', name: 'Calf Pressa', sets: '4x15-20', target: '70kg', rest: 60, img: 'img/polpacci.png', note: 'Pausa 2s.' },
-                { id: 'hanging_leg', name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', rest: 60, img: 'img/hanging_leg.png', note: 'Addome basso.' }
+                { id: 'hack_squat', name: 'Hack Squat', sets: '4x10-12', target: '65kg', rest: 120, img: 'img/hack_squat.png', note: 'Massima profondità. Alterna ogni settimana.',
+                  alts: [{ id: 'belt_squat', name: 'Belt Squat', target: '65kg', rest: 120, img: 'img/belt_squat.png', note: 'Focus gambe senza carico sulla schiena lombare.' }]
+                },
+                { id: 'hip_thrust', name: 'Hip Thrust con Bilanciere', sets: '4x10-12', target: '30kg', rest: 90, img: 'img/hip_thrust.png', note: 'Massima contrazione dei glutei in alto.' },
+                { id: 'leg_press', name: 'Leg Press 45°', sets: '3x15-20', target: '120kg', rest: 90, img: 'img/leg_press.png', note: 'Piedi bassi sulla pedana per quadricipiti.' },
+                { id: 'leg_ext', name: 'Leg Extension', sets: '3x15-20', target: '30kg', rest: 60, img: 'img/leg_ext.png', note: 'Sull\'ultima serie: Drop Set.' },
+                { id: 'polpacci', name: 'Calf Raise alla Pressa', sets: '4x15-20', target: '70kg', rest: 60, img: 'img/polpacci.png', note: 'Pausa 2s in allungamento.' },
+                { id: 'hanging_leg', name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', rest: 60, img: 'img/hanging_leg.png', note: 'Addome: Parte Bassa.' },
+                { id: 'plank', name: 'Plank', sets: '3x max', target: 'C.L.', rest: 60, img: 'img/russian_twist.png', note: 'Mantieni la retroversione del bacino.' }
             ]},
             4: { title: 'UPPER (G4)', items: [
-                { id: 'chest_press', name: 'Chest Press Bassa', sets: '4x12-15', target: '35kg', rest: 75, img: 'img/chest_press.png', note: 'Sedile basso per petto alto.' },
-                { id: 'pectoral', name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', rest: 75, img: 'img/pectoral.png', note: 'Picco contrazione.' },
-                { id: 'lat_neutra', name: 'Lat Machine', sets: '4x12-15', target: '45kg', rest: 75, img: 'img/lat_neutra.png', note: 'Presa neutra.', alt: { name: 'Lat Machine Larga', target: '40kg', rest: 75, img: 'img/lat_larga.png', note: 'Focus ampiezza dorsali.' }},
-                { id: 'alzate_cavi', name: 'Alzate Laterali Cavi', sets: '4x15-20', target: '10kg', rest: 60, img: 'img/alzate_cavi.png', note: 'Cavo dietro schiena.' },
-                { id: 'tirate_mento', name: 'Tirate al Mento', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/tirate_mento.png', note: 'Presa larga.' },
-                { id: 'crossover', name: 'Crossover Cavi', sets: '3x15-20', target: '15kg', rest: 60, img: 'img/crossover.png', note: 'Focus petto basso.' },
-                { id: 'pushdown_corda', name: 'SS1: Push Down Corda', sets: '3x12-15', target: '20kg', rest: 0, img: 'img/pushdown_corda.png', note: 'No recupero, passa al curl.' },
-                { id: 'curl_cavi', name: 'SS1: Curl ai Cavi', sets: '3x12-15', target: '15kg', rest: 90, img: 'img/curl_cavi.png', note: 'Recupera 90s e ripeti SS1.' },
-                { id: 'estensioni_testa', name: 'SS2: Estensioni Manubrio', sets: '3x12-15', target: '10kg', rest: 0, img: 'img/estensioni_testa.png', note: 'No recupero, passa al curl.' },
-                { id: 'curl_concentrazione', name: 'SS2: Curl Concentrazione', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/curl_concentrazione.png', note: 'Recupera 90s e ripeti SS2.' }
+                { id: 'chest_press', name: 'Chest Press (Sedile Basso)', sets: '4x12-15', target: '35kg', rest: 75, img: 'img/chest_press.png', note: 'Focus petto alto. Contrazione lenta.' },
+                { id: 'pectoral', name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', rest: 75, img: 'img/pectoral.png', note: 'Massimo stiramento, chiusura lenta.' },
+                { id: 'lat_neutra', name: 'Lat Machine Presa Neutra', sets: '4x12-15', target: '45kg', rest: 75, img: 'img/lat_neutra.png', note: 'Tira i gomiti verso le tasche.',
+                  alts: [{ id: 'lat_larga', name: 'Lat Machine Presa Larga', target: '40kg', rest: 75, img: 'img/lat_larga.png', note: 'Focus ampiezza dorsali.' }]
+                },
+                { id: 'alzate_cavi', name: 'Alzate Laterali ai Cavi', sets: '4x15-20', target: '10kg', rest: 60, img: 'img/alzate_cavi.png', note: 'Sull\'ultima serie: Drop Set.' },
+                { id: 'tirate_mento', name: 'Tirate al Mento (EZ)', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/tirate_mento.png', note: 'Presa larga per il deltoide mediale.' },
+                { id: 'crossover', name: 'Cavi Crossover (dall\'alto)', sets: '3x15-20', target: '15kg', rest: 60, img: 'img/crossover.png', note: 'Parte bassa e sterno del petto.' },
+                { id: 'pushdown_corda', name: 'SS1: Push Down Corda', sets: '3x12-15', target: '20kg', rest: 0, img: 'img/pushdown_corda.png', note: 'Tricipiti, passa subito ai bicipiti.' },
+                { id: 'curl_cavi', name: 'SS1: Curl ai Cavi', sets: '3x12-15', target: '15kg', rest: 90, img: 'img/curl_cavi.png', note: 'Bicipiti senza sosta, poi recupera 90s.' },
+                { id: 'estensioni_testa', name: 'SS2: Estensioni Manubrio', sets: '3x12-15', target: '10kg', rest: 0, img: 'img/estensioni_testa.png', note: 'Tricipiti overhead.' },
+                { id: 'curl_concentrazione', name: 'SS2: Curl Concentrazione', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/curl_concentrazione.png', note: 'Pump finale bicipiti.' }
             ]}
         };
 
-        const activeVariants = {}; 
+        const activeVariants = {}; // Salva l'indice della variante attiva (0 = base, 1 = alt[0], ecc.)
         const activeTimers = {}; 
 
         function getHistory(exId) {
@@ -257,8 +281,9 @@
             lucide.createIcons();
         }
 
-        function toggleVariant(exId) {
-            activeVariants[exId] = !activeVariants[exId];
+        // Cliccando CAMBIA, scorre al prossimo esercizio alternativo. Torna a 0 (base) se finiscono.
+        function toggleVariant(exId, altsLength) {
+            activeVariants[exId] = ((activeVariants[exId] || 0) + 1) % (altsLength + 1);
             renderWorkout(window.currentWorkoutId);
         }
 
@@ -282,34 +307,41 @@
             const items = workoutPlan[id].items;
             
             container.innerHTML = items.map((ex, i) => {
-                const isAlt = activeVariants[ex.id];
-                const current = isAlt ? ex.alt : ex;
-                const history = getHistory(ex.id + (isAlt ? '_alt' : ''));
+                const variantIdx = activeVariants[ex.id] || 0;
+                const current = variantIdx === 0 ? ex : ex.alts[variantIdx - 1];
+                const currentId = variantIdx === 0 ? ex.id : current.id;
+                
+                const history = getHistory(currentId);
                 const last = history.length > 0 ? history.slice(-1)[0].w : '--';
                 
-                const fallbackImg = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop';
+                const fallbackImg = '';
                 
+                const variantButton = ex.alts ? 
+                    `<button onclick="toggleVariant('${ex.id}', ${ex.alts.length})" class="btn-variant">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> CAMBIA
+                    </button>` : '';
+
                 return `
                     <div class="apple-card overflow-hidden animate-slide">
                         <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.onerror=null; this.src='${fallbackImg}'">
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 class="text-xl font-bold text-white">${current.name}</h3>
+                                <div class="flex-1 pr-2">
+                                    <h3 class="text-xl font-bold text-white leading-tight">${current.name}</h3>
                                     <p class="text-xs font-semibold text-blue-500 mt-1">${ex.sets} • Target ${current.target}</p>
                                 </div>
                                 <div class="flex flex-col gap-2 items-end">
-                                    ${ex.alt ? `<button onclick="toggleVariant('${ex.id}')" class="btn-variant">VARIANTE</button>` : ''}
-                                    <div class="flex items-center gap-2">
-                                        <button id="timer-btn-${ex.id}${isAlt ? '_alt' : ''}" onclick="toggleTimer('${ex.id}${isAlt ? '_alt' : ''}', ${current.rest})" class="flex items-center text-[10px] font-bold text-gray-400 bg-white/5 px-2.5 py-1.5 rounded-xl transition-all">
+                                    ${variantButton}
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <button id="timer-btn-${currentId}" onclick="toggleTimer('${currentId}', ${current.rest})" class="flex items-center text-[10px] font-bold text-gray-400 bg-white/5 px-2.5 py-1.5 rounded-xl transition-all">
                                             <i data-lucide="timer" class="w-3.5 h-3.5 mr-1"></i> ${current.rest}s
                                         </button>
-                                        <button onclick="showChart('${ex.id}${isAlt ? '_alt' : ''}', '${current.name}')" class="text-blue-500 bg-white/5 p-1.5 rounded-xl"><i data-lucide="line-chart" class="w-4 h-4"></i></button>
+                                        <button onclick="showChart('${currentId}', '${current.name.replace(/'/g, "\\'")}')" class="text-blue-500 bg-white/5 p-1.5 rounded-xl"><i data-lucide="line-chart" class="w-4 h-4"></i></button>
                                     </div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5">
-                                <div class="flex-1"><label class="text-[9px] font-bold text-gray-500 block mb-2 px-1 uppercase">Peso Odierno</label><div class="flex gap-2"><input type="number" id="in-${ex.id}${isAlt ? '_alt' : ''}" placeholder="${last !== '--' ? last : '0'}"><button onclick="saveWeight('${ex.id}${isAlt ? '_alt' : ''}', document.getElementById('in-${ex.id}${isAlt ? '_alt' : ''}').value)" class="btn-primary px-5 text-xs text-white">OK</button></div></div>
+                                <div class="flex-1"><label class="text-[9px] font-bold text-gray-500 block mb-2 px-1 uppercase">Peso Odierno</label><div class="flex gap-2"><input type="number" id="in-${currentId}" placeholder="${last !== '--' ? last : '0'}"><button onclick="saveWeight('${currentId}', document.getElementById('in-${currentId}').value)" class="btn-primary px-5 text-xs text-white">OK</button></div></div>
                                 <div class="w-[1px] h-10 bg-white/10"></div>
                                 <div class="text-center px-2"><label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Ultimo</label><span class="text-xl font-black italic text-white">${last}</span></div>
                             </div>
