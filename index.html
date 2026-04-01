@@ -47,6 +47,7 @@
                 <div class="flex overflow-x-auto gap-3 no-scrollbar -mx-6 px-6">
                     <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Volume Sessione</p><div class="h-14"><canvas id="chart-volume"></canvas></div></div>
                     <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Panca Piana</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
+                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Progresso Braccia</p><div class="h-14"><canvas id="chart-braccia-home"></canvas></div></div>
                 </div>
             </section>
 
@@ -55,10 +56,10 @@
 
         <!-- VISTA WORKOUT -->
         <div id="view-workout" class="view hidden pb-32">
-            <header class="p-6 sticky top-0 z-50 glass border-b border-white/5 pt-12 flex justify-between items-center">
+            <header class="p-6 glass pt-12 flex justify-between items-center sticky top-0 z-50">
                 <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm"><i data-lucide="chevron-left" class="w-5 h-5"></i> Esci</button>
                 <h2 id="workout-title" class="font-bold">Allenamento</h2>
-                <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-2 rounded-full shadow-lg shadow-green-500/20">CONCLUDI</button>
+                <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-2 rounded-full">CONCLUDI</button>
             </header>
             <main id="exercise-list" class="p-4 space-y-8 mt-4 animate-slide"></main>
             <div id="notes-area" class="p-4 pt-0">
@@ -69,12 +70,12 @@
             </div>
         </div>
 
-        <!-- VISTA DIARIO/CALENDARIO -->
+        <!-- VISTA DIARIO -->
         <div id="view-calendar" class="view hidden p-6 pb-32 animate-slide">
             <h1 class="text-3xl font-extrabold text-white mb-8">Diario</h1>
             <div id="calendar-container" class="apple-card p-5 mb-8">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 id="calendar-month" class="font-bold text-lg text-white">Mese Anno</h3>
+                    <h3 id="calendar-month" class="font-bold text-lg">Mese</h3>
                     <div class="flex gap-4">
                         <button onclick="changeMonth(-1)" class="text-blue-500"><i data-lucide="chevron-left"></i></button>
                         <button onclick="changeMonth(1)" class="text-blue-500"><i data-lucide="chevron-right"></i></button>
@@ -88,29 +89,11 @@
             <div id="calendar-selection" class="space-y-4"></div>
         </div>
 
-        <!-- VISTA IMPOSTAZIONI -->
-        <div id="view-settings" class="view hidden p-6 pb-32 animate-slide">
-            <h1 class="text-3xl font-extrabold text-white mb-8">Impostazioni</h1>
-            <div class="apple-card p-6 mb-6">
-                <h3 class="font-bold mb-2">Gestione Dati</h3>
-                <p class="text-xs text-gray-400 mb-4">Esporta i tuoi progressi o importa un backup.</p>
-                <div class="flex flex-col gap-3">
-                    <button onclick="exportData()" class="btn-primary py-3 flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> ESPORTA JSON</button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-white/10 rounded-2xl py-3 flex items-center justify-center gap-2 font-bold text-sm"><i data-lucide="upload" class="w-4 h-4"></i> IMPORTA JSON</button>
-                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
-                </div>
-            </div>
-            <div class="apple-card p-6 border border-red-500/20">
-                <h3 class="font-bold text-red-500 mb-2">Area Pericolo</h3>
-                <button onclick="resetAllData()" class="text-red-500 text-xs font-bold uppercase tracking-widest bg-red-500/10 w-full py-3 rounded-xl border border-red-500/30">Reset Totale</button>
-            </div>
-        </div>
-
-        <!-- MODALE LIBRERIA ESERCIZI -->
+        <!-- MODALE LIBRERIA -->
         <div id="modal-library" class="modal-sheet" onclick="closeLibrary()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-6 text-white">
-                    <h3 class="text-xl font-bold">Sostituisci Esercizio</h3>
+                    <h3 class="text-xl font-bold">Cambia Esercizio</h3>
                     <button onclick="closeLibrary()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div id="library-list" class="space-y-4"></div>
@@ -118,14 +101,14 @@
         </div>
 
         <!-- NAVBAR -->
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-8 py-4 flex justify-around items-center z-50 pb-safe">
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
             <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold">Home</span></button>
             <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold">Diario</span></button>
         </nav>
     </div>
 
     <script>
-        // --- DATABASE ESERCIZI BASE & LIBRERIA ---
+        // --- LIBRERIA MODULARE (Focus Braccia aggiunto) ---
         const exerciseLibrary = {
             petto: [
                 { id: 'dips_petto', name: 'Dips alle Parallele (Petto)', target: 'C.L.', rest: 120, img: 'img/dips_petto.png', note: 'Inclinati in avanti.' },
@@ -140,7 +123,15 @@
                 { id: 'rdl_manubri', name: 'RDL con Manubri', target: '24kg', rest: 90, img: 'img/rdl_manubri.png', note: 'Catena posteriore.' }
             ],
             spalle: [
-                { id: 'lu_raises', name: 'Lu Raises', target: '5kg', rest: 60, img: 'img/lu_raises.png', note: 'ROM completo.' }
+                { id: 'lu_raises', name: 'Lu Raises', target: '5kg', rest: 60, img: 'img/lu_raises.png', note: 'ROM completo per il V-Taper.' },
+                { id: 'landmine_press', name: 'Landmine Press', target: '15kg', rest: 90, img: 'img/landmine_press.png', note: 'Ottimo per petto alto e spalle.' }
+            ],
+            braccia: [
+                { id: 'spider_curl', name: 'Spider Curl su Panca', target: '12kg', rest: 75, img: 'img/spider_curl.png', note: 'Isolamento totale bicipiti.' },
+                { id: 'incline_curl', name: 'Curl Panca Inclinata 45°', target: '10kg', rest: 90, img: 'img/incline_curl.png', note: 'Massimo allungamento del bicipite.' },
+                { id: 'french_press_db', name: 'French Press Manubri', target: '12kg', rest: 90, img: 'img/french_press.png', note: 'Focus capo lungo del tricipite.' },
+                { id: 'dips_tricipiti', name: 'Dips tra Panche', target: 'C.L.', rest: 60, img: 'img/dips_tricipiti.png', note: 'Pump finale tricipiti.' },
+                { id: 'zottman_curl', name: 'Zottman Curl', target: '10kg', rest: 75, img: 'img/zottman_curl.png', note: 'Per spessore avambraccio e braccio.' }
             ]
         };
 
@@ -194,17 +185,18 @@
         const getHistory = (id) => JSON.parse(localStorage.getItem(`h_${id}`)) || [];
         const getJournal = () => JSON.parse(localStorage.getItem('workout_journal')) || {};
 
-        // --- BUG FIX: TRACK & DESTROY CHART INSTANCES ---
         function renderDashboardCharts() {
-            ['volume', 'petto'].forEach(id => {
+            ['volume', 'petto', 'braccia-home'].forEach(id => {
                 const canvas = document.getElementById(`chart-${id}`);
                 if (!canvas) return;
-                
-                if (homeCharts[id]) homeCharts[id].destroy(); // FIX: Distrugge l'istanza esistente
+                if (homeCharts[id]) homeCharts[id].destroy();
 
                 let data = [0,0,0,0,0];
                 if (id === 'petto') {
                     const h = getHistory('panca_piana');
+                    if (h.length > 0) data = h.map(i => i.w);
+                } else if (id === 'braccia-home') {
+                    const h = getHistory('curl_ez');
                     if (h.length > 0) data = h.map(i => i.w);
                 } else {
                     const journal = getJournal();
@@ -233,7 +225,7 @@
                         <p class="text-[10px] text-gray-400">${ex.note}</p>
                     </div>
                     <i data-lucide="plus-circle" class="text-blue-500"></i>
-                </div>`).join('') + `<p class="text-center text-[10px] text-gray-500 uppercase py-4">Fine della selezione</p>`;
+                </div>`).join('') + `<p class="text-center text-[10px] text-gray-500 uppercase py-4">Fine della selezione modulare</p>`;
             document.getElementById('modal-library').style.display = 'flex';
             lucide.createIcons();
         }
@@ -243,7 +235,7 @@
             localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
             if (!exerciseData[newExId]) {
                 const libEx = Object.values(exerciseLibrary).flat().find(e => e.id === newExId);
-                exerciseData[newExId] = { ...libEx, sets: '3x10-12' }; 
+                exerciseData[newExId] = { ...libEx, sets: '3x12-15' }; 
             }
             closeLibrary();
             renderWorkout(currentWorkoutId);
@@ -313,7 +305,6 @@
         function openSettings() {
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-settings').classList.remove('hidden');
-            updateNav('settings');
         }
 
         function renderWorkout(id, isHistory = false, historyData = null) {
@@ -323,7 +314,7 @@
             document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
 
             container.innerHTML = items.map((exId, idx) => {
-                const ex = exerciseData[exId] || { name: exId, sets: '--', target: '--', category: 'petto', img: '' };
+                const ex = exerciseData[exId] || { name: exId, sets: '--', target: '--', category: 'braccia', img: '' };
                 const h = getHistory(exId);
                 const last = h.length > 0 ? h[h.length-1].w : '--';
                 const todayVal = isHistory ? (historyData[exId] || '--') : (activeSession[exId] || '');
@@ -386,7 +377,6 @@
             });
         }
 
-        // --- BACKUP & CALENDAR ---
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
             const dl = document.createElement('a'); dl.href = dataStr; dl.download = "powerlog_backup.json"; dl.click();
