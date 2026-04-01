@@ -15,7 +15,6 @@
         .apple-card { background-color: var(--apple-card); border-radius: 24px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
         .btn-primary { background-color: var(--apple-blue); border-radius: 14px; font-weight: 600; }
         .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
-        .btn-variant { background-color: var(--apple-blue); border-radius: 8px; font-size: 10px; text-transform: uppercase; font-weight: 800; color: #ffffff; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4); }
         .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-size: 13px; font-weight: 600; position: relative; }
         .day-workout-dot { width: 4px; height: 4px; border-radius: 50%; position: absolute; bottom: 6px; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
@@ -45,9 +44,9 @@
             <section class="mb-10">
                 <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Andamento</h2>
                 <div class="flex overflow-x-auto gap-3 no-scrollbar -mx-6 px-6">
-                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Volume Sessione</p><div class="h-14"><canvas id="chart-volume"></canvas></div></div>
-                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Panca Piana</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
-                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Progresso Braccia</p><div class="h-14"><canvas id="chart-braccia-home"></canvas></div></div>
+                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase text-center mb-2">Volume Sessione</p><div class="h-14"><canvas id="chart-volume"></canvas></div></div>
+                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase text-center mb-2">Panca Piana</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
+                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase text-center mb-2">Focus Braccia</p><div class="h-14"><canvas id="chart-braccia-home"></canvas></div></div>
                 </div>
             </section>
 
@@ -58,8 +57,8 @@
         <div id="view-workout" class="view hidden pb-32">
             <header class="p-6 glass pt-12 flex justify-between items-center sticky top-0 z-50">
                 <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm"><i data-lucide="chevron-left" class="w-5 h-5"></i> Esci</button>
-                <h2 id="workout-title" class="font-bold">Allenamento</h2>
-                <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-2 rounded-full">CONCLUDI</button>
+                <h2 id="workout-title-text" class="font-bold text-sm uppercase tracking-widest text-white">Allenamento</h2>
+                <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-2 rounded-full shadow-lg">CONCLUDI</button>
             </header>
             <main id="exercise-list" class="p-4 space-y-8 mt-4 animate-slide"></main>
             <div id="notes-area" class="p-4 pt-0">
@@ -73,7 +72,7 @@
         <!-- VISTA DIARIO -->
         <div id="view-calendar" class="view hidden p-6 pb-32 animate-slide">
             <h1 class="text-3xl font-extrabold text-white mb-8">Diario</h1>
-            <div id="calendar-container" class="apple-card p-5 mb-8">
+            <div id="calendar-container" class="apple-card p-5 mb-8 text-white">
                 <div class="flex justify-between items-center mb-6">
                     <h3 id="calendar-month" class="font-bold text-lg">Mese</h3>
                     <div class="flex gap-4">
@@ -84,7 +83,7 @@
                 <div class="grid grid-cols-7 text-gray-500 text-[10px] font-bold uppercase mb-4 text-center">
                     <div>Lun</div><div>Mar</div><div>Mer</div><div>Gio</div><div>Ven</div><div>Sab</div><div>Dom</div>
                 </div>
-                <div id="calendar-days" class="grid grid-cols-7 gap-2 text-white"></div>
+                <div id="calendar-days" class="grid grid-cols-7 gap-2"></div>
             </div>
             <div id="calendar-selection" class="space-y-4"></div>
         </div>
@@ -93,17 +92,17 @@
         <div id="view-settings" class="view hidden p-6 pb-32 animate-slide">
             <h1 class="text-3xl font-extrabold text-white mb-8">Impostazioni</h1>
             <div class="apple-card p-6 mb-6">
-                <h3 class="font-bold mb-2">Gestione Dati</h3>
-                <p class="text-xs text-gray-400 mb-4">Salva i tuoi progressi o importa un backup (JSON).</p>
+                <h3 class="font-bold mb-2 text-white">Gestione Dati</h3>
+                <p class="text-xs text-gray-400 mb-4">Esegui il backup o ripristina i tuoi dati.</p>
                 <div class="flex flex-col gap-3">
                     <button onclick="exportData()" class="btn-primary py-3 flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> ESPORTA JSON</button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-white/10 rounded-2xl py-3 flex items-center justify-center gap-2 font-bold text-sm"><i data-lucide="upload" class="w-4 h-4"></i> IMPORTA JSON</button>
+                    <button onclick="document.getElementById('importFile').click()" class="bg-white/10 rounded-2xl py-3 flex items-center justify-center gap-2 font-bold text-sm text-white"><i data-lucide="upload" class="w-4 h-4"></i> IMPORTA JSON</button>
                     <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
                 </div>
             </div>
             <div class="apple-card p-6 border border-red-500/20">
-                <h3 class="font-bold text-red-500 mb-2">Reset App</h3>
-                <button onclick="resetAllData()" class="text-red-500 text-xs font-bold uppercase tracking-widest bg-red-500/10 w-full py-3 rounded-xl border border-red-500/30">CANCELLA TUTTI I DATI</button>
+                <h3 class="font-bold text-red-500 mb-2">Area Pericolo</h3>
+                <button onclick="resetAllData()" class="text-red-500 text-xs font-bold uppercase tracking-widest bg-red-500/10 w-full py-3 rounded-xl border border-red-500/30">Reset Totale App</button>
             </div>
         </div>
 
@@ -111,7 +110,7 @@
         <div id="modal-library" class="modal-sheet" onclick="closeLibrary()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-6 text-white">
-                    <h3 class="text-xl font-bold">Alternative Biomeccaniche</h3>
+                    <h3 class="text-xl font-bold">Cambia Esercizio</h3>
                     <button onclick="closeLibrary()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div id="library-list" class="space-y-4 pb-10"></div>
@@ -119,38 +118,49 @@
         </div>
 
         <!-- NAVBAR -->
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
-            <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500 transition-all"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold">Home</span></button>
-            <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500 transition-all"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold">Diario</span></button>
-            <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500 transition-all"><i data-lucide="settings" class="w-6 h-6"></i><span class="text-[10px] font-bold">Opzioni</span></button>
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-8 py-4 flex justify-around items-center z-50 pb-safe">
+            <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold">Home</span></button>
+            <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold">Diario</span></button>
+            <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="settings" class="w-6 h-6"></i><span class="text-[10px] font-bold">Opzioni</span></button>
         </nav>
     </div>
 
     <script>
-        // --- DATABASE ESERCIZI INTEGRALE (Tutte le categorie e varianti) ---
+        // --- DATABASE ESERCIZI (Precisione Categorie) ---
         const exerciseData = {
-            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5x5-8', target: '32.5kg', rest: 120, img: 'img/panca_piana.png', category: 'petto', note: 'Esercizio re per la forza.' },
-            'chest_press_g1': { name: 'Chest Press', sets: '4x8-10', target: '35kg', rest: 120, img: 'img/chest_press_g1.png', category: 'petto', note: 'Alternativa se panca è occupata.' },
-            'dips_petto': { name: 'Dips alle Parallele', sets: '3xMax', target: 'C.L.', rest: 120, img: 'img/dips_petto.png', category: 'petto', note: 'Busto avanti per petto basso.' },
-            'spinte_macchina_inc': { name: 'Chest Press Macchina Inc.', sets: '4x10-12', target: '40kg', rest: 90, img: 'img/spinte_macchina_inc.png', category: 'petto', note: 'Focus petto alto.' },
-            
-            'lento_avanti': { name: 'Lento Avanti Bilanciere', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', category: 'spalle', note: 'Forza pura spalle.' },
-            'lento_manubri': { name: 'Lento Avanti Manubri', sets: '4x8-10', target: '12kg', rest: 120, img: 'img/lento_manubri.png', category: 'spalle' },
+            // PETTO
+            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', category: 'petto' },
+            'chest_press_g1': { name: 'Chest Press', sets: '4x8-10', target: '35kg', rest: 120, img: 'img/chest_press_g1.png', category: 'petto' },
+            'spinte_inc': { name: 'Spinte Inc. 30° Manubri', sets: '4x8-10', target: '26kg', rest: 90, img: 'img/spinte_inc.png', category: 'petto' },
+            'dips_petto': { name: 'Dips alle Parallele', sets: '3xMax', target: 'C.L.', rest: 120, img: 'img/dips_petto.png', category: 'petto' },
+            'spinte_macchina_inc': { name: 'Incline Chest Press Machine', sets: '4x10-12', target: '40kg', rest: 90, img: 'img/spinte_macchina_inc.png', category: 'petto' },
+            'pectoral': { name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', rest: 75, img: 'img/pectoral.png', category: 'petto' },
+            'crossover': { name: 'Crossover Cavi (Alti)', sets: '3x15-20', target: '15kg', rest: 60, img: 'img/crossover.png', category: 'petto' },
+            'chest_press_bassa': { name: 'Chest Press Bassa', sets: '4x12-15', target: '35kg', rest: 75, img: 'img/chest_press.png', category: 'petto' },
+
+            // SPALLE
+            'lento_avanti': { name: 'Lento Avanti Bilanciere', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', category: 'spalle' },
+            'lento_manubri': { name: 'Lento Manubri', sets: '4x8-10', target: '12kg', rest: 120, img: 'img/lento_manubri.png', category: 'spalle' },
             'arnold_press': { name: 'Arnold Press', sets: '4x10-12', target: '10kg', rest: 120, img: 'img/arnold_press.png', category: 'spalle' },
             'landmine_press': { name: 'Landmine Press', sets: '3x10-12', target: '15kg', rest: 90, img: 'img/landmine_press.png', category: 'spalle' },
             'lu_raises': { name: 'Lu Raises', sets: '3x12-15', target: '5kg', rest: 60, img: 'img/lu_raises.png', category: 'spalle' },
             'alzate_lat': { name: 'Alzate Laterali Manubri', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.png', category: 'spalle' },
             'alzate_inclinata': { name: 'Alzate su Panca Inc.', sets: '3x12-15', target: '6kg', rest: 75, img: 'img/alzate_inclinata.png', category: 'spalle' },
             'alzate_cavi_dietro': { name: 'Alzate Cavi Dietro', sets: '4x15-20', target: '7.5kg', rest: 60, img: 'img/alzate_cavi_dietro.png', category: 'spalle' },
-            'alzate_seduto': { name: 'Alzate Laterali Seduto', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_seduto.png', category: 'spalle' },
+            'alzate_seduto': { name: 'Alzate Lat. Seduto', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_seduto.png', category: 'spalle' },
+            'alzate_90': { name: 'Alzate 90° Post.', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_90.png', category: 'spalle' },
+            'alzate_cavi': { name: 'Alzate Laterali ai Cavi', sets: '4x15-20', target: '10kg', rest: 60, img: 'img/alzate_cavi.png', category: 'spalle' },
+            'tirate_mento': { name: 'Tirate al Mento EZ', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/tirate_mento.png', category: 'spalle' },
 
+            // DORSO
             'trazioni': { name: 'Trazioni Sbarra', sets: '5x6-8', target: 'Zavorra', rest: 120, img: 'img/trazioni.png', category: 'dorso' },
             'tbar_row': { name: 'Rematore T-Bar', sets: '4x8-10', target: '30kg', rest: 120, img: 'img/tbar_row.png', category: 'dorso' },
             'rematore_manubrio': { name: 'Rematore Manubrio', sets: '4x10-12', target: '28kg', rest: 120, img: 'img/rematore_manubrio.png', category: 'dorso' },
-            'pullover_cavi': { name: 'Pullover ai Cavi', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/pullover_cavi.png', category: 'dorso' },
             'lat_neutra': { name: 'Lat Machine Neutra', sets: '4x12-15', target: '45kg', rest: 75, img: 'img/lat_neutra.png', category: 'dorso' },
             'lat_larga': { name: 'Lat Machine Larga', sets: '4x12-15', target: '40kg', rest: 75, img: 'img/lat_larga.png', category: 'dorso' },
+            'pullover_cavi': { name: 'Pullover ai Cavi', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/pullover_cavi.png', category: 'dorso' },
 
+            // GAMBE
             'hack_squat': { name: 'Hack Squat', sets: '4x10-12', target: '65kg', rest: 120, img: 'img/hack_squat.png', category: 'gambe' },
             'belt_squat': { name: 'Belt Squat', sets: '4x12-15', target: '65kg', rest: 120, img: 'img/belt_squat.png', category: 'gambe' },
             'bulgarian_split': { name: 'Bulgarian Split Squat', sets: '3x10-12', target: '16kg', rest: 90, img: 'img/bulgarian_split.png', category: 'gambe' },
@@ -159,19 +169,24 @@
             'leg_ext': { name: 'Leg Extension', sets: '3x15-20', target: '30kg', rest: 60, img: 'img/leg_ext.png', category: 'gambe' },
             'polpacci': { name: 'Calf Raise Pressa', sets: '4x15-20', target: '70kg', rest: 60, img: 'img/polpacci.png', category: 'gambe' },
 
-            'skullcrusher': { name: 'Skullcrusher Manubri', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png', category: 'braccia' },
-            'pushdown': { name: 'Push Down Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png', category: 'braccia' },
-            'pushdown_corda': { name: 'Push Down Corda', sets: '3x12-15', target: '20kg', rest: 0, img: 'img/pushdown_corda.png', category: 'braccia' },
-            'french_press_db': { name: 'French Press Manubri', sets: '3x10-12', target: '12kg', rest: 90, img: 'img/french_press_db.png', category: 'braccia' },
-            'dips_tricipiti': { name: 'Dips tra Panche', sets: '3xMax', target: 'C.L.', rest: 60, img: 'img/dips_tricipiti.png', category: 'braccia' },
-            'curl_ez': { name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', rest: 90, img: 'img/curl_ez.png', category: 'braccia' },
-            'spider_curl': { name: 'Spider Curl', sets: '3x10-12', target: '12kg', rest: 75, img: 'img/spider_curl.png', category: 'braccia' },
-            'incline_curl': { name: 'Curl Panca Incl. 45°', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/incline_curl.png', category: 'braccia' },
-            'hammer_curl': { name: 'Curl a Martello', sets: '3x8-10', target: '14kg', rest: 75, img: 'img/hammer_curl.png', category: 'braccia' },
-            'zottman_curl': { name: 'Zottman Curl', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/zottman_curl.png', category: 'braccia' },
-            'curl_cavi': { name: 'Curl ai Cavi', sets: '3x12-15', target: '15kg', rest: 90, img: 'img/curl_cavi.png', category: 'braccia' },
-            'curl_concentrazione': { name: 'Curl Concentrazione', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/curl_concentrazione.png', category: 'braccia' },
+            // BICIPITI
+            'curl_ez': { name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', rest: 90, img: 'img/curl_ez.png', category: 'bicipiti' },
+            'hammer_curl': { name: 'Curl a Martello', sets: '3x8-10', target: '14kg', rest: 75, img: 'img/hammer_curl.png', category: 'bicipiti' },
+            'spider_curl': { name: 'Spider Curl', sets: '3x10-12', target: '12kg', rest: 75, img: 'img/spider_curl.png', category: 'bicipiti' },
+            'incline_curl': { name: 'Curl Panca Incl. 45°', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/incline_curl.png', category: 'bicipiti' },
+            'zottman_curl': { name: 'Zottman Curl', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/zottman_curl.png', category: 'bicipiti' },
+            'curl_cavi': { name: 'Curl ai Cavi', sets: '3x12-15', target: '15kg', rest: 90, img: 'img/curl_cavi.png', category: 'bicipiti' },
+            'curl_concentrazione': { name: 'Curl Concentrazione', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/curl_concentrazione.png', category: 'bicipiti' },
 
+            // TRICIPITI
+            'skullcrusher': { name: 'Skullcrusher Manubri', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png', category: 'tricipiti' },
+            'pushdown': { name: 'Push Down Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png', category: 'tricipiti' },
+            'pushdown_corda': { name: 'Push Down Corda', sets: '3x12-15', target: '20kg', rest: 0, img: 'img/pushdown_corda.png', category: 'tricipiti' },
+            'french_press_db': { name: 'French Press Manubri', sets: '3x10-12', target: '12kg', rest: 90, img: 'img/french_press_db.png', category: 'tricipiti' },
+            'dips_tricipiti': { name: 'Dips tra Panche', sets: '3xMax', target: 'C.L.', rest: 60, img: 'img/dips_tricipiti.png', category: 'tricipiti' },
+            'estensioni_testa': { name: 'Estensioni sopra Testa', sets: '3x12-15', target: '10kg', rest: 0, img: 'img/estensioni_testa.png', category: 'tricipiti' },
+
+            // CORE
             'russian_twist': { name: 'Russian Twist', sets: '3x15-20', target: '10kg', rest: 60, img: 'img/russian_twist.png', category: 'core' },
             'hanging_leg': { name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', rest: 60, img: 'img/hanging_leg.png', category: 'core' }
         };
@@ -180,18 +195,19 @@
             1: { title: 'PUSH (Forza)', color: '#007AFF', img: 'img/panca_piana.png', items: ['panca_piana', 'lento_avanti', 'spinte_inc', 'alzate_lat', 'skullcrusher', 'pushdown'] },
             2: { title: 'PULL (Forza)', color: '#AF52DE', img: 'img/trazioni.png', items: ['trazioni', 'tbar_row', 'curl_ez', 'alzate_90', 'hammer_curl', 'russian_twist'] },
             3: { title: 'LEGS (Volume)', color: '#34C759', img: 'img/hack_squat.png', items: ['hack_squat', 'hip_thrust', 'leg_press', 'leg_ext', 'polpacci', 'hanging_leg'] },
-            4: { title: 'IPERTROFIA (Upper)', color: '#FF9500', img: 'img/chest_press.png', items: ['chest_press', 'pectoral', 'lat_neutra', 'alzate_cavi', 'tirate_mento', 'crossover', 'pushdown_corda', 'curl_cavi', 'estensioni_testa', 'curl_concentrazione'] }
+            4: { title: 'IPERTROFIA (Upper)', color: '#FF9500', img: 'img/chest_press.png', items: ['chest_press_bassa', 'pectoral', 'lat_neutra', 'alzate_cavi', 'tirate_mento', 'crossover', 'pushdown_corda', 'curl_cavi', 'estensioni_testa', 'curl_concentrazione'] }
         };
 
-        // --- STATO ---
+        // --- STATO GLOBALE ---
         let userPlan = JSON.parse(localStorage.getItem('user_workout_plan')) || defaultPlan;
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer')) || {};
+        let activeTimers = {};
         let currentWorkoutId = null;
         let swappingIndex = null;
         let calendarDate = new Date();
         let homeCharts = {}; 
 
-        // --- CORE FUNCTIONS ---
+        // --- DASHBOARD CHARTS ---
         function renderDashboardCharts() {
             ['volume', 'petto', 'braccia-home'].forEach(id => {
                 const canvas = document.getElementById(`chart-${id}`);
@@ -219,28 +235,70 @@
             });
         }
 
-        // --- LIBRERIA MODULARE CIRCOLARE ---
+        // --- TIMER ---
+        function toggleTimer(exId, seconds) {
+            const btn = document.getElementById(`timer-${exId}`);
+            if (activeTimers[exId]) {
+                clearInterval(activeTimers[exId].interval);
+                delete activeTimers[exId];
+                btn.innerHTML = `<i data-lucide="timer" class="w-3 h-3"></i> ${seconds}s`;
+                btn.classList.replace('bg-orange-500/20', 'bg-white/5');
+                btn.classList.replace('text-orange-500', 'text-gray-400');
+                lucide.createIcons();
+                return;
+            }
+            if (!seconds || seconds <= 0) return;
+            
+            let remaining = seconds;
+            btn.classList.replace('bg-white/5', 'bg-orange-500/20');
+            btn.classList.replace('text-gray-400', 'text-orange-500');
+            
+            activeTimers[exId] = {
+                interval: setInterval(() => {
+                    remaining--;
+                    const m = Math.floor(remaining/60);
+                    const s = remaining % 60;
+                    btn.innerHTML = `<i data-lucide="timer" class="w-3 h-3"></i> ${m}:${s < 10 ? '0' : ''}${s}`;
+                    lucide.createIcons();
+                    
+                    if (remaining <= 0) {
+                        clearInterval(activeTimers[exId].interval);
+                        delete activeTimers[exId];
+                        btn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i> GO!`;
+                        btn.classList.replace('text-orange-500', 'text-green-500');
+                        if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]);
+                        setTimeout(() => {
+                            btn.innerHTML = `<i data-lucide="timer" class="w-3 h-3"></i> ${seconds}s`;
+                            btn.classList.replace('text-green-500', 'text-gray-400');
+                            btn.classList.replace('bg-orange-500/20', 'bg-white/5');
+                            lucide.createIcons();
+                        }, 5000);
+                    }
+                }, 1000)
+            };
+        }
+
+        // --- LIBRERIA (Filtro per Distretto) ---
         function openLibrary(index, category) {
             swappingIndex = index;
             const currentExId = userPlan[currentWorkoutId].items[index];
             const list = document.getElementById('library-list');
             
-            // Trova tutti gli esercizi che appartengono a questa categoria
             const alternatives = Object.entries(exerciseData)
                 .filter(([id, data]) => data.category === category && id !== currentExId)
                 .map(([id, data]) => ({ id, ...data }));
             
             list.innerHTML = alternatives.map(ex => `
                 <div onclick="swapExercise('${ex.id}')" class="apple-card p-4 flex items-center gap-4 border border-white/5 active:bg-blue-500/20 cursor-pointer transition-all">
-                    <div class="w-16 h-16 rounded-xl img-box">
-                        <img src="${ex.img}" class="w-full h-full object-cover" onerror="this.style.opacity='0'; this.parentElement.innerHTML='<i data-lucide=\'dumbbell\' class=\'text-gray-600\'></i>'; lucide.createIcons();">
+                    <div class="w-14 h-14 rounded-xl overflow-hidden img-box flex-shrink-0">
+                        <img src="${ex.img}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i data-lucide=\'dumbbell\' class=\'w-6 h-6 text-gray-600\'></i>'; lucide.createIcons();">
                     </div>
                     <div class="flex-1 text-left">
                         <h4 class="font-bold text-sm text-white">${ex.name}</h4>
-                        <p class="text-[10px] text-gray-400 line-clamp-2">${ex.note || 'Focus muscolare mirato.'}</p>
+                        <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">${ex.sets} • ${ex.target}</p>
                     </div>
                     <i data-lucide="refresh-cw" class="text-blue-500 w-5 h-5"></i>
-                </div>`).join('') + `<p class="text-center text-[10px] text-gray-600 uppercase py-6 tracking-widest">Fine della libreria biomeccanica</p>`;
+                </div>`).join('') + `<p class="text-center text-[10px] text-gray-700 uppercase py-6 tracking-widest">Fine delle alternative per ${category}</p>`;
             
             document.getElementById('modal-library').style.display = 'flex';
             lucide.createIcons();
@@ -255,7 +313,7 @@
 
         function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
 
-        // --- CORE WORKOUT ---
+        // --- CORE LOGIC ---
         function saveWeight(exId, val) {
             if (!val || isNaN(val)) return;
             const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
@@ -266,74 +324,31 @@
             renderWorkout(currentWorkoutId);
         }
 
+        function undoLastWeight(exId) {
+            const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
+            if (h.length > 0) {
+                h.pop();
+                localStorage.setItem(`h_${exId}`, JSON.stringify(h));
+                delete activeSession[exId];
+                localStorage.setItem('active_session_buffer', JSON.stringify(activeSession));
+                renderWorkout(currentWorkoutId);
+                renderDashboardCharts();
+            }
+        }
+
         function finishWorkout() {
             if (Object.keys(activeSession).length === 0) return alert("Inserisci almeno un peso.");
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
             const today = new Date().toISOString().split('T')[0];
             const vol = Object.values(activeSession).reduce((a, b) => a + b, 0);
-            journal[today] = { 
-                id: currentWorkoutId, 
-                title: userPlan[currentWorkoutId].title, 
-                exercises: { ...activeSession }, 
-                note: document.getElementById('session-note').value, 
-                volume: vol 
-            };
+            journal[today] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, exercises: { ...activeSession }, note: document.getElementById('session-note').value, volume: vol };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
             activeSession = {};
             localStorage.removeItem('active_session_buffer');
             goHome();
         }
 
-        function renderWorkout(id, isHistory = false, historyData = null) {
-            currentWorkoutId = id;
-            const container = document.getElementById('exercise-list');
-            const items = userPlan[id].items;
-            document.getElementById('finish-btn').style.display = isHistory ? 'none' : 'block';
-            document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
-
-            container.innerHTML = items.map((exId, idx) => {
-                const ex = exerciseData[exId] || { name: exId, sets: '--', target: '--', img: '', category: 'braccia' };
-                const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
-                const last = h.length > 0 ? h[h.length-1].w : '--';
-                const todayVal = isHistory ? (historyData[exId] || '--') : (activeSession[exId] || '');
-
-                return `
-                <div class="apple-card overflow-hidden animate-slide mb-4">
-                    <div class="relative h-44 img-box">
-                        <img src="${ex.img}" class="w-full h-full object-cover opacity-80" onerror="this.style.opacity='0'; this.parentElement.innerHTML='<i data-lucide=\'dumbbell\' class=\'w-12 h-12 text-gray-700\'></i>'; lucide.createIcons();">
-                        ${!isHistory ? `
-                        <button onclick="openLibrary(${idx}, '${ex.category}')" class="absolute top-4 right-4 bg-black/60 backdrop-blur-md p-3 rounded-full border border-white/10 active:scale-90 transition-all">
-                            <i data-lucide="replace" class="w-5 h-5 text-blue-400"></i>
-                        </button>` : ''}
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-1">${ex.name}</h3>
-                        <p class="text-xs font-bold text-blue-500 mb-6 uppercase tracking-widest">${ex.sets} • Target ${ex.target}</p>
-                        ${isHistory ? `
-                            <div class="bg-blue-500/10 p-4 rounded-2xl text-center"><span class="text-3xl font-black">${todayVal} kg</span></div>
-                        ` : `
-                            <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5">
-                                <div class="flex-1">
-                                    <div class="flex gap-2">
-                                        <input type="number" id="in-${exId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}">
-                                        <button onclick="saveWeight('${exId}', document.getElementById('in-${exId}').value)" class="btn-primary px-5 text-xs text-white">OK</button>
-                                    </div>
-                                </div>
-                                <div class="w-[1px] h-10 bg-white/10"></div>
-                                <div class="text-center px-2 cursor-pointer" onclick="showChart('${exId}', '${ex.name}')">
-                                    <label class="text-[9px] font-bold text-gray-500 block uppercase">Ultimo</label>
-                                    <span class="text-xl font-black italic underline decoration-blue-500/30 text-white">${last}</span>
-                                </div>
-                            </div>
-                        `}
-                        ${ex.note ? `<p class="mt-4 text-[10px] text-gray-500 italic">"${ex.note}"</p>` : ''}
-                    </div>
-                </div>`;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        // --- NAVIGATION ---
+        // --- RENDERING ---
         function goHome() {
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-home').classList.remove('hidden');
@@ -343,26 +358,89 @@
         }
 
         function openWorkout(id) {
+            currentWorkoutId = id;
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-workout').classList.remove('hidden');
-            document.getElementById('workout-title').innerText = userPlan[id].title;
+            document.getElementById('workout-title-text').innerText = userPlan[id].title;
             document.getElementById('session-note').value = '';
             renderWorkout(id);
         }
 
-        function openCalendar() {
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-            document.getElementById('view-calendar').classList.remove('hidden');
-            updateNav('calendar');
-            renderCalendar();
+        function renderWorkout(id, isHistory = false, historyData = null) {
+            const container = document.getElementById('exercise-list');
+            const items = userPlan[id].items;
+            document.getElementById('finish-btn').style.display = isHistory ? 'none' : 'block';
+            document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
+
+            container.innerHTML = items.map((exId, idx) => {
+                const ex = exerciseData[exId] || { name: exId, sets: '--', target: '--', img: '', category: 'petto', rest: 60 };
+                const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
+                const last = h.length > 0 ? h[h.length-1].w : '--';
+                const todayVal = isHistory ? (historyData[exId] || '--') : (activeSession[exId] || '');
+
+                return `
+                <div class="apple-card overflow-hidden animate-slide mb-4">
+                    <div class="relative h-48 img-box">
+                        <img src="${ex.img}" class="w-full h-full object-cover opacity-80" onerror="this.style.display='none'; this.parentElement.innerHTML='<i data-lucide=\'dumbbell\' class=\'w-12 h-12 text-gray-700\'></i>'; lucide.createIcons();">
+                        ${!isHistory ? `
+                        <button onclick="openLibrary(${idx}, '${ex.category}')" class="absolute top-4 right-4 bg-black/60 backdrop-blur-md p-3 rounded-full border border-white/10 active:scale-90 transition-all">
+                            <i data-lucide="replace" class="w-4 h-4 text-blue-400"></i>
+                        </button>` : ''}
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold">${ex.name}</h3>
+                                <p class="text-xs font-bold text-blue-500 uppercase tracking-widest mt-1">${ex.sets} • Target ${ex.target}</p>
+                            </div>
+                            ${!isHistory ? `
+                                <button id="timer-${exId}" onclick="toggleTimer('${exId}', ${ex.rest})" class="bg-white/5 text-gray-400 text-[10px] font-black px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all">
+                                    <i data-lucide="timer" class="w-3 h-3"></i> ${ex.rest}s
+                                </button>
+                            ` : ''}
+                        </div>
+                        
+                        ${isHistory ? `
+                            <div class="bg-blue-500/10 p-5 rounded-2xl text-center"><span class="text-4xl font-black">${todayVal} <small class="text-sm">kg</small></span></div>
+                        ` : `
+                            <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5">
+                                <div class="flex-1">
+                                    <div class="flex gap-2">
+                                        <input type="number" id="in-${exId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}">
+                                        <button onclick="saveWeight('${exId}', document.getElementById('in-${exId}').value)" class="btn-primary px-5 text-xs text-white">OK</button>
+                                        ${todayVal ? `<button onclick="undoLastWeight('${exId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl"><i data-lucide="undo" class="w-4 h-4"></i></button>` : ''}
+                                    </div>
+                                </div>
+                                <div class="w-[1px] h-10 bg-white/10"></div>
+                                <div class="text-center px-2 cursor-pointer" onclick="showChart('${exId}', '${ex.name}')">
+                                    <label class="text-[9px] font-bold text-gray-500 block uppercase">Ultimo</label>
+                                    <span class="text-xl font-black italic underline decoration-blue-500/30 text-white">${last}</span>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
         }
 
-        function openSettings() {
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-            document.getElementById('view-settings').classList.remove('hidden');
-            updateNav('settings');
+        function renderHomeCards() {
+            const container = document.getElementById('workout-cards-container');
+            container.innerHTML = Object.entries(userPlan).map(([id, p]) => `
+                <div onclick="openWorkout(${id})" class="apple-card relative h-32 overflow-hidden transform active:scale-[0.98] transition-all" style="background-color: ${p.color}15">
+                    <img src="${p.img}" class="absolute inset-0 w-full h-full object-cover opacity-30">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent p-6 flex flex-col justify-center">
+                        <p class="text-[10px] font-black uppercase mb-1" style="color: ${p.color}">Giorno ${id}</p>
+                        <h3 class="text-2xl font-extrabold text-white">${p.title}</h3>
+                    </div>
+                    <div class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                        <i data-lucide="play" class="w-5 h-5 text-white ml-0.5"></i>
+                    </div>
+                </div>`).join('');
+            lucide.createIcons();
         }
 
+        // --- NAVIGATION ---
         function updateNav(active) {
             ['home', 'calendar', 'settings'].forEach(n => {
                 const btn = document.getElementById(`nav-${n}`);
@@ -372,25 +450,23 @@
                 }
             });
         }
-
-        function renderHomeCards() {
-            const container = document.getElementById('workout-cards-container');
-            container.innerHTML = Object.entries(userPlan).map(([id, p]) => `
-                <div onclick="openWorkout(${id})" class="apple-card relative h-32 overflow-hidden transform active:scale-95 transition-all">
-                    <img src="${p.img}" class="absolute inset-0 w-full h-full object-cover opacity-30">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent p-6 flex flex-col justify-center">
-                        <p class="text-[10px] font-black uppercase mb-1" style="color: ${p.color}">Giorno ${id}</p>
-                        <h3 class="text-2xl font-extrabold text-white">${p.title}</h3>
-                    </div>
-                </div>`).join('');
+        function openCalendar() {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-calendar').classList.remove('hidden');
+            updateNav('calendar');
+            renderCalendar();
+        }
+        function openSettings() {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-settings').classList.remove('hidden');
+            updateNav('settings');
         }
 
-        // --- UTILS ---
+        // --- DATA MGMT ---
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
             const dl = document.createElement('a'); dl.href = dataStr; dl.download = "powerlog_backup.json"; dl.click();
         }
-
         function importData(e) {
             const reader = new FileReader();
             reader.onload = (ev) => {
@@ -400,9 +476,9 @@
             };
             reader.readAsText(e.target.files[0]);
         }
+        function resetAllData() { if(confirm("Cancellare tutto definitivamente?")) { localStorage.clear(); location.reload(); } }
 
-        function resetAllData() { if(confirm("RESET TOTALE?")) { localStorage.clear(); location.reload(); } }
-
+        // --- CALENDAR ---
         function renderCalendar() {
             const container = document.getElementById('calendar-days');
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
@@ -410,18 +486,18 @@
             const year = calendarDate.getFullYear();
             const month = calendarDate.getMonth();
             document.getElementById('calendar-month').innerText = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' }).format(calendarDate);
-            const offset = new Date(year, month, 1).getDay();
-            for(let i=0; i<(offset === 0 ? 6 : offset - 1); i++) container.innerHTML += `<div></div>`;
+            const firstDay = new Date(year, month, 1).getDay();
+            const offset = firstDay === 0 ? 6 : firstDay - 1;
+            for(let i=0; i<offset; i++) container.innerHTML += `<div></div>`;
             for(let d=1; d<=new Date(year, month + 1, 0).getDate(); d++) {
                 const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 const workout = journal[key];
                 container.innerHTML += `
-                    <div onclick="selectDate('${key}')" class="calendar-day cursor-pointer hover:bg-white/10 ${new Date().toISOString().split('T')[0] === key ? 'bg-blue-500' : ''}">
+                    <div onclick="selectDate('${key}')" class="calendar-day cursor-pointer hover:bg-white/10 ${new Date().toISOString().split('T')[0] === key ? 'border border-blue-500' : ''}">
                         ${d}${workout ? `<div class="day-workout-dot" style="background-color: ${defaultPlan[workout.id]?.color || '#fff'}"></div>` : ''}
                     </div>`;
             }
         }
-
         function selectDate(key) {
             const workout = (JSON.parse(localStorage.getItem('workout_journal')) || {})[key];
             const display = document.getElementById('calendar-selection');
@@ -429,19 +505,17 @@
             display.innerHTML = `
                 <div onclick="viewPastWorkout(${workout.id}, '${key}')" class="apple-card p-5 flex flex-col cursor-pointer border-l-4" style="border-left-color: ${defaultPlan[workout.id]?.color || '#fff'}">
                     <div class="flex justify-between items-center">
-                        <div><h3 class="text-xl font-black text-white">${workout.title}</h3><p class="text-xs text-gray-400">${workout.volume || 0} kg</p></div>
+                        <div><h3 class="text-xl font-black text-white">${workout.title}</h3><p class="text-xs text-gray-400">${workout.volume || 0} kg totali</p></div>
                         <i data-lucide="chevron-right"></i>
                     </div>
                 </div>`;
             lucide.createIcons();
         }
-
         function viewPastWorkout(wid, dkey) {
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-workout').classList.remove('hidden');
             renderWorkout(wid, true, (JSON.parse(localStorage.getItem('workout_journal')) || {})[dkey].exercises);
         }
-
         function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); renderCalendar(); }
         
         let myChart = null;
@@ -458,7 +532,8 @@
         function closeChart() { document.getElementById('chart-modal').classList.add('hidden'); }
 
         window.onload = () => {
-            document.getElementById('date-label').innerText = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+            const d = new Date();
+            document.getElementById('date-label').innerText = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
             goHome();
             lucide.createIcons();
         };
