@@ -14,29 +14,10 @@
         .glass { background: rgba(28, 28, 30, 0.7); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); }
         .apple-card { background-color: var(--apple-card); border-radius: 24px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
         .btn-primary { background-color: var(--apple-blue); border-radius: 14px; font-weight: 600; }
-        
-        /* Design Pulsante CAMBIA Ultra-Visibile */
-        .btn-variant { 
-            background-color: var(--apple-blue); 
-            border-radius: 8px; 
-            font-size: 10px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 800; 
-            color: #ffffff; 
-            padding: 8px 14px; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 6px; 
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-        }
-        .btn-variant:active { transform: scale(0.95); background-color: #005bb5; }
-        
-        .horizontal-scroll-container { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 12px; scroll-snap-type: x mandatory; margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
-        .horizontal-scroll-container > div { flex: 0 0 140px; scroll-snap-align: start; }
-        .mini-chart-container { height: 60px; width: 100%; }
-        input[type="number"] { background: #2C2C2E; border: none; border-radius: 12px; color: white; padding: 10px; text-align: center; font-size: 18px; font-weight: 700; width: 100%; }
+        .btn-variant { background-color: var(--apple-blue); border-radius: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; color: #ffffff; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-size: 13px; font-weight: 600; position: relative; }
+        .day-workout-dot { width: 4px; height: 4px; border-radius: 50%; position: absolute; bottom: 6px; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         .pt-safe { padding-top: env(safe-area-inset-top); }
         .animate-slide { animation: slide 0.3s ease-out; }
@@ -46,7 +27,6 @@
 <body class="pt-safe">
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden">
         
-        <!-- VISTA HOME -->
         <div id="view-home" class="view p-6 pb-32 animate-slide">
             <header class="flex justify-between items-end mb-8">
                 <div>
@@ -57,89 +37,86 @@
 
             <section class="mb-10">
                 <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Andamento Distretti</h2>
-                <div class="horizontal-scroll-container no-scrollbar">
-                    <div class="apple-card p-4"><p class="text-[10px] font-bold text-gray-400 uppercase">Petto</p><div class="mini-chart-container"><canvas id="chart-petto"></canvas></div></div>
-                    <div class="apple-card p-4"><p class="text-[10px] font-bold text-gray-400 uppercase">Dorso</p><div class="mini-chart-container"><canvas id="chart-dorso"></canvas></div></div>
-                    <div class="apple-card p-4"><p class="text-[10px] font-bold text-gray-400 uppercase">Gambe</p><div class="mini-chart-container"><canvas id="chart-gambe"></canvas></div></div>
-                    <div class="apple-card p-4"><p class="text-[10px] font-bold text-gray-400 uppercase">Braccia</p><div class="mini-chart-container"><canvas id="chart-braccia"></canvas></div></div>
+                <div class="horizontal-scroll-container flex overflow-x-auto gap-3 no-scrollbar -mx-6 px-6">
+                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Petto</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
+                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Dorso</p><div class="h-14"><canvas id="chart-dorso"></canvas></div></div>
+                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Gambe</p><div class="h-14"><canvas id="chart-gambe"></canvas></div></div>
+                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase">Braccia</p><div class="h-14"><canvas id="chart-braccia"></canvas></div></div>
                 </div>
             </section>
 
             <section class="space-y-4">
-                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">I Tuoi Programmi (v3.0)</h2>
-                
-                <div onclick="openWorkout(1)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-blue-900/20">
-                    <img src="img/panca_piana.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src=''">
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">I Tuoi Programmi</h2>
+                <div onclick="openWorkout(1)" class="relative overflow-hidden rounded-[24px] cursor-pointer group h-32 transform transition active:scale-[0.98] bg-blue-900/20">
+                    <img src="img/panca_piana.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.src=''">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
-                        <p class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 1</p>
-                        <h3 class="font-extrabold text-2xl text-white drop-shadow-lg tracking-tight">PUSH</h3>
-                        <p class="text-[11px] text-gray-300 font-medium mt-1">Petto, Spalle, Tricipiti</p>
-                    </div>
-                    <div class="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
-                        <i data-lucide="play" class="w-5 h-5 text-white ml-1"></i>
+                        <p class="text-blue-500 font-black text-[10px] uppercase mb-1">Giorno 1</p>
+                        <h3 class="font-extrabold text-2xl text-white">PUSH</h3>
                     </div>
                 </div>
-
-                <div onclick="openWorkout(2)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-purple-900/20">
-                    <img src="img/trazioni.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src=''">
+                <div onclick="openWorkout(2)" class="relative overflow-hidden rounded-[24px] cursor-pointer group h-32 transform transition active:scale-[0.98] bg-purple-900/20">
+                    <img src="img/trazioni.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.src=''">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
-                        <p class="text-purple-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 2</p>
-                        <h3 class="font-extrabold text-2xl text-white drop-shadow-lg tracking-tight">PULL</h3>
-                        <p class="text-[11px] text-gray-300 font-medium mt-1">Dorso, Bicipiti, Addome</p>
-                    </div>
-                    <div class="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
-                        <i data-lucide="play" class="w-5 h-5 text-white ml-1"></i>
+                        <p class="text-purple-500 font-black text-[10px] uppercase mb-1">Giorno 2</p>
+                        <h3 class="font-extrabold text-2xl text-white">PULL</h3>
                     </div>
                 </div>
-
-                <div onclick="openWorkout(3)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-green-900/20">
-                    <img src="img/hack_squat.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src=''">
+                <div onclick="openWorkout(3)" class="relative overflow-hidden rounded-[24px] cursor-pointer group h-32 transform transition active:scale-[0.98] bg-green-900/20">
+                    <img src="img/hack_squat.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.src=''">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
-                        <p class="text-green-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 3</p>
-                        <h3 class="font-extrabold text-2xl text-white drop-shadow-lg tracking-tight">LEGS</h3>
-                        <p class="text-[11px] text-gray-300 font-medium mt-1">Gambe, Glutei, Addome</p>
-                    </div>
-                    <div class="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
-                        <i data-lucide="play" class="w-5 h-5 text-white ml-1"></i>
+                        <p class="text-green-500 font-black text-[10px] uppercase mb-1">Giorno 3</p>
+                        <h3 class="font-extrabold text-2xl text-white">LEGS</h3>
                     </div>
                 </div>
-
-                <div onclick="openWorkout(4)" class="relative overflow-hidden rounded-[24px] cursor-pointer group border border-white/5 h-32 transform transition active:scale-[0.98] bg-orange-900/20">
-                    <img src="img/chest_press.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.onerror=null; this.src=''">
+                <div onclick="openWorkout(4)" class="relative overflow-hidden rounded-[24px] cursor-pointer group h-32 transform transition active:scale-[0.98] bg-orange-900/20">
+                    <img src="img/chest_press.png" class="absolute inset-0 w-full h-full object-cover opacity-50" onerror="this.src=''">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
                     <div class="absolute inset-0 p-5 flex flex-col justify-center">
-                        <p class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-1 shadow-black drop-shadow-md">Giorno 4</p>
-                        <h3 class="font-extrabold text-2xl text-white drop-shadow-lg tracking-tight">UPPER</h3>
-                        <p class="text-[11px] text-gray-300 font-medium mt-1">Ipertrofia Petto/Dorso/Spalle + Braccia</p>
-                    </div>
-                    <div class="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
-                        <i data-lucide="play" class="w-5 h-5 text-white ml-1"></i>
+                        <p class="text-orange-500 font-black text-[10px] uppercase mb-1">Giorno 4</p>
+                        <h3 class="font-extrabold text-2xl text-white">UPPER</h3>
                     </div>
                 </div>
             </section>
         </div>
 
-        <!-- VISTA WORKOUT -->
-        <div id="view-workout" class="view hidden pb-32">
-            <header class="p-6 sticky top-0 z-50 glass border-b border-white/5 pt-12">
-                <div class="flex items-center justify-between">
-                    <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm"><i data-lucide="chevron-left" class="w-5 h-5"></i> Indietro</button>
-                    <h2 id="workout-title" class="font-bold">Allenamento</h2>
-                    <div class="w-12"></div>
+        <div id="view-calendar" class="view hidden p-6 pb-32 animate-slide">
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-8">Calendario</h1>
+            <div class="apple-card p-5 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="calendar-month" class="font-bold text-lg">Mese Anno</h3>
+                    <div class="flex gap-4">
+                        <button onclick="changeMonth(-1)" class="text-blue-500"><i data-lucide="chevron-left"></i></button>
+                        <button onclick="changeMonth(1)" class="text-blue-500"><i data-lucide="chevron-right"></i></button>
+                    </div>
                 </div>
+                <div class="calendar-grid text-gray-500 text-[10px] font-bold uppercase mb-4 text-center">
+                    <div>Lun</div><div>Mar</div><div>Mer</div><div>Gio</div><div>Ven</div><div>Sab</div><div>Dom</div>
+                </div>
+                <div id="calendar-days" class="calendar-grid"></div>
+            </div>
+            <div id="calendar-selection" class="space-y-4">
+                <p class="text-center text-gray-500 text-sm">Seleziona un giorno per vedere i dettagli</p>
+            </div>
+        </div>
+
+        <div id="view-workout" class="view hidden pb-32">
+            <header class="p-6 sticky top-0 z-50 glass border-b border-white/5 pt-12 flex justify-between items-center">
+                <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm"><i data-lucide="chevron-left" class="w-5 h-5"></i> Esci</button>
+                <h2 id="workout-title" class="font-bold">Allenamento</h2>
+                <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-green-500/20">CONCLUDI</button>
             </header>
             <main id="exercise-list" class="p-4 space-y-8 mt-4 animate-slide"></main>
         </div>
 
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-8 py-4 flex justify-around items-center z-50 pb-safe">
-            <button onclick="goHome()" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Home</span></button>
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
+            <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Home</span></button>
+            <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Diario</span></button>
         </nav>
     </div>
 
-    <!-- MODAL GRAFICI -->
     <div id="chart-modal" class="fixed inset-0 bg-black z-[100] hidden flex flex-col p-6 animate-slide">
         <div class="flex justify-between items-center mb-8 pt-12">
             <h3 id="chart-title" class="text-2xl font-bold">Andamento</h3>
@@ -149,310 +126,252 @@
     </div>
 
     <script>
-        const groups = {
-            petto: ['panca_piana', 'spinte_inc', 'chest_press', 'pectoral', 'crossover'],
-            dorso: ['trazioni', 'tbar_row', 'lat_neutra', 'lat_iper', 'lat_larga', 'rematore_manubrio'],
-            gambe: ['hack_squat', 'hip_thrust', 'leg_press', 'leg_ext', 'polpacci', 'belt_squat'],
-            braccia: ['skullcrusher', 'pushdown', 'curl_ez', 'hammer_curl', 'curl_alt', 'pushdown_corda', 'curl_cavi', 'estensioni_testa', 'curl_concentrazione']
-        };
-
-        // Database degli allenamenti (Multi-Variante Definitivo con Tutte le Immagini)
+        // --- DATABASE & STATO ---
         const workoutPlan = {
-            1: { title: 'PUSH (G1)', items: [
-                { id: 'panca_piana', name: 'Panca Piana (Bilanciere)', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', note: '8 reps prima di passare a 35kg.', 
-                  alts: [{ id: 'chest_press_g1', name: 'Chest Press', target: '35kg', rest: 180, img: 'img/chest_press_g1.png', note: 'Alternativa se la panca è occupata.' }]
-                },
-                { id: 'lento_avanti', name: 'Lento Avanti (Bilanciere)', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', note: 'Forza pura. Core contratto, niente slancio di gambe.',
-                  alts: [
-                      { id: 'lento_manubri', name: 'Lento Avanti Manubri', target: '12kg', rest: 120, img: 'img/lento_manubri.png', note: 'ROM più naturale. Richiede stabilizzazione.' },
-                      { id: 'arnold_press', name: 'Arnold Press', target: '10kg', rest: 120, img: 'img/arnold_press.png', note: 'Focus rotondità della spalla (3 capi).' },
-                      { id: 'landmine_press', name: 'Landmine Press (Monolat.)', target: '15kg', rest: 120, img: 'img/landmine_press.png', note: 'Protegge la schiena e le spalle.' },
-                      { id: 'tirate_larga', name: 'Tirate al Mento Larga', target: '20kg', rest: 120, img: 'img/tirate_larga.png', note: 'Isola brutalmente il deltoide laterale.' }
-                  ]
-                },
-                { id: 'spinte_inc', name: 'Spinte Inclinata 30° Manubri', sets: '4x8-10', target: '26kg', rest: 90, img: 'img/spinte_inc.png', note: 'Focus petto alto. Eccentrica 3 sec.' },
-                { id: 'alzate_lat', name: 'Alzate Laterali in Piedi', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.png', note: 'Qualità sopra il carico. Niente cheating.', 
-                  alts: [
-                      { id: 'alzate_inclinata', name: 'Alzate su Panca Inclinata', target: '6kg', rest: 75, img: 'img/alzate_inclinata.png', note: 'Sul fianco a 30-45°. Elimina lo slancio, tensione in allungamento.' },
-                      { id: 'alzate_cavi_dietro', name: 'Alzate ai Cavi (Dietro Schiena)', target: '7.5kg', rest: 75, img: 'img/alzate_cavi_dietro.png', note: 'Tensione costante con cavo che passa dietro la schiena.' },
-                      { id: 'alzate_lean_away', name: 'Alzate Lean-Away', target: '8kg', rest: 75, img: 'img/alzate_lean_away.png', note: 'Inclinati tenendoti a un palo. Aumenta il ROM senza trapezio.' },
-                      { id: 'alzate_seduto', name: 'Alzate Laterali da Seduto', target: '8kg', rest: 75, img: 'img/alzate_seduto.png', note: 'Impedisce l\'uso delle gambe e della schiena.' }
-                  ]
-                },
-                { id: 'skullcrusher', name: 'Skullcrusher Manubri', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png', note: 'Gomiti chiusi e fermi.' },
-                { id: 'pushdown', name: 'Push Down Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png', note: 'Sull\'ultima serie: Drop Set.' }
+            1: { title: 'PUSH', color: '#007AFF', items: [
+                { id: 'panca_piana', name: 'Panca Piana (Bilanciere)', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', note: '8 reps prima di passare a 35kg.', alts: [{ id: 'chest_press_g1', name: 'Chest Press', target: '35kg', rest: 180, img: 'img/chest_press_g1.png' }]},
+                { id: 'lento_avanti', name: 'Lento Avanti (Bilanciere)', sets: '4x6-8', target: '22.5kg', rest: 120, img: 'img/lento_avanti.png', alts: [{id:'lento_manubri', name:'Lento Manubri', target:'12kg', rest:120, img:'img/lento_manubri.png'},{id:'arnold_press', name:'Arnold Press', target:'10kg', rest:120, img:'img/arnold_press.png'}]},
+                { id: 'spinte_inc', name: 'Spinte Inc. 30° Manubri', sets: '4x8-10', target: '26kg', rest: 90, img: 'img/spinte_inc.png' },
+                { id: 'alzate_lat', name: 'Alzate Laterali in Piedi', sets: '3x10-12', target: '10kg', rest: 75, img: 'img/alzate_lat.png', alts: [{id:'alzate_cavi_dietro', name:'Alzate Cavi Dietro', target:'7.5kg', rest:75, img:'img/alzate_cavi_dietro.png'}]},
+                { id: 'skullcrusher', name: 'Skullcrusher Manubri', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png' },
+                { id: 'pushdown', name: 'Push Down Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png' }
             ]},
-            2: { title: 'PULL (G2)', items: [
-                { id: 'trazioni', name: 'Trazioni Sbarra (Zavorrate)', sets: '5x6-8', target: 'Zavorra', rest: 120, img: 'img/trazioni.png', note: 'Focus ampiezza. Petto verso la sbarra.' },
-                { id: 'tbar_row', name: 'Rematore T-Bar (Appoggio)', sets: '4x8-10', target: '30kg', rest: 120, img: 'img/tbar_row.png', note: 'Tira i gomiti indietro, non staccare il petto.',
-                  alts: [{ id: 'rematore_manubrio', name: 'Rematore Manubrio Singolo', target: '28kg', rest: 120, img: 'img/rematore_manubrio.png', note: 'Un braccio alla volta.' }]
-                },
-                { id: 'curl_ez', name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', rest: 90, img: 'img/curl_ez.png', note: 'Schiena ferma, estensione completa.' },
-                { id: 'alzate_90', name: 'Alzate a 90° (Reverse Fly)', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_90.png', note: 'Per la rotondità posteriore della spalla.' },
-                { id: 'hammer_curl', name: 'Curl a Martello', sets: '3x8-10', target: '14kg', rest: 75, img: 'img/hammer_curl.png', note: 'Spessore braccio e avambraccio.' },
-                { id: 'russian_twist', name: 'Russian Twist', sets: '3x15-20', target: '10kg', rest: 60, img: 'img/russian_twist.png', note: 'Addome: Obliqui.' }
+            2: { title: 'PULL', color: '#AF52DE', items: [
+                { id: 'trazioni', name: 'Trazioni Sbarra', sets: '5x6-8', target: 'Zavorra', rest: 120, img: 'img/trazioni.png' },
+                { id: 'tbar_row', name: 'Rematore T-Bar', sets: '4x8-10', target: '30kg', rest: 120, img: 'img/tbar_row.png', alts: [{id:'rematore_manubrio', name:'Rematore Manubrio', target:'28kg', rest:120, img:'img/rematore_manubrio.png'}]},
+                { id: 'curl_ez', name: 'Curl Bilanciere EZ', sets: '3x8-10', target: '20kg', rest: 90, img: 'img/curl_ez.png' },
+                { id: 'alzate_90', name: 'Alzate a 90°', sets: '3x12-15', target: '8kg', rest: 75, img: 'img/alzate_90.png' },
+                { id: 'hammer_curl', name: 'Curl a Martello', sets: '3x8-10', target: '14kg', rest: 75, img: 'img/hammer_curl.png' },
+                { id: 'russian_twist', name: 'Russian Twist', sets: '3x15-20', target: '10kg', rest: 60, img: 'img/russian_twist.png' }
             ]},
-            3: { title: 'LEGS (G3)', items: [
-                { id: 'hack_squat', name: 'Hack Squat', sets: '4x10-12', target: '65kg', rest: 120, img: 'img/hack_squat.png', note: 'Massima profondità. Alterna ogni settimana.',
-                  alts: [{ id: 'belt_squat', name: 'Belt Squat', target: '65kg', rest: 120, img: 'img/belt_squat.png', note: 'Focus gambe senza carico sulla schiena lombare.' }]
-                },
-                { id: 'hip_thrust', name: 'Hip Thrust con Bilanciere', sets: '4x10-12', target: '30kg', rest: 90, img: 'img/hip_thrust.png', note: 'Massima contrazione dei glutei in alto.' },
-                { id: 'leg_press', name: 'Leg Press 45°', sets: '3x15-20', target: '120kg', rest: 90, img: 'img/leg_press.png', note: 'Piedi bassi sulla pedana per quadricipiti.' },
-                { id: 'leg_ext', name: 'Leg Extension', sets: '3x15-20', target: '30kg', rest: 60, img: 'img/leg_ext.png', note: 'Sull\'ultima serie: Drop Set.' },
-                { id: 'polpacci', name: 'Calf Raise alla Pressa', sets: '4x15-20', target: '70kg', rest: 60, img: 'img/polpacci.png', note: 'Pausa 2s in allungamento.' },
-                { id: 'hanging_leg', name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', rest: 60, img: 'img/hanging_leg.png', note: 'Addome: Parte Bassa.' },
-                { id: 'plank', name: 'Plank', sets: '3x max', target: 'C.L.', rest: 60, img: 'img/russian_twist.png', note: 'Mantieni la retroversione del bacino.' }
+            3: { title: 'LEGS', color: '#34C759', items: [
+                { id: 'hack_squat', name: 'Hack Squat', sets: '4x10-12', target: '65kg', rest: 120, img: 'img/hack_squat.png', alts: [{id:'belt_squat', name:'Belt Squat', target:'65kg', rest:120, img:'img/belt_squat.png'}]},
+                { id: 'hip_thrust', name: 'Hip Thrust Bilanciere', sets: '4x10-12', target: '30kg', rest: 90, img: 'img/hip_thrust.png' },
+                { id: 'leg_press', name: 'Leg Press 45°', sets: '3x15-20', target: '120kg', rest: 90, img: 'img/leg_press.png' },
+                { id: 'leg_ext', name: 'Leg Extension', sets: '3x15-20', target: '30kg', rest: 60, img: 'img/leg_ext.png' },
+                { id: 'polpacci', name: 'Calf Raise Pressa', sets: '4x15-20', target: '70kg', rest: 60, img: 'img/polpacci.png' },
+                { id: 'hanging_leg', name: 'Hanging Leg Raises', sets: '3x15-20', target: 'C.L.', rest: 60, img: 'img/hanging_leg.png' }
             ]},
-            4: { title: 'UPPER (G4)', items: [
-                { id: 'chest_press', name: 'Chest Press (Sedile Basso)', sets: '4x12-15', target: '35kg', rest: 75, img: 'img/chest_press.png', note: 'Focus petto alto. Contrazione lenta.' },
-                { id: 'pectoral', name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', rest: 75, img: 'img/pectoral.png', note: 'Massimo stiramento, chiusura lenta.' },
-                { id: 'lat_neutra', name: 'Lat Machine Presa Neutra', sets: '4x12-15', target: '45kg', rest: 75, img: 'img/lat_neutra.png', note: 'Tira i gomiti verso le tasche.',
-                  alts: [{ id: 'lat_larga', name: 'Lat Machine Presa Larga', target: '40kg', rest: 75, img: 'img/lat_larga.png', note: 'Focus ampiezza dorsali.' }]
-                },
-                { id: 'alzate_cavi', name: 'Alzate Laterali ai Cavi', sets: '4x15-20', target: '10kg', rest: 60, img: 'img/alzate_cavi.png', note: 'Sull\'ultima serie: Drop Set.' },
-                { id: 'tirate_mento', name: 'Tirate al Mento (EZ)', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/tirate_mento.png', note: 'Presa larga per il deltoide mediale.' },
-                { id: 'crossover', name: 'Cavi Crossover (dall\'alto)', sets: '3x15-20', target: '15kg', rest: 60, img: 'img/crossover.png', note: 'Parte bassa e sterno del petto.' },
-                { id: 'pushdown_corda', name: 'SS1: Push Down Corda', sets: '3x12-15', target: '20kg', rest: 0, img: 'img/pushdown_corda.png', note: 'Tricipiti, passa subito ai bicipiti.' },
-                { id: 'curl_cavi', name: 'SS1: Curl ai Cavi', sets: '3x12-15', target: '15kg', rest: 90, img: 'img/curl_cavi.png', note: 'Bicipiti senza sosta, poi recupera 90s.' },
-                { id: 'estensioni_testa', name: 'SS2: Estensioni Manubrio', sets: '3x12-15', target: '10kg', rest: 0, img: 'img/estensioni_testa.png', note: 'Tricipiti overhead.' },
-                { id: 'curl_concentrazione', name: 'SS2: Curl Concentrazione', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/curl_concentrazione.png', note: 'Pump finale bicipiti.' }
+            4: { title: 'UPPER', color: '#FF9500', items: [
+                { id: 'chest_press', name: 'Chest Press Bassa', sets: '4x12-15', target: '35kg', rest: 75, img: 'img/chest_press.png' },
+                { id: 'pectoral', name: 'Pectoral Machine', sets: '3x12-15', target: '35kg', rest: 75, img: 'img/pectoral.png' },
+                { id: 'lat_neutra', name: 'Lat Machine Neutra', sets: '4x12-15', target: '45kg', rest: 75, img: 'img/lat_neutra.png', alts: [{id:'lat_larga', name:'Lat Machine Larga', target:'40kg', rest:75, img:'img/lat_larga.png'}]},
+                { id: 'alzate_cavi', name: 'Alzate Laterali ai Cavi', sets: '4x15-20', target: '10kg', rest: 60, img: 'img/alzate_cavi.png' },
+                { id: 'tirate_mento', name: 'Tirate al Mento EZ', sets: '3x12-15', target: '20kg', rest: 75, img: 'img/tirate_mento.png' },
+                { id: 'crossover', name: 'Crossover Cavi', sets: '3x15-20', target: '15kg', rest: 60, img: 'img/crossover.png' },
+                { id: 'pushdown_corda', name: 'SS1: Push Down Corda', sets: '3x12-15', target: '20kg', rest: 0, img: 'img/pushdown_corda.png' },
+                { id: 'curl_cavi', name: 'SS1: Curl ai Cavi', sets: '3x12-15', target: '15kg', rest: 90, img: 'img/curl_cavi.png' },
+                { id: 'estensioni_testa', name: 'SS2: Estensioni Manubrio', sets: '3x12-15', target: '10kg', rest: 0, img: 'img/estensioni_testa.png' },
+                { id: 'curl_concentrazione', name: 'SS2: Curl Concentrazione', sets: '3x12-15', target: '10kg', rest: 90, img: 'img/curl_concentrazione.png' }
             ]}
         };
 
-        const activeVariants = {}; // Salva l'indice della variante attiva (0 = base, 1 = alt[0], ecc.)
-        const activeTimers = {}; 
+        let currentWorkoutId = null;
+        let activeVariants = {};
+        let currentSessionData = {}; // Salva pesi inseriti oggi prima della chiusura
+        let calendarDate = new Date();
 
-        function getHistory(exId) {
-            try { return JSON.parse(localStorage.getItem(`h_${exId}`)) || []; } 
-            catch(e) { return []; }
-        }
-        
+        // --- STORAGE ---
+        const getHistory = (id) => JSON.parse(localStorage.getItem(`h_${id}`)) || [];
+        const getJournal = () => JSON.parse(localStorage.getItem('workout_journal')) || {};
+
         function saveWeight(exId, weight) {
-            // Controllo anti-errore: se il peso è vuoto, nullo, o non è un numero, non fa nulla!
-            if (!weight || weight.trim() === '' || isNaN(weight)) return; 
-            
+            if (!weight || isNaN(weight)) return;
+            const val = parseFloat(weight);
+            // 1. Salva nello storico globale (per i grafici)
             const h = getHistory(exId);
-            h.push({ d: new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}), w: parseFloat(weight) });
-            if (h.length > 15) h.shift();
-            localStorage.setItem(`h_${exId}`, JSON.stringify(h));
-            renderWorkout(window.currentWorkoutId);
-            renderDashboardCharts();
+            h.push({ d: new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}), w: val });
+            localStorage.setItem(`h_${exId}`, JSON.stringify(h.slice(-15)));
+            // 2. Salva nella sessione attiva (per il calendario)
+            currentSessionData[exId] = val;
+            renderWorkout(currentWorkoutId);
         }
 
-        // Funzione per annullare l'ultimo peso inserito
         function undoLastWeight(exId) {
             const h = getHistory(exId);
             if (h.length > 0) {
-                h.pop(); // Rimuove l'ultimo elemento
+                h.pop();
                 localStorage.setItem(`h_${exId}`, JSON.stringify(h));
-                renderWorkout(window.currentWorkoutId);
-                renderDashboardCharts();
+                delete currentSessionData[exId];
+                renderWorkout(currentWorkoutId);
             }
         }
 
-        function clearAllTimers() {
-            for (let id in activeTimers) {
-                clearInterval(activeTimers[id].interval);
-                delete activeTimers[id];
-            }
-        }
-
-        function toggleTimer(exId, durationInSeconds) {
-            const btn = document.getElementById(`timer-btn-${exId}`);
-            if (!btn) return;
-
-            if (activeTimers[exId]) {
-                clearInterval(activeTimers[exId].interval);
-                delete activeTimers[exId];
-                resetTimerUI(btn, durationInSeconds);
+        function finishWorkout() {
+            if (Object.keys(currentSessionData).length === 0) {
+                alert("Inserisci almeno un peso prima di concludere!");
                 return;
             }
-
-            let remaining = durationInSeconds;
-            btn.classList.remove('text-gray-400', 'bg-white/5', 'text-green-500', 'bg-green-500/20');
-            btn.classList.add('text-orange-500', 'bg-orange-500/20');
-
-            const updateUI = () => {
-                const m = Math.floor(remaining / 60);
-                const s = remaining % 60;
-                btn.innerHTML = `<i data-lucide="timer" class="w-3.5 h-3.5 mr-1"></i> ${m}:${s.toString().padStart(2, '0')}`;
-                lucide.createIcons();
+            const journal = getJournal();
+            const today = new Date().toISOString().split('T')[0];
+            journal[today] = {
+                id: currentWorkoutId,
+                title: workoutPlan[currentWorkoutId].title,
+                exercises: { ...currentSessionData }
             };
-
-            updateUI();
-
-            activeTimers[exId] = {
-                interval: setInterval(() => {
-                    remaining--;
-                    if (remaining <= 0) {
-                        clearInterval(activeTimers[exId].interval);
-                        delete activeTimers[exId];
-                        btn.classList.remove('text-orange-500', 'bg-orange-500/20');
-                        btn.classList.add('text-green-500', 'bg-green-500/20');
-                        btn.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5 mr-1"></i> GO!`;
-                        if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]);
-                        lucide.createIcons();
-
-                        setTimeout(() => {
-                            const currentBtn = document.getElementById(`timer-btn-${exId}`);
-                            if (currentBtn && !activeTimers[exId]) {
-                                resetTimerUI(currentBtn, durationInSeconds);
-                            }
-                        }, 5000);
-                    } else {
-                        updateUI();
-                    }
-                }, 1000)
-            };
+            localStorage.setItem('workout_journal', JSON.stringify(journal));
+            alert("Allenamento salvato nel diario!");
+            goHome();
         }
 
-        function resetTimerUI(btn, durationInSeconds) {
-            btn.classList.remove('text-orange-500', 'bg-orange-500/20', 'text-green-500', 'bg-green-500/20');
-            btn.classList.add('text-gray-400', 'bg-white/5');
-            btn.innerHTML = `<i data-lucide="timer" class="w-3.5 h-3.5 mr-1"></i> ${durationInSeconds}s`;
-            lucide.createIcons();
-        }
-
-        // Cliccando CAMBIA, scorre al prossimo esercizio alternativo. Torna a 0 (base) se finiscono.
-        function toggleVariant(exId, altsLength) {
-            activeVariants[exId] = ((activeVariants[exId] || 0) + 1) % (altsLength + 1);
-            renderWorkout(window.currentWorkoutId);
-        }
-
-        function openWorkout(id) {
-            window.currentWorkoutId = id;
-            document.getElementById('view-home').classList.add('hidden');
-            document.getElementById('view-workout').classList.remove('hidden');
-            renderWorkout(id);
-        }
-
+        // --- INTERFACCIA ---
         function goHome() {
-            clearAllTimers(); 
-            document.getElementById('view-workout').classList.add('hidden');
+            currentSessionData = {};
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-home').classList.remove('hidden');
+            updateNav('home');
             renderDashboardCharts();
         }
 
-        function renderWorkout(id) {
-            clearAllTimers(); 
+        function openWorkout(id) {
+            currentWorkoutId = id;
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-workout').classList.remove('hidden');
+            document.getElementById('workout-title').innerText = workoutPlan[id].title;
+            renderWorkout(id);
+        }
+
+        function openCalendar() {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-calendar').classList.remove('hidden');
+            updateNav('calendar');
+            renderCalendar();
+        }
+
+        function updateNav(active) {
+            document.getElementById('nav-home').classList.replace(active==='home'?'text-gray-500':'text-blue-500', active==='home'?'text-blue-500':'text-gray-500');
+            document.getElementById('nav-calendar').classList.replace(active==='calendar'?'text-gray-500':'text-blue-500', active==='calendar'?'text-blue-500':'text-gray-500');
+        }
+
+        function renderWorkout(id, isHistory = false, historyData = null) {
             const container = document.getElementById('exercise-list');
             const items = workoutPlan[id].items;
-            
-            container.innerHTML = items.map((ex, i) => {
-                const variantIdx = activeVariants[ex.id] || 0;
-                const current = variantIdx === 0 ? ex : ex.alts[variantIdx - 1];
-                const currentId = variantIdx === 0 ? ex.id : current.id;
-                
-                const history = getHistory(currentId);
-                const last = history.length > 0 ? history.slice(-1)[0].w : '--';
-                
-                const fallbackImg = '';
-                
-                const variantButton = (ex.alts && ex.alts.length > 0) ? 
-                    `<button type="button" onclick="toggleVariant('${ex.id}', ${ex.alts.length})" class="btn-variant">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> CAMBIA
-                    </button>` : '';
+            document.getElementById('finish-btn').style.display = isHistory ? 'none' : 'block';
 
-                // Pulsante Annulla visibile solo se c'è storico
-                const undoButton = history.length > 0 ? 
-                    `<button onclick="undoLastWeight('${currentId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl flex items-center justify-center transition-all active:scale-95" title="Annulla Ultimo Peso">
-                        <i data-lucide="undo" class="w-4 h-4"></i>
-                    </button>` : '';
+            container.innerHTML = items.map((ex) => {
+                const vIdx = activeVariants[ex.id] || 0;
+                const current = vIdx === 0 ? ex : ex.alts[vIdx - 1];
+                const cId = vIdx === 0 ? ex.id : current.id;
+                
+                const history = getHistory(cId);
+                const last = history.length > 0 ? history.slice(-1)[0].w : '--';
+                const todayVal = isHistory ? (historyData[cId] || '--') : (currentSessionData[cId] || '');
 
                 return `
-                    <div class="apple-card overflow-hidden animate-slide">
-                        <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.onerror=null; this.src='${fallbackImg}'">
-                        <div class="p-6">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="flex-1 pr-2">
-                                    <h3 class="text-xl font-bold text-white leading-tight">${current.name}</h3>
-                                    <p class="text-xs font-semibold text-blue-500 mt-1">${ex.sets} • Target ${current.target}</p>
-                                </div>
-                                <div class="flex flex-col gap-2 items-end">
-                                    ${variantButton}
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <button id="timer-btn-${currentId}" onclick="toggleTimer('${currentId}', ${current.rest})" class="flex items-center text-[10px] font-bold text-gray-400 bg-white/5 px-2.5 py-1.5 rounded-xl transition-all">
-                                            <i data-lucide="timer" class="w-3.5 h-3.5 mr-1"></i> ${current.rest}s
-                                        </button>
-                                        <button onclick="showChart('${currentId}', '${current.name.replace(/'/g, "\\'")}')" class="text-blue-500 bg-white/5 p-1.5 rounded-xl"><i data-lucide="line-chart" class="w-4 h-4"></i></button>
-                                    </div>
-                                </div>
+                <div class="apple-card overflow-hidden animate-slide">
+                    <img src="${current.img}" class="w-full h-44 object-cover opacity-80" onerror="this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=500&q=60'">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1 pr-2">
+                                <h3 class="text-xl font-bold text-white leading-tight">${current.name}</h3>
+                                <p class="text-xs font-semibold text-blue-500 mt-1">${ex.sets} • Target ${current.target}</p>
                             </div>
+                            ${!isHistory && ex.alts ? `<button onclick="toggleVariant('${ex.id}', ${ex.alts.length})" class="btn-variant">🔄 CAMBIA</button>` : ''}
+                        </div>
+                        
+                        ${isHistory ? `
+                            <div class="bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20 text-center">
+                                <p class="text-[10px] font-bold text-blue-500 uppercase mb-1">Peso Registrato</p>
+                                <span class="text-3xl font-black text-white">${todayVal} <small class="text-sm font-normal text-gray-400">kg</small></span>
+                            </div>
+                        ` : `
                             <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5">
                                 <div class="flex-1">
-                                    <label class="text-[9px] font-bold text-gray-500 block mb-2 px-1 uppercase">Peso Odierno</label>
+                                    <label class="text-[9px] font-bold text-gray-500 block mb-2 uppercase">Peso Odierno</label>
                                     <div class="flex gap-2">
-                                        <input type="number" id="in-${currentId}" placeholder="${last !== '--' ? last : '0'}" 
-                                               oninput="const btn = document.getElementById('btn-ok-${currentId}'); if(this.value.trim()){btn.removeAttribute('disabled'); btn.classList.remove('opacity-50');}else{btn.setAttribute('disabled', 'true'); btn.classList.add('opacity-50');}">
-                                        <button id="btn-ok-${currentId}" disabled onclick="saveWeight('${currentId}', document.getElementById('in-${currentId}').value)" class="btn-primary px-4 text-xs text-white transition-all active:scale-95 opacity-50">OK</button>
-                                        ${undoButton}
+                                        <input type="number" id="in-${cId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}" 
+                                               oninput="const b = document.getElementById('ok-${cId}'); if(this.value){b.removeAttribute('disabled'); b.classList.remove('opacity-50')}else{b.setAttribute('disabled','true'); b.classList.add('opacity-50')}">
+                                        <button id="ok-${cId}" ${todayVal?'':'disabled'} onclick="saveWeight('${cId}', document.getElementById('in-${cId}').value)" class="btn-primary px-4 text-xs text-white ${todayVal?'':'opacity-50'}">OK</button>
+                                        ${todayVal ? `<button onclick="undoLastWeight('${cId}')" class="bg-red-500/20 text-red-500 px-3 rounded-xl"><i data-lucide="undo" class="w-4 h-4"></i></button>` : ''}
                                     </div>
                                 </div>
                                 <div class="w-[1px] h-10 bg-white/10"></div>
                                 <div class="text-center px-2"><label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Ultimo</label><span class="text-xl font-black italic text-white">${last}</span></div>
                             </div>
-                            <p class="mt-4 text-[11px] text-gray-400 italic">"${current.note}"</p>
-                        </div>
-                    </div>`;
+                        `}
+                    </div>
+                </div>`;
             }).join('');
             lucide.createIcons();
         }
 
-        let myChart = null;
-        function showChart(id, name) {
-            const h = getHistory(id);
-            if (h.length < 1) return;
-            document.getElementById('chart-modal').classList.remove('hidden');
-            document.getElementById('chart-title').innerText = name;
-            const ctx = document.getElementById('progressChart').getContext('2d');
-            if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: h.map(i => i.d),
-                    datasets: [{
-                        data: h.map(i => i.w),
-                        spanGaps: true, // Collega la spezzata anche se mancano giorni
-                        borderColor: '#007AFF',
-                        borderWidth: 4,
-                        pointBackgroundColor: '#007AFF',
-                        pointBorderColor: '#000',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: (c) => {
-                            const g = c.chart.ctx.createLinearGradient(0, 0, 0, 400);
-                            g.addColorStop(0, 'rgba(0, 122, 255, 0.4)');
-                            g.addColorStop(1, 'rgba(0, 122, 255, 0)');
-                            return g;
-                        }
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } },
-                        x: { grid: { display: false }, ticks: { color: '#8E8E93' } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
+        function toggleVariant(id, len) {
+            activeVariants[id] = ((activeVariants[id] || 0) + 1) % (len + 1);
+            renderWorkout(currentWorkoutId);
+        }
+
+        // --- CALENDARIO LOGICA ---
+        function renderCalendar() {
+            const container = document.getElementById('calendar-days');
+            const monthLabel = document.getElementById('calendar-month');
+            const journal = getJournal();
+            
+            container.innerHTML = '';
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            monthLabel.innerText = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' }).format(calendarDate);
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const offset = firstDay === 0 ? 6 : firstDay - 1;
+
+            for(let i=0; i<offset; i++) container.innerHTML += `<div></div>`;
+
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const workout = journal[dateKey];
+                const isToday = new Date().toISOString().split('T')[0] === dateKey;
+                
+                container.innerHTML += `
+                    <div onclick="selectDate('${dateKey}')" class="calendar-day ${isToday ? 'bg-blue-500 text-white' : 'text-white hover:bg-white/10'} cursor-pointer">
+                        ${d}
+                        ${workout ? `<div class="day-workout-dot" style="background-color: ${workoutPlan[workout.id].color}"></div>` : ''}
+                    </div>`;
+            }
+        }
+
+        function changeMonth(dir) {
+            calendarDate.setMonth(calendarDate.getMonth() + dir);
+            renderCalendar();
+        }
+
+        function selectDate(key) {
+            const journal = getJournal();
+            const workout = journal[key];
+            const display = document.getElementById('calendar-selection');
+            
+            if(!workout) {
+                display.innerHTML = `<div class="apple-card p-8 text-center text-gray-500">Nessun allenamento registrato per il ${new Date(key).toLocaleDateString('it-IT')}</div>`;
+                return;
+            }
+
+            display.innerHTML = `
+                <div onclick="viewPastWorkout(${workout.id}, '${key}')" class="apple-card p-5 flex items-center justify-between cursor-pointer border-l-4" style="border-left-color: ${workoutPlan[workout.id].color}">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase">${new Date(key).toLocaleDateString('it-IT', {weekday:'long'})}</p>
+                        <h3 class="text-xl font-black">${workout.title}</h3>
+                        <p class="text-xs text-gray-400">${Object.keys(workout.exercises).length} esercizi completati</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="text-gray-600"></i>
+                </div>`;
             lucide.createIcons();
         }
 
-        function closeChart() {
-            document.getElementById('chart-modal').classList.add('hidden');
+        function viewPastWorkout(workoutId, dateKey) {
+            const workoutData = getJournal()[dateKey];
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-workout').classList.remove('hidden');
+            document.getElementById('workout-title').innerText = `${workoutData.title} (${new Date(dateKey).toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'})})`;
+            renderWorkout(workoutId, true, workoutData.exercises);
         }
 
-        let homeCharts = {};
+        // --- GRAFICI ---
         function renderDashboardCharts() {
-            Object.values(homeCharts).forEach(c => c.destroy());
             ['petto', 'dorso', 'gambe', 'braccia'].forEach(g => {
+                const ctx = document.getElementById(`chart-${g}`).getContext('2d');
                 const h = getHistory(groups[g][0]);
                 const data = h.length > 0 ? h.map(i => i.w) : [0,0,0,0,0];
-                homeCharts[g] = new Chart(document.getElementById(`chart-${g}`), {
+                new Chart(ctx, {
                     type: 'line', data: { labels: data.map((_, i) => i), datasets: [{ data, spanGaps: true, borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
                     options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } }
                 });
