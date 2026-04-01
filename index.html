@@ -27,6 +27,8 @@
         textarea { text-align: left; font-size: 14px; font-weight: 400; resize: none; }
         .img-box { background: #2C2C2E; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 56px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .horizontal-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 4px 24px; margin: 0 -24px; scroll-snap-type: x mandatory; }
+        .scroll-item { flex: 0 0 140px; scroll-snap-align: start; }
     </style>
 </head>
 <body class="pt-safe">
@@ -42,11 +44,15 @@
             </header>
 
             <section class="mb-10">
-                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1 text-center">Andamento</h2>
-                <div class="flex overflow-x-auto gap-3 no-scrollbar -mx-6 px-6">
-                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase text-center mb-2">Volume Sessione</p><div class="h-14"><canvas id="chart-volume"></canvas></div></div>
-                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase text-center mb-2">Panca Piana</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
-                    <div class="apple-card p-4 min-w-[140px]"><p class="text-[10px] font-bold text-gray-400 uppercase text-center mb-2">Focus Braccia</p><div class="h-14"><canvas id="chart-braccia-home"></canvas></div></div>
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Trend Distretti</h2>
+                <div class="horizontal-scroll no-scrollbar">
+                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Volume Tot.</p><div class="h-14"><canvas id="chart-volume"></canvas></div></div>
+                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Petto</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
+                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Dorso</p><div class="h-14"><canvas id="chart-dorso"></canvas></div></div>
+                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Spalle</p><div class="h-14"><canvas id="chart-spalle"></canvas></div></div>
+                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Gambe</p><div class="h-14"><canvas id="chart-gambe"></canvas></div></div>
+                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Bicipiti</p><div class="h-14"><canvas id="chart-bicipiti"></canvas></div></div>
+                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Tricipiti</p><div class="h-14"><canvas id="chart-tricipiti"></canvas></div></div>
                 </div>
             </section>
 
@@ -182,7 +188,7 @@
             'skullcrusher': { name: 'Skullcrusher Manubri', sets: '3x8-10', target: '14kg', rest: 90, img: 'img/skullcrusher.png', category: 'tricipiti' },
             'pushdown': { name: 'Push Down Sbarra', sets: '3x10-12', target: '25kg', rest: 75, img: 'img/pushdown.png', category: 'tricipiti' },
             'pushdown_corda': { name: 'Push Down Corda', sets: '3x12-15', target: '20kg', rest: 0, img: 'img/pushdown_corda.png', category: 'tricipiti' },
-            'french_press': { name: 'French Press Manubri', sets: '3x10-12', target: '12kg', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
+            'french_press_db': { name: 'French Press Manubri', sets: '3x10-12', target: '12kg', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
             'dips_tricipiti': { name: 'Dips tra Panche', sets: '3xMax', target: 'C.L.', rest: 60, img: 'img/dips_tricipiti.png', category: 'tricipiti' },
             'estensioni_testa': { name: 'Estensioni sopra Testa', sets: '3x12-15', target: '10kg', rest: 0, img: 'img/estensioni_testa.png', category: 'tricipiti' },
 
@@ -207,29 +213,37 @@
         let calendarDate = new Date();
         let homeCharts = {}; 
 
-        // --- DASHBOARD CHARTS ---
+        // --- DASHBOARD CHARTS (Suddivisione Distretti) ---
         function renderDashboardCharts() {
-            ['volume', 'petto', 'braccia-home'].forEach(id => {
-                const canvas = document.getElementById(`chart-${id}`);
+            const categories = ['volume', 'petto', 'dorso', 'spalle', 'gambe', 'bicipiti', 'tricipiti'];
+            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+            const journalEntries = Object.entries(journal).sort((a, b) => new Date(a[0]) - new Date(b[0])).slice(-10);
+
+            categories.forEach(cat => {
+                const canvas = document.getElementById(`chart-${cat}`);
                 if (!canvas) return;
-                if (homeCharts[id]) homeCharts[id].destroy();
+                if (homeCharts[cat]) homeCharts[cat].destroy();
 
-                let data = [0,0,0,0,0];
-                if (id === 'petto') {
-                    const h = JSON.parse(localStorage.getItem('h_panca_piana')) || [];
-                    if (h.length > 0) data = h.map(i => i.w);
-                } else if (id === 'braccia-home') {
-                    const h = JSON.parse(localStorage.getItem('h_curl_ez')) || [];
-                    if (h.length > 0) data = h.map(i => i.w);
+                let dataPoints = [];
+                if (cat === 'volume') {
+                    dataPoints = journalEntries.map(e => e[1].volume || 0);
                 } else {
-                    const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-                    data = Object.values(journal).map(j => j.volume || 0);
+                    // Calcola il volume per categoria aggregando tutti gli esercizi di quel distretto in quel giorno
+                    dataPoints = journalEntries.map(e => {
+                        let catSum = 0;
+                        Object.entries(e[1].exercises || {}).forEach(([exId, weight]) => {
+                            if (exerciseData[exId]?.category === cat) catSum += (parseFloat(weight) || 0);
+                        });
+                        return catSum;
+                    });
                 }
-                if (data.length < 5) while(data.length < 5) data.unshift(0);
 
-                homeCharts[id] = new Chart(canvas.getContext('2d'), {
+                // Riempimento se pochi dati
+                if (dataPoints.length < 5) while(dataPoints.length < 5) dataPoints.unshift(0);
+
+                homeCharts[cat] = new Chart(canvas.getContext('2d'), {
                     type: 'line', 
-                    data: { labels: data.map((_, i) => i), datasets: [{ data: data.slice(-5), borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4, spanGaps: true }] },
+                    data: { labels: dataPoints.map((_, i) => i), datasets: [{ data: dataPoints, borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4, spanGaps: true }] },
                     options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } }
                 });
             });
