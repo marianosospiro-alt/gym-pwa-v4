@@ -27,6 +27,7 @@
         input[type="number"], textarea { background: #2C2C2E; border: none; border-radius: 12px; color: white; padding: 10px; text-align: center; font-size: 18px; font-weight: 700; width: 100%; }
         textarea { text-align: left; font-size: 14px; font-weight: 400; resize: none; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .img-placeholder { background: linear-gradient(135deg, #2C2C2E 0%, #1C1C1E 100%); display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="pt-safe">
@@ -39,7 +40,7 @@
                     <p id="date-label" class="text-blue-500 font-bold text-xs uppercase tracking-widest mb-1"></p>
                     <h1 class="text-3xl font-extrabold tracking-tight">Riepilogo</h1>
                 </div>
-                <div onclick="openSettings()" class="bg-white/5 p-3 rounded-full cursor-pointer"><i data-lucide="settings" class="w-5 h-5 text-gray-400"></i></div>
+                <!-- Rimosso tasto impostazioni qui per pulizia -->
             </header>
 
             <section class="mb-10">
@@ -120,7 +121,7 @@
         </div>
 
         <!-- NAVBAR -->
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-6 py-4 flex justify-around items-center z-50 pb-safe">
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
             <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold">Home</span></button>
             <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold">Diario</span></button>
             <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500"><i data-lucide="settings" class="w-6 h-6"></i><span class="text-[10px] font-bold">Impostazioni</span></button>
@@ -149,7 +150,7 @@
             braccia: [
                 { id: 'spider_curl', name: 'Spider Curl su Panca', target: '12kg', rest: 75, img: 'img/spider_curl.png', note: 'Isolamento totale bicipiti.' },
                 { id: 'incline_curl', name: 'Curl Panca Inclinata 45°', target: '10kg', rest: 90, img: 'img/incline_curl.png', note: 'Massimo allungamento del bicipite.' },
-                { id: 'french_press_db', name: 'French Press Manubri', target: '12kg', rest: 90, img: 'img/french_press.png', note: 'Focus capo lungo del tricipite.' },
+                { id: 'french_press_db', name: 'French Press Manubri', target: '12kg', rest: 90, img: 'img/french_press_db.png', note: 'Focus capo lungo del tricipite.' },
                 { id: 'dips_tricipiti', name: 'Dips tra Panche', target: 'C.L.', rest: 60, img: 'img/dips_tricipiti.png', note: 'Pump finale tricipiti.' },
                 { id: 'zottman_curl', name: 'Zottman Curl', target: '10kg', rest: 75, img: 'img/zottman_curl.png', note: 'Per spessore avambraccio e braccio.' }
             ]
@@ -190,7 +191,7 @@
             1: { title: 'PUSH', color: '#007AFF', img: 'img/panca_piana.png', items: ['panca_piana', 'lento_avanti', 'spinte_inc', 'alzate_lat', 'skullcrusher', 'pushdown'] },
             2: { title: 'PULL', color: '#AF52DE', img: 'img/trazioni.png', items: ['trazioni', 'tbar_row', 'curl_ez', 'alzate_90', 'hammer_curl', 'russian_twist'] },
             3: { title: 'LEGS', color: '#34C759', img: 'img/hack_squat.png', items: ['hack_squat', 'hip_thrust', 'leg_press', 'leg_ext', 'polpacci', 'hanging_leg'] },
-            4: { title: 'UPPER', color: '#FF9500', img: 'img/chest_press.png', items: ['chest_press', 'pectoral', 'lat_neutra', 'alzate_cavi', 'tirate_mento', 'crossover', 'pushdown_corda', 'curl_cavi', 'estensioni_testa', 'curl_concentrazione'] }
+            4: { title: 'IPERTROFIA', color: '#FF9500', img: 'img/chest_press.png', items: ['chest_press', 'pectoral', 'lat_neutra', 'alzate_cavi', 'tirate_mento', 'crossover', 'pushdown_corda', 'curl_cavi', 'estensioni_testa', 'curl_concentrazione'] }
         };
 
         // --- STATO GLOBALE ---
@@ -237,15 +238,23 @@
             swappingIndex = index;
             const list = document.getElementById('library-list');
             const alternatives = exerciseLibrary[category] || [];
-            list.innerHTML = alternatives.map(ex => `
-                <div onclick="swapExercise('${ex.id}')" class="apple-card p-4 flex items-center gap-4 border border-white/5 active:bg-blue-500/20 cursor-pointer">
-                    <img src="${ex.img}" class="w-16 h-16 rounded-xl object-cover" onerror="this.src=''">
-                    <div class="flex-1 text-left">
-                        <h4 class="font-bold text-sm text-white">${ex.name}</h4>
-                        <p class="text-[10px] text-gray-400">${ex.note}</p>
-                    </div>
-                    <i data-lucide="plus-circle" class="text-blue-500"></i>
-                </div>`).join('') + `<p class="text-center text-[10px] text-gray-500 uppercase py-4">Fine selezione</p>`;
+            
+            if (alternatives.length === 0) {
+                list.innerHTML = `<p class="text-center text-gray-500 py-10">Nessuna alternativa biomeccanica censita per questa categoria.</p>`;
+            } else {
+                list.innerHTML = alternatives.map(ex => `
+                    <div onclick="swapExercise('${ex.id}')" class="apple-card p-4 flex items-center gap-4 border border-white/5 active:bg-blue-500/20 cursor-pointer transition-all">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden img-placeholder">
+                            <img src="${ex.img}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i data-lucide=\'dumbbell\' class=\'w-6 h-6 text-gray-600\'></i>'; lucide.createIcons();">
+                        </div>
+                        <div class="flex-1 text-left">
+                            <h4 class="font-bold text-sm text-white">${ex.name}</h4>
+                            <p class="text-[10px] text-gray-400">${ex.note}</p>
+                        </div>
+                        <i data-lucide="plus-circle" class="text-blue-500 w-6 h-6"></i>
+                    </div>`).join('') + `<p class="text-center text-[10px] text-gray-500 uppercase py-4 tracking-widest">Fine selezione</p>`;
+            }
+            
             document.getElementById('modal-library').style.display = 'flex';
             lucide.createIcons();
         }
@@ -253,10 +262,15 @@
         function swapExercise(newExId) {
             userPlan[currentWorkoutId].items[swappingIndex] = newExId;
             localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
+            
+            // Verifica se l'esercizio è presente nei dati base o nella libreria
             if (!exerciseData[newExId]) {
                 const libEx = Object.values(exerciseLibrary).flat().find(e => e.id === newExId);
-                exerciseData[newExId] = { ...libEx, sets: '3x12-15' }; 
+                if (libEx) {
+                    exerciseData[newExId] = { ...libEx, sets: '3x12-15' }; 
+                }
             }
+            
             closeLibrary();
             renderWorkout(currentWorkoutId);
         }
@@ -267,7 +281,8 @@
         function saveWeight(exId, val) {
             if (!val || isNaN(val)) return;
             const h = getHistory(exId);
-            h.push({ d: new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}), w: parseFloat(val) });
+            const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'});
+            h.push({ d: todayStr, w: parseFloat(val) });
             localStorage.setItem(`h_${exId}`, JSON.stringify(h.slice(-15)));
             activeSession[exId] = parseFloat(val);
             localStorage.setItem('active_session_buffer', JSON.stringify(activeSession));
@@ -287,11 +302,17 @@
         }
 
         function finishWorkout() {
-            if (Object.keys(activeSession).length === 0) return alert("Nessun peso inserito.");
+            if (Object.keys(activeSession).length === 0) return alert("Inserisci almeno un peso prima di concludere.");
             const journal = getJournal();
             const today = new Date().toISOString().split('T')[0];
             const vol = Object.values(activeSession).reduce((a, b) => a + b, 0);
-            journal[today] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, exercises: { ...activeSession }, note: document.getElementById('session-note').value, volume: vol };
+            journal[today] = { 
+                id: currentWorkoutId, 
+                title: userPlan[currentWorkoutId].title, 
+                exercises: { ...activeSession }, 
+                note: document.getElementById('session-note').value, 
+                volume: vol 
+            };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
             activeSession = {};
             localStorage.removeItem('active_session_buffer');
@@ -353,8 +374,8 @@
 
                 return `
                 <div class="apple-card overflow-hidden animate-slide mb-4">
-                    <div class="relative h-44">
-                        <img src="${ex.img}" class="w-full h-full object-cover opacity-80" onerror="this.src=''">
+                    <div class="relative h-44 img-placeholder">
+                        <img src="${ex.img}" class="w-full h-full object-cover opacity-80" onerror="this.style.display='none'; this.parentElement.innerHTML='<i data-lucide=\'dumbbell\' class=\'w-12 h-12 text-gray-600\'></i>'; lucide.createIcons();">
                         ${!isHistory ? `
                         <button onclick="openLibrary(${idx}, '${ex.category}')" class="absolute top-4 right-4 bg-black/60 backdrop-blur-md p-3 rounded-full border border-white/10 active:scale-90 transition-all">
                             <i data-lucide="replace" class="w-4 h-4 text-blue-400"></i>
@@ -415,16 +436,16 @@
             reader.onload = (ev) => {
                 try {
                     const data = JSON.parse(ev.target.result);
-                    if (confirm("Sovrascrivere tutti i dati con questo backup?")) {
+                    if (confirm("Attenzione: caricando un backup perderai i dati correnti che non sono nel file. Procedere?")) {
                         Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
                         location.reload();
                     }
-                } catch(err) { alert("Errore nel file."); }
+                } catch(err) { alert("Il file non sembra un backup valido di PowerLog."); }
             };
             reader.readAsText(e.target.files[0]);
         }
 
-        function resetAllData() { if(confirm("RESET TOTALE? Perderai tutti i tuoi pesi.")) { localStorage.clear(); location.reload(); } }
+        function resetAllData() { if(confirm("RESET TOTALE? Perderai tutti i tuoi pesi e le impostazioni della scheda.")) { localStorage.clear(); location.reload(); } }
 
         function renderCalendar() {
             const container = document.getElementById('calendar-days');
@@ -448,13 +469,13 @@
         function selectDate(key) {
             const workout = getJournal()[key];
             const display = document.getElementById('calendar-selection');
-            if(!workout) return display.innerHTML = `<div class="apple-card p-8 text-center text-gray-500">Nessun allenamento</div>`;
+            if(!workout) return display.innerHTML = `<div class="apple-card p-8 text-center text-gray-500">Nessun allenamento registrato in questa data.</div>`;
             display.innerHTML = `
-                <div onclick="viewPastWorkout(${workout.id}, '${key}')" class="apple-card p-5 flex flex-col cursor-pointer border-l-4" style="border-left-color: ${defaultPlan[workout.id]?.color || '#fff'}">
+                <div onclick="viewPastWorkout(${workout.id}, '${key}')" class="apple-card p-5 flex flex-col cursor-pointer border-l-4 transition-all active:scale-95" style="border-left-color: ${defaultPlan[workout.id]?.color || '#fff'}">
                     <div class="flex justify-between items-center">
                         <div>
                             <h3 class="text-xl font-black text-white">${workout.title}</h3>
-                            <p class="text-xs text-gray-400">${workout.volume || 0} kg complessivi</p>
+                            <p class="text-xs text-gray-400">${workout.volume || 0} kg totali sollevati</p>
                         </div>
                         <i data-lucide="chevron-right"></i>
                     </div>
