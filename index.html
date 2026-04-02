@@ -3,574 +3,613 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PowerLog Pro</title>
+    <title>PowerLog Pro v10.7</title>
     
-    <!-- Icona Personalizzata Utente -->
     <link rel="apple-touch-icon" href="icon_gym.png">
-    <link rel="icon" type="image/png" href="icon_gym.png">
-    <meta name="apple-mobile-web-app-title" content="PowerLog">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        :root { --apple-blue: #007AFF; --apple-bg: #000000; --apple-card: #1C1C1E; }
-        body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--apple-bg); color: white; -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
-        .glass { background: rgba(28, 28, 30, 0.7); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); }
-        .apple-card { background-color: var(--apple-card); border-radius: 24px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
-        .btn-primary { background-color: var(--apple-blue); border-radius: 14px; font-weight: 600; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-        .pt-safe { padding-top: env(safe-area-inset-top); }
-        .animate-slide { animation: slide 0.2s ease-out; }
-        @keyframes slide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .modal-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: flex-end; }
-        .sheet-content { background: #1C1C1E; width: 100%; border-top-left-radius: 32px; border-top-right-radius: 32px; padding: 24px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; border-top: 1px solid rgba(255,255,255,0.1); }
-        
-        .scrollable-area { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
+        :root { 
+            --apple-blue: #007AFF; 
+            --apple-bg: #000000; 
+            --apple-card: #111113; 
+            --apple-green: #30D158; 
+            --apple-purple: #BF5AF2; 
+            --apple-red: #FF453A; 
+            --apple-gray: #1C1C1E;
+        }
 
-        input[type="number"], input[type="text"], select, textarea { background: #2C2C2E; border: none; border-radius: 12px; color: white; padding: 12px; text-align: center; font-size: 16px; font-weight: 600; width: 100%; appearance: none; }
-        label { color: #8E8E93; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
-        
-        .img-card { width: 100%; aspect-ratio: 16 / 9; background: #2C2C2E; position: relative; overflow: hidden; border-radius: 24px 24px 0 0; }
-        .img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
-        .img-thumb { width: 60px !important; height: 60px !important; background: #2C2C2E; border-radius: 12px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; aspect-ratio: 1 / 1 !important; }
-        .img-thumb img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background-color: var(--apple-bg); 
+            color: white; 
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.02em;
+            overscroll-behavior: none;
+        }
 
-        .superset-connector { width: 4px; height: 30px; background: linear-gradient(to bottom, #AF52DE, #AF52DE44); margin: -16px auto; position: relative; z-index: 1; border-radius: 2px; }
+        .glass-nav { 
+            background: rgba(10, 10, 12, 0.85); 
+            backdrop-filter: blur(25px) saturate(160%); 
+            -webkit-backdrop-filter: blur(25px) saturate(160%); 
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
 
+        .apple-card { 
+            background-color: var(--apple-card); 
+            border-radius: 28px; 
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .btn-icon {
+            background: #1C1C1E;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .btn-icon:active { transform: scale(0.9); }
+
+        .input-log {
+            background: #1C1C1E;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: white;
+            font-weight: 800;
+            padding: 8px 4px;
+            font-size: 15px;
+            text-align: center;
+        }
+        .input-log:focus { border-color: var(--apple-blue); outline: none; }
+
+        .label-style {
+            font-size: 9px;
+            font-weight: 900;
+            color: #48484A;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .img-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #1C1C1E;
+            position: relative;
+            overflow: hidden;
+            border-radius: 28px 28px 0 0;
+        }
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+        }
+
+        .img-thumb {
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #2C2C2E;
+            flex-shrink: 0;
+            aspect-ratio: 1/1 !important;
+        }
+        .img-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        .superset-link {
+            width: 4px;
+            height: 25px;
+            background: linear-gradient(to bottom, var(--apple-purple), transparent);
+            margin: -12px auto;
+            position: relative;
+            z-index: 1;
+            border-radius: 2px;
+        }
+
+        .scroll-area { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .horizontal-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 4px 0; scroll-snap-type: x mandatory; }
-        .scroll-item { flex: 0 0 140px; scroll-snap-align: start; }
+
+        #toast {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 13px;
+            display: none;
+            background: var(--apple-blue);
+            box-shadow: 0 10px 30px rgba(0, 122, 255, 0.5);
+            animation: popIn 0.3s cubic-bezier(0.17, 0.89, 0.32, 1.28);
+        }
+
+        @keyframes popIn { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+
+        .set-grid {
+            display: grid;
+            grid-template-cols: 0.6fr 1.2fr 1.2fr 1.2fr;
+            gap: 8px;
+            align-items: center;
+        }
         
-        #message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 16px 24px; border-radius: 16px; background: rgba(0, 122, 255, 0.95); backdrop-filter: blur(10px); color: white; font-weight: 700; text-align: center; display: none; width: 90%; max-width: 400px; }
-        
-        .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-size: 13px; font-weight: 600; position: relative; color: #8E8E93; }
-        .calendar-day.today { border: 2px solid var(--apple-blue); color: var(--apple-blue); }
-        .calendar-day.workout::after { content: ''; width: 4px; height: 4px; background: #34C759; border-radius: 50%; position: absolute; bottom: 6px; }
+        .modal-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: flex-end; }
+        .sheet-content { 
+            background: #121214; 
+            width: 100%; 
+            border-top-left-radius: 35px; 
+            border-top-right-radius: 35px; 
+            padding: 28px; 
+            max-height: 92vh; 
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
-<body class="pt-safe">
-    <div id="message-box"></div>
-    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden text-white">
+<body class="pt-safe pb-safe">
+    <div id="toast"></div>
+
+    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden">
         
-        <!-- VISTA HOME -->
+        <!-- HOME -->
         <div id="view-home" class="view p-6 pb-32 animate-slide">
-            <header class="flex justify-between items-end mb-8">
+            <header class="mb-10 flex justify-between items-center">
                 <div>
-                    <p id="date-label" class="text-blue-500 font-bold text-xs uppercase tracking-widest mb-1"></p>
-                    <h1 class="text-3xl font-extrabold tracking-tight">Riepilogo</h1>
+                    <p id="date-label" class="label-style text-blue-500 mb-1"></p>
+                    <h1 class="text-4xl font-black tracking-tight italic">PowerLog<span class="text-blue-500 text-2xl not-italic">.</span></h1>
                 </div>
+                <button onclick="openBiometrics()" class="btn-icon w-12 h-12 border border-white/5 shadow-2xl">
+                    <i data-lucide="scale" class="text-white w-5 h-5"></i>
+                </button>
             </header>
-            <section class="mb-10">
-                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Andamento Distretti</h2>
-                <div class="horizontal-scroll no-scrollbar -mx-6 px-6">
-                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Volume Tot.</p><div class="h-14"><canvas id="chart-volume"></canvas></div></div>
-                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Petto</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
-                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Dorso</p><div class="h-14"><canvas id="chart-dorso"></canvas></div></div>
-                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Spalle</p><div class="h-14"><canvas id="chart-spalle"></canvas></div></div>
-                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Gambe</p><div class="h-14"><canvas id="chart-gambe"></canvas></div></div>
-                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Bicipiti</p><div class="h-14"><canvas id="chart-bicipiti"></canvas></div></div>
-                    <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Tricipiti</p><div class="h-14"><canvas id="chart-tricipiti"></canvas></div></div>
+
+            <!-- V-TAPER DASHBOARD -->
+            <section class="apple-card p-6 mb-10 bg-gradient-to-br from-[#18181b] to-[#09090b]">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="label-style">V-Taper Index</h2>
+                        <p class="text-[10px] text-gray-500">Shoulder-to-Waist Ratio</p>
+                    </div>
+                    <span id="v-index-val" class="text-5xl font-black tracking-tighter text-blue-500">--</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 border-t border-white/5 pt-5">
+                    <div class="text-center"><p class="label-style text-[8px] mb-1">PESO</p><p id="v-weight" class="font-bold text-sm">--</p></div>
+                    <div class="text-center border-x border-white/5"><p class="label-style text-[8px] mb-1">SPALLE</p><p id="v-shoulders" class="font-bold text-sm">--</p></div>
+                    <div class="text-center"><p class="label-style text-[8px] mb-1">VITA</p><p id="v-waist" class="font-bold text-sm">--</p></div>
                 </div>
             </section>
-            <section id="workout-cards-container" class="space-y-4"></section>
+
+            <section id="workout-cards-container" class="space-y-6"></section>
         </div>
 
-        <!-- VISTA WORKOUT -->
+        <!-- WORKOUT -->
         <div id="view-workout" class="view hidden pb-32">
-            <header class="p-6 glass pt-12 flex justify-between items-center sticky top-0 z-50">
-                <button onclick="goHome()" class="text-blue-500 flex items-center gap-1 font-semibold text-sm transition-all"><i data-lucide="chevron-left" class="w-5 h-5"></i> Esci</button>
-                <h2 id="workout-title-text" class="font-bold text-sm uppercase tracking-widest text-white text-center flex-1">Allenamento</h2>
-                <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-2 rounded-full shadow-lg">CONCLUDI</button>
+            <header class="glass-nav sticky top-0 z-50 p-6 pt-14 flex justify-between items-center">
+                <button onclick="goHome()" class="text-blue-500 font-bold active:scale-75 transition-all"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
+                <div class="text-center">
+                    <h2 id="workout-title-text" class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-0.5">Sessione Attiva</h2>
+                    <p id="session-timer" class="text-xl font-black tabular-nums tracking-tight">00:00:00</p>
+                </div>
+                <button onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-6 py-2.5 rounded-full shadow-lg">CONCLUDI</button>
             </header>
-            <main id="exercise-list" class="p-4 space-y-4 mt-4 animate-slide"></main>
-            <div class="p-4 space-y-4">
-                <button onclick="openAddMenu()" class="w-full bg-white/5 border border-dashed border-white/20 rounded-2xl py-8 flex flex-col items-center justify-center gap-2 active:scale-[0.98]">
-                    <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
-                        <i data-lucide="plus" class="text-blue-500 w-6 h-6"></i>
+
+            <main id="exercise-list" class="p-4 space-y-8 mt-4 animate-slide"></main>
+
+            <div class="p-4 space-y-6">
+                <button onclick="openAddMenu()" class="w-full bg-[#1c1c1e] border border-dashed border-white/10 rounded-[35px] py-14 flex flex-col items-center gap-3 active:scale-95 transition-all">
+                    <div class="w-14 h-14 bg-blue-500/10 rounded-full flex items-center justify-center">
+                        <i data-lucide="plus" class="text-blue-500 w-7 h-7"></i>
                     </div>
-                    <span class="text-xs font-bold text-blue-500 uppercase tracking-widest">Aggiungi Esercizio Extra</span>
+                    <span class="label-style text-blue-500">Aggiungi Esercizio</span>
                 </button>
-                <div id="notes-area">
-                    <textarea id="session-note" rows="3" placeholder="Note di fine sessione..."></textarea>
-                </div>
+                <textarea id="session-note" rows="3" placeholder="Note di fine allenamento..." class="apple-card p-5 text-sm w-full text-left bg-transparent border-white/10"></textarea>
             </div>
         </div>
 
-        <!-- VISTA DIARIO -->
-        <div id="view-calendar" class="view hidden p-6 pb-32 animate-slide">
-            <h1 class="text-3xl font-extrabold text-white mb-8">Diario</h1>
-            <div id="calendar-container" class="apple-card p-5 mb-8 text-white">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 id="calendar-month" class="font-bold text-lg">Mese</h3>
-                    <div class="flex gap-4">
-                        <button onclick="changeMonth(-1)" class="text-blue-500"><i data-lucide="chevron-left"></i></button>
-                        <button onclick="changeMonth(1)" class="text-blue-500"><i data-lucide="chevron-right"></i></button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-7 text-gray-500 text-[10px] font-bold uppercase mb-4 text-center">
-                    <div>Lun</div><div>Mar</div><div>Mer</div><div>Gio</div><div>Ven</div><div>Sab</div><div>Dom</div>
-                </div>
-                <div id="calendar-days" class="grid grid-cols-7 gap-2"></div>
-            </div>
-            <div id="calendar-selection" class="space-y-4"></div>
-        </div>
-
-        <!-- VISTA IMPOSTAZIONI -->
-        <div id="view-settings" class="view hidden p-6 pb-32 animate-slide">
-            <h1 class="text-3xl font-extrabold text-white mb-8">Opzioni</h1>
-            <div class="apple-card p-6 mb-6">
-                <h3 class="font-bold mb-2">Gestione Dati</h3>
-                <p class="text-xs text-gray-400 mb-6">Backup manuale locale via JSON.</p>
-                <div class="flex flex-col gap-3">
-                    <button onclick="exportData()" class="btn-primary py-3 flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> ESPORTA JSON</button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-white/10 rounded-2xl py-3 flex items-center justify-center gap-2 font-bold text-sm text-white"><i data-lucide="upload" class="w-4 h-4"></i> IMPORTA JSON</button>
-                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
-                </div>
-            </div>
-            <div class="apple-card p-6 border border-red-500/20">
-                <h3 class="font-bold text-red-500 mb-2">Area Pericolo</h3>
-                <button onclick="resetAllData()" class="text-red-500 text-xs font-bold bg-red-500/10 w-full py-3 rounded-xl border border-red-500/30">CANCELLA TUTTI I DATI</button>
-            </div>
-        </div>
-
-        <!-- MODALE MODIFICA PARAMETRI -->
+        <!-- MODALI -->
         <div id="modal-edit-params" class="modal-sheet" onclick="closeEditParams()">
             <div class="sheet-content" onclick="event.stopPropagation()">
-                <div class="flex justify-between items-center mb-6 text-white">
-                    <h3 class="text-xl font-bold">Parametri Esercizio</h3>
-                    <button onclick="closeEditParams()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-2xl font-black italic">PARAMETRI</h3>
+                    <button onclick="closeEditParams()" class="btn-icon w-10 h-10"><i data-lucide="x"></i></button>
                 </div>
-                <div class="scrollable-area space-y-6">
+                <div class="space-y-8 pb-10">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div><label class="label-style mb-2">Serie</label><input type="number" id="edit-sets" class="w-full text-2xl py-4 input-log"></div>
+                        <div><label class="label-style mb-2">Target Reps</label><input type="text" id="edit-reps" class="w-full text-2xl py-4 input-log"></div>
+                    </div>
+                    <div><label class="label-style mb-2">Recupero (Sec)</label><input type="number" id="edit-rest" class="w-full text-2xl py-4 input-log"></div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label>Serie</label>
-                            <input type="number" id="edit-sets" placeholder="5">
-                        </div>
-                        <div>
-                            <label>Reps / Sec</label>
-                            <input type="text" id="edit-reps" placeholder="10 o 60s">
-                        </div>
+                        <button id="btn-toggle-drop" onclick="tempDrop = !tempDrop; updateToggleUI()" class="py-5 rounded-2xl font-black uppercase text-[10px] bg-[#1C1C1E] border border-white/5">Drop Set: OFF</button>
+                        <button id="btn-toggle-super" onclick="toggleSupersetLocal()" class="py-5 rounded-2xl font-black uppercase text-[10px] bg-[#1C1C1E] border border-white/5">Super Set: OFF</button>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label>Recupero (sec)</label>
-                            <input type="number" id="edit-rest" placeholder="90">
-                        </div>
-                        <div class="flex flex-col justify-end pb-1">
-                            <label>Opzioni</label>
-                            <button id="toggle-drop" onclick="toggleDropSetLocal()" class="w-full py-3 rounded-xl border border-white/10 text-xs font-bold transition-all">DROP SET: OFF</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label>Super Set con esercizio successivo?</label>
-                        <button id="toggle-superset" onclick="toggleSupersetLocal()" class="w-full py-4 rounded-xl border border-white/10 text-sm font-bold flex items-center justify-center gap-2 transition-all">
-                            <i data-lucide="link" class="w-4 h-4"></i> SUPER SET: OFF
-                        </button>
-                    </div>
-
-                    <button onclick="saveExerciseParams()" class="btn-primary w-full py-4 text-white text-sm font-black mt-4">AGGIORNA PROGRAMMA</button>
+                    <button onclick="confirmParams()" class="bg-blue-600 w-full py-5 text-white font-black rounded-2xl shadow-2xl shadow-blue-600/30">AGGIORNA</button>
                 </div>
             </div>
         </div>
 
-        <!-- MODALE LIBRERIA -->
-        <div id="modal-library" class="modal-sheet" onclick="closeLibrary()">
+        <div id="modal-biometrics" class="modal-sheet" onclick="closeBiometrics()">
             <div class="sheet-content" onclick="event.stopPropagation()">
-                <div class="flex justify-between items-center mb-6 text-white">
-                    <h3 id="library-title" class="text-xl font-bold">Libreria Esercizi</h3>
-                    <button onclick="closeLibrary()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x"></i></button>
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-3xl font-black italic tracking-tighter uppercase">Check-in Fisico</h3>
+                    <button onclick="closeBiometrics()" class="btn-icon w-10 h-10"><i data-lucide="x"></i></button>
                 </div>
-                <div id="library-categories" class="flex overflow-x-auto gap-2 no-scrollbar mb-6 pb-2"></div>
-                <div class="scrollable-area" id="library-list-container">
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1"><label class="label-style px-2">Peso (kg)</label><input type="number" id="bio-weight" step="0.1" class="w-full input-log py-4 text-xl"></div>
+                        <div class="space-y-1"><label class="label-style px-2">% Grasso</label><input type="number" id="bio-bf" step="0.1" class="w-full input-log py-4 text-xl"></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="space-y-1"><label class="label-style text-center">Spalle</label><input type="number" id="bio-shoulders" class="w-full input-log py-4"></div>
+                        <div class="space-y-1"><label class="label-style text-center">Vita</label><input type="number" id="bio-waist" class="w-full input-log py-4"></div>
+                        <div class="space-y-1"><label class="label-style text-center">Braccio</label><input type="number" id="bio-arms" class="w-full input-log py-4"></div>
+                    </div>
+                    <button onclick="saveBiometrics()" class="bg-blue-600 w-full py-5 text-white font-black rounded-2xl mt-4">SALVA MISURE</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-library" class="modal-sheet" onclick="closeLibrary()">
+            <div class="sheet-content h-[85vh]" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="library-title" class="text-2xl font-black">LIBRERIA</h3>
+                    <button onclick="closeLibrary()" class="btn-icon w-10 h-10"><i data-lucide="x"></i></button>
+                </div>
+                <div id="library-categories" class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2"></div>
+                <div class="scroll-area" id="library-list-container">
                     <div id="library-list" class="space-y-4"></div>
                 </div>
             </div>
         </div>
 
-        <!-- MODALE INFO COACH -->
         <div id="modal-info" class="modal-sheet" onclick="closeInfo()">
             <div class="sheet-content" onclick="event.stopPropagation()">
-                <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4">
-                    <h3 id="info-title" class="text-xl font-extrabold">Focus Tecnico</h3>
-                    <button onclick="closeInfo()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x"></i></button>
+                <div class="flex justify-between border-b border-white/5 pb-4 mb-6">
+                    <h3 id="info-title" class="text-xl font-black italic uppercase">Focus Tecnico</h3>
+                    <button onclick="closeInfo()" class="btn-icon w-10 h-10"><i data-lucide="x"></i></button>
                 </div>
-                <div class="scrollable-area" id="info-content"></div>
-            </div>
-        </div>
-        
-        <!-- MODALE GRAFICO -->
-        <div id="chart-modal" class="modal-sheet" onclick="closeChart()">
-            <div class="sheet-content" onclick="event.stopPropagation()">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 id="chart-title" class="text-xl font-bold">Progresso</h3>
-                    <button onclick="closeChart()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x"></i></button>
-                </div>
-                <div class="h-64 w-full">
-                    <canvas id="progressChart"></canvas>
-                </div>
+                <div id="info-content" class="space-y-5 pb-10"></div>
             </div>
         </div>
 
         <!-- NAVBAR -->
-        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
-            <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500 transition-all"><i data-lucide="layout-grid"></i><span class="text-[10px] font-bold uppercase">Home</span></button>
-            <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500 transition-all"><i data-lucide="calendar"></i><span class="text-[10px] font-bold uppercase">Diario</span></button>
-            <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500 transition-all"><i data-lucide="settings"></i><span class="text-[10px] font-bold uppercase">Opzioni</span></button>
+        <nav class="fixed bottom-0 left-0 right-0 glass-nav px-12 py-7 flex justify-around items-center z-50 pb-safe">
+            <button onclick="goHome()" class="text-blue-500" id="nav-home"><i data-lucide="layout-grid" class="w-7 h-7"></i></button>
+            <button onclick="exportData()" class="text-gray-600"><i data-lucide="download-cloud" class="w-7 h-7"></i></button>
+            <button onclick="resetAllData()" class="text-gray-800"><i data-lucide="trash-2" class="w-7 h-7"></i></button>
         </nav>
     </div>
 
     <script>
-        // --- DATABASE ESERCIZI INTEGRALE (38 Esercizi) ---
+        // --- DB INTEGRALE (38 Esercizi) ---
         const exerciseData = {
-            // PETTO
-            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5', reps: '5-8', rest: 180, img: 'img/panca_piana.png', category: 'petto', coach: { esecuzione: "Arco moderato, scapole incollate. Scendi allo sterno.", target: "Massa pettorale centrale.", tempo: "3s discesa, 1s pausa, salita esplosiva." } },
-            'spinte_inc': { name: 'Spinte Inclinata 30° Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/spinte_inc.png', category: 'petto', coach: { esecuzione: "Panca a 30°. Gomiti a 45°. Stretch massimo.", target: "Petto alto (V-Shape).", tempo: "4s negativa controllata." } },
-            'pectoral': { name: 'Pectoral Machine', sets: '4', reps: '12-15', rest: 75, img: 'img/pectoral.png', category: 'petto' },
-            'crossover': { name: 'Crossover ai Cavi', sets: '3', reps: '15-20', rest: 60, img: 'img/crossover.png', category: 'petto' },
-            'chest_press_g1': { name: 'Chest Press (Piana/Alta)', sets: '4', reps: '8-10', rest: 120, img: 'img/chest_press_g1.png', category: 'petto' },
-            'chest_press_bassa': { name: 'Chest Press Bassa', sets: '4', reps: '12-15', rest: 75, img: 'img/chest_press.png', category: 'petto' },
-            'dips_petto': { name: 'Dips alle Parallele', sets: '3', reps: 'Max', rest: 120, img: 'img/dips_petto.png', category: 'petto' },
-            'croci_cavi_bassi': { name: 'Croci ai Cavi Bassi', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_cavi_bassi.png', category: 'petto' },
-            'croci_inc_manubri': { name: 'Croci Manubri Inclinata', sets: '3', reps: '12-15', rest: 75, img: 'img/croci_inc.png', category: 'petto' },
-
-            // DORSO
-            'trazioni': { name: 'Trazioni alla Sbarra', sets: '5', reps: '6-8', rest: 120, img: 'img/trazioni.png', category: 'dorso', coach: { esecuzione: "Petto alla sbarra. Depressione scapolare.", target: "Ampiezza dorsale ('ali').", tempo: "3s discesa." } },
-            'tbar_row': { name: 'Rematore T-Bar (Chest Supp.)', sets: '4', reps: '8-10', rest: 120, img: 'img/tbar_row.png', category: 'dorso' },
-            'lat_larga': { name: 'Lat Machine Presa Larga', sets: '4', reps: '12-15', rest: 75, img: 'img/lat_larga.png', category: 'dorso' },
-            'lat_neutra': { name: 'Lat Machine Presa Neutra', sets: '4', reps: '12-15', rest: 75, img: 'img/lat_neutra.png', category: 'dorso' },
-            'pullover_manubrio': { name: 'Pullover con Manubrio', sets: '3', reps: '12-15', rest: 90, img: 'img/pullover_manubrio.png', category: 'dorso' },
-            'meadows_row': { name: 'Meadows Row', sets: '3', reps: '10-12', rest: 90, img: 'img/meadows_row.png', category: 'dorso' },
-            'rematore_manubrio': { name: 'Rematore Manubrio Singolo', sets: '4', reps: '10-12', rest: 120, img: 'img/rematore_manubrio.png', category: 'dorso' },
-
-            // SPALLE
-            'lento_avanti': { name: 'Lento Avanti Bilanciere', sets: '4', reps: '6-8', rest: 120, img: 'img/lento_avanti.png', category: 'spalle' },
-            'alzate_lat': { name: 'Alzate Laterali Manubri', sets: '3', reps: '10-12', rest: 75, img: 'img/alzate_lat.png', category: 'spalle', coach: { esecuzione: "Mignolo in alto. Piano scapolare.", target: "Larghezza spalle.", tempo: "1s fermo in alto." } },
-            'alzate_90': { name: 'Alzate a 90° (Deltoidi Post.)', sets: '3', reps: '12-15', rest: 75, img: 'img/alzate_90.png', category: 'spalle' },
-            'alzate_cavi': { name: 'Alzate Laterali ai Cavi', sets: '4', reps: '15-20', rest: 60, img: 'img/alzate_cavi.png', category: 'spalle' },
-            'tirate_mento': { name: 'Tirate al Mento EZ', sets: '3', reps: '12-15', rest: 75, img: 'img/tirate_mento.png', category: 'spalle' },
-            'lento_manubri': { name: 'Lento Avanti Manubri', sets: '4', reps: '8-10', rest: 120, img: 'img/lento_manubri.png', category: 'spalle' },
-            'arnold_press': { name: 'Arnold Press', sets: '4', reps: '10-12', rest: 120, img: 'img/arnold_press.png', category: 'spalle' },
-            'landmine_press': { name: 'Landmine Press', sets: '3', reps: '10-12', rest: 90, img: 'img/landmine_press.png', category: 'spalle' },
-            'lu_raises': { name: 'Lu Raises', sets: '3', reps: '12-15', rest: 60, img: 'img/lu_raises.png', category: 'spalle' },
-            'alzate_cavi_dietro': { name: 'Alzate Cavi Dietro Schiena', sets: '4', reps: '15-20', rest: 60, img: 'img/alzate_cavi_dietro.png', category: 'spalle' },
-
-            // BICIPITI
-            'curl_ez': { name: 'Curl Bilanciere EZ', sets: '3', reps: '8-10', rest: 90, img: 'img/curl_ez.png', category: 'bicipiti' },
-            'hammer_curl': { name: 'Hammer Curl (Martello)', sets: '3', reps: '8-10', rest: 75, img: 'img/hammer_curl.png', category: 'bicipiti' },
-            'spider_curl': { name: 'Spider Curl', sets: '3', reps: '10-12', rest: 75, img: 'img/spider_curl.png', category: 'bicipiti' },
-            'zottman_curl': { name: 'Zottman Curl', sets: '3', reps: '10-12', rest: 75, img: 'img/zottman_curl.png', category: 'bicipiti' },
-            'curl_cavi': { name: 'Curl ai Cavi (Sbarra)', sets: '3', reps: '12-15', rest: 90, img: 'img/curl_cavi.png', category: 'bicipiti' },
-            'curl_concentrazione': { name: 'Curl Concentrazione', sets: '3', reps: '12-15', rest: 10, img: 'img/curl_concentrazione.png', category: 'bicipiti' },
-            'preacher_curl': { name: 'Preacher Curl (Panca Scott)', sets: '3', reps: '10-12', rest: 90, img: 'img/preacher_curl.png', category: 'bicipiti' },
-
-            // TRICIPITI
-            'skullcrusher': { name: 'Skullcrusher Manubri', sets: '3', reps: '8-10', rest: 90, img: 'img/skullcrusher.png', category: 'tricipiti' },
-            'pushdown': { name: 'Push Down Sbarra', sets: '3', reps: '10-12', rest: 75, img: 'img/pushdown.png', category: 'tricipiti' },
-            'pushdown_corda': { name: 'Push Down Corda', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_corda.png', category: 'tricipiti' },
-            'estensioni_testa': { name: 'Estensioni sopra Testa', sets: '3', reps: '12-15', rest: 60, img: 'img/estensioni_testa.png', category: 'tricipiti' },
-            'kickback': { name: 'Kickback ai Cavi', sets: '3', reps: '15-20', rest: 45, img: 'img/kickback.png', category: 'tricipiti' },
-            'french_press_db': { name: 'French Press Manubri', sets: '3', reps: '10-12', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
-
-            // GAMBE & CORE
-            'hack_squat': { name: 'Hack Squat', sets: '4', reps: '10-12', rest: 120, img: 'img/hack_squat.png', category: 'gambe' },
-            'leg_press': { name: 'Leg Press 45°', sets: '3', reps: '15-20', rest: 90, img: 'img/leg_press.png', category: 'gambe' },
-            'hip_thrust': { name: 'Hip Thrust', sets: '3', reps: '12-15', rest: 90, img: 'img/hip_thrust.png', category: 'gambe' },
-            'polpacci': { name: 'Polpacci alla Pressa', sets: '4', reps: '15-20', rest: 60, img: 'img/polpacci.png', category: 'gambe' },
-            'leg_ext': { name: 'Leg Extension', sets: '3', reps: '15-20', rest: 60, img: 'img/leg_ext.png', category: 'gambe' },
-            'russian_twist': { name: 'Russian Twist', sets: '3', reps: '15-20', rest: 60, img: 'img/russian_twist.png', category: 'core' },
-            'hanging_leg': { name: 'Hanging Leg Raises', sets: '3', reps: '15-20', rest: 60, img: 'img/hanging_leg.png', category: 'core' },
-            'plank': { name: 'Plank (con peso)', sets: '3', reps: 'Max', rest: 60, img: 'img/plank.png', category: 'core' },
-            'cable_crunch': { name: 'Cable Crunch', sets: '3', reps: '15-20', rest: 60, img: 'img/cable_crunch.png', category: 'core' },
-            'decline_crunch': { name: 'Decline Crunch', sets: '3', reps: '15-20', rest: 60, img: 'img/decline_crunch.png', category: 'core' },
-            'woodchopper': { name: 'Woodchopper Cavi', sets: '3', reps: '15-20', rest: 60, img: 'img/woodchopper.png', category: 'core' }
+            'panca_piana': { name: 'Panca Piana', sets: 5, reps: '5-8', rest: 180, img: 'img/panca_piana.png', category: 'petto', coach: { esecuzione: "Scapole addotte, arco toracico, barra allo sterno.", target: "Massa pettorale centrale." } },
+            'spinte_inc': { name: 'Spinte Inc. 30°', sets: 4, reps: '8-10', rest: 90, img: 'img/spinte_inc.png', category: 'petto', coach: { esecuzione: "Panca a 30°, stretch profondo, gomiti a 45°.", target: "Focus fasci alti." } },
+            'croci_cavi_bassi': { name: 'Croci ai Cavi Bassi', sets: 3, reps: '12-15', rest: 60, img: 'img/croci_cavi_bassi.png', category: 'petto' },
+            'croci_inc': { name: 'Croci Inclinata', sets: 3, reps: '12-15', rest: 75, img: 'img/croci_inc.png', category: 'petto' },
+            'pectoral': { name: 'Pectoral Machine', sets: 4, reps: '12-15', rest: 75, img: 'img/pectoral.png', category: 'petto' },
+            'crossover': { name: 'Crossover Cavi', sets: 3, reps: '15-20', rest: 60, img: 'img/crossover.png', category: 'petto' },
+            'chest_press_g1': { name: 'Chest Press High', sets: 4, reps: '8-10', rest: 120, img: 'img/chest_press_g1.png', category: 'petto' },
+            'chest_press_bassa': { name: 'Chest Press Low', sets: 4, reps: '12-15', rest: 75, img: 'img/chest_press.png', category: 'petto' },
+            'dips_petto': { name: 'Dips Pettorali', sets: 3, reps: 'Max', rest: 120, img: 'img/dips_petto.png', category: 'petto' },
+            'trazioni': { name: 'Trazioni Sbarra', sets: 5, reps: '6-8', rest: 120, img: 'img/trazioni.png', category: 'dorso', coach: { esecuzione: "Mento sopra la sbarra, controllo in discesa.", target: "Ampiezza ali dorsali." } },
+            'tbar_row': { name: 'Rematore T-Bar', sets: 4, reps: '8-10', rest: 120, img: 'img/tbar_row.png', category: 'dorso' },
+            'lat_machine_larga': { name: 'Lat Machine Larga', sets: 4, reps: '12-15', rest: 75, img: 'img/lat_larga.png', category: 'dorso' },
+            'lat_machine_neutra': { name: 'Lat Machine Neutra', sets: 4, reps: '12-15', rest: 75, img: 'img/lat_neutra.png', category: 'dorso' },
+            'pullover_manubrio': { name: 'Pullover Manubrio', sets: 3, reps: '12-15', rest: 90, img: 'img/pullover_manubrio.png', category: 'dorso' },
+            'meadows_row': { name: 'Meadows Row', sets: 3, reps: '10-12', rest: 90, img: 'img/meadows_row.png', category: 'dorso' },
+            'rematore_manubrio': { name: 'Rematore Manubrio', sets: 4, reps: '10-12', rest: 120, img: 'img/rematore_manubrio.png', category: 'dorso' },
+            'lento_avanti': { name: 'Lento Bilanciere', sets: 4, reps: '6-8', rest: 120, img: 'img/lento_avanti.png', category: 'spalle' },
+            'alzate_lat': { name: 'Alzate Laterali', sets: 3, reps: '10-12', rest: 75, img: 'img/alzate_lat.png', category: 'spalle' },
+            'alzate_90': { name: 'Alzate a 90°', sets: 3, reps: '12-15', rest: 75, img: 'img/alzate_90.png', category: 'spalle' },
+            'alzate_cavi': { name: 'Alzate ai Cavi', sets: 4, reps: '15-20', rest: 60, img: 'img/alzate_cavi.png', category: 'spalle' },
+            'tirate_mento': { name: 'Tirate al Mento', sets: 3, reps: '12-15', rest: 75, img: 'img/tirate_mento.png', category: 'spalle' },
+            'lu_raises': { name: 'Lu Raises', sets: 3, reps: '12-15', rest: 60, img: 'img/lu_raises.png', category: 'spalle' },
+            'arnold_press': { name: 'Arnold Press', sets: 4, reps: '10-12', rest: 120, img: 'img/arnold_press.png', category: 'spalle' },
+            'curl_ez': { name: 'Curl EZ', sets: 3, reps: '8-10', rest: 90, img: 'img/curl_ez.png', category: 'bicipiti' },
+            'hammer_curl': { name: 'Hammer Curl', sets: 3, reps: '8-10', rest: 75, img: 'img/hammer_curl.png', category: 'bicipiti' },
+            'spider_curl': { name: 'Spider Curl', sets: 3, reps: '10-12', rest: 75, img: 'img/spider_curl.png', category: 'bicipiti' },
+            'curl_cavi': { name: 'Curl ai Cavi', sets: 3, reps: '12-15', rest: 90, img: 'img/curl_cavi.png', category: 'bicipiti' },
+            'skullcrusher': { name: 'Skullcrusher', sets: 3, reps: '8-10', rest: 90, img: 'img/skullcrusher.png', category: 'tricipiti' },
+            'pushdown': { name: 'Push Down Sbarra', sets: 3, reps: '10-12', rest: 75, img: 'img/pushdown.png', category: 'tricipiti' },
+            'french_press': { name: 'French Press', sets: 3, reps: '10-12', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
+            'hack_squat': { name: 'Hack Squat', sets: 4, reps: '10-12', rest: 120, img: 'img/hack_squat.png', category: 'gambe' },
+            'leg_press': { name: 'Leg Press 45°', sets: 3, reps: '15-20', rest: 90, img: 'img/leg_press.png', category: 'gambe' },
+            'hip_thrust': { name: 'Hip Thrust', sets: 3, reps: '12-15', rest: 90, img: 'img/hip_thrust.png', category: 'gambe' },
+            'polpacci': { name: 'Polpacci Pressa', sets: 4, reps: '15-20', rest: 60, img: 'img/polpacci.png', category: 'gambe' },
+            'leg_ext': { name: 'Leg Extension', sets: 3, reps: '15-20', rest: 60, img: 'img/leg_ext.png', category: 'gambe' },
+            'russian_twist': { name: 'Russian Twist', sets: 3, reps: '15-20', rest: 60, img: 'img/russian_twist.png', category: 'core' },
+            'hanging_leg': { name: 'Hanging Leg Raises', sets: 3, reps: '15-20', rest: 60, img: 'img/hanging_leg.png', category: 'core' },
+            'plank': { name: 'Plank (Zavorra)', sets: 3, reps: 'Max', rest: 60, img: 'img/plank.png', category: 'core' }
         };
 
         const defaultPlan = {
             1: { title: 'PUSH (Forza)', color: '#007AFF', items: ['panca_piana', 'lento_avanti', 'spinte_inc', 'alzate_lat', 'skullcrusher', 'pushdown'], overrides: {} },
             2: { title: 'PULL (Forza)', color: '#AF52DE', items: ['trazioni', 'tbar_row', 'curl_ez', 'alzate_90', 'hammer_curl', 'russian_twist'], overrides: {} },
             3: { title: 'LEGS (Volume)', color: '#34C759', items: ['hack_squat', 'leg_press', 'hip_thrust', 'polpacci', 'leg_ext', 'hanging_leg', 'plank'], overrides: {} },
-            4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', items: ['pectoral', 'lat_larga', 'alzate_cavi', 'tirate_mento', 'crossover', 'pushdown_corda', 'curl_cavi', 'estensioni_testa', 'curl_concentrazione'], overrides: {} }
+            4: { title: 'UPPER (Hyper)', color: '#FF9500', items: ['pectoral', 'lat_machine_larga', 'alzate_cavi', 'tirate_mento', 'crossover', 'curl_cavi'], overrides: {} }
         };
 
-        // --- STATO GLOBALE ---
+        // --- STATO ---
         let userPlan = JSON.parse(localStorage.getItem('user_workout_plan')) || defaultPlan;
-        let activeSession = JSON.parse(localStorage.getItem('active_session_buffer')) || {};
-        let activeTimers = {};
-        let homeCharts = {}; 
+        let biometrics = JSON.parse(localStorage.getItem('biometrics')) || { weight: [], shoulders: [], waist: [], arms: [], bf: [] };
+        let activeSession = {}; 
         let currentWorkoutId = null;
-        let swappingIndex = null; 
+        let startTime = null;
+        let timerInterval = null;
         let editingIdx = null;
-        let tempDropSet = false;
-        let tempSuperset = false;
-        let calendarDate = new Date();
-        let myChart = null;
+        let tempDrop = false, tempSuper = false;
 
-        function showMessage(text) {
-            const box = document.getElementById('message-box');
-            box.innerText = text; box.style.display = 'block';
-            setTimeout(() => { box.style.display = 'none'; }, 3000);
+        function showMessage(text) { 
+            const b = document.getElementById('toast'); 
+            b.innerText = text; b.style.display = 'block'; 
+            setTimeout(()=>b.style.display = 'none', 3000); 
         }
 
         function handleImgError(el) {
             el.style.display = 'none';
-            const placeholder = document.createElement('div');
-            placeholder.className = "absolute inset-0 flex items-center justify-center bg-[#2C2C2E]";
-            placeholder.innerHTML = '<i data-lucide="dumbbell" class="w-10 h-10 text-gray-700 opacity-30"></i>';
-            el.parentElement.appendChild(placeholder);
+            const icon = document.createElement('div');
+            icon.className = "absolute inset-0 flex flex-col items-center justify-center opacity-20";
+            icon.innerHTML = '<i data-lucide="dumbbell" class="w-12 h-12 mb-2"></i><span class="text-[8px] font-black uppercase tracking-tighter">Aesthetic View</span>';
+            el.parentElement.appendChild(icon);
             lucide.createIcons();
         }
 
-        // --- PARAM EDIT LOGIC ---
-        function openEditParams(idx) {
-            editingIdx = idx;
-            const exId = userPlan[currentWorkoutId].items[idx];
-            const override = userPlan[currentWorkoutId].overrides[idx] || {};
-            
-            document.getElementById('edit-sets').value = override.sets || exerciseData[exId].sets;
-            document.getElementById('edit-reps').value = override.reps || exerciseData[exId].reps;
-            document.getElementById('edit-rest').value = override.rest !== undefined ? override.rest : exerciseData[exId].rest;
-            
-            tempDropSet = override.isDropSet || false;
-            tempSuperset = override.isSuperset || false;
-            
-            updateLocalToggleUI();
-            document.getElementById('modal-edit-params').style.display = 'flex';
+        // --- WORKOUT ---
+        function openWorkout(id) {
+            currentWorkoutId = id;
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-workout').classList.remove('hidden');
+            document.getElementById('workout-title-text').innerText = userPlan[id].title;
+            activeSession = {};
+            startTime = Date.now();
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const diff = Date.now() - startTime;
+                const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+                document.getElementById('session-timer').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            }, 1000);
+            renderWorkout(id);
         }
 
-        function toggleDropSetLocal() { tempDropSet = !tempDropSet; updateLocalToggleUI(); }
-
-        function toggleSupersetLocal() { 
-            tempSuperset = !tempSuperset; 
-            if (tempSuperset) {
-                document.getElementById('edit-rest').value = 0;
-            } else {
-                const exId = userPlan[currentWorkoutId].items[editingIdx];
-                document.getElementById('edit-rest').value = exerciseData[exId].rest;
-            }
-            updateLocalToggleUI(); 
-        }
-
-        function updateLocalToggleUI() {
-            const btnDrop = document.getElementById('toggle-drop');
-            btnDrop.innerText = `DROP SET: ${tempDropSet ? 'ON' : 'OFF'}`;
-            btnDrop.style.backgroundColor = tempDropSet ? 'rgba(255, 59, 48, 0.2)' : 'transparent';
-            btnDrop.style.color = tempDropSet ? '#FF3B30' : 'white';
-
-            const btnSuper = document.getElementById('toggle-superset');
-            btnSuper.innerText = `SUPER SET: ${tempSuperset ? 'ATTIVO' : 'OFF'}`;
-            btnSuper.style.backgroundColor = tempSuperset ? 'rgba(175, 82, 222, 0.2)' : 'transparent';
-            btnSuper.style.color = tempSuperset ? '#AF52DE' : 'white';
-        }
-
-        function saveExerciseParams() {
-            if (!userPlan[currentWorkoutId].overrides) userPlan[currentWorkoutId].overrides = {};
-            userPlan[currentWorkoutId].overrides[editingIdx] = {
-                sets: document.getElementById('edit-sets').value,
-                reps: document.getElementById('edit-reps').value,
-                rest: parseInt(document.getElementById('edit-rest').value),
-                isDropSet: tempDropSet,
-                isSuperset: tempSuperset
-            };
-            localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
-            closeEditParams(); renderWorkout(currentWorkoutId);
-            showMessage("Programma aggiornato.");
-        }
-
-        function closeEditParams() { document.getElementById('modal-edit-params').style.display = 'none'; }
-
-        // --- CORE LOGIC ---
-        function renderWorkout(id, isHistory = false, hist = null) {
+        function renderWorkout(id) {
             const container = document.getElementById('exercise-list');
             const items = userPlan[id].items;
             const overrides = userPlan[id].overrides || {};
-            const finishBtn = document.getElementById('finish-btn');
-            if (finishBtn) finishBtn.style.display = isHistory ? 'none' : 'block';
-            if (document.getElementById('notes-area')) document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
-
+            
             container.innerHTML = items.map((exId, idx) => {
-                const ex = exerciseData[exId] || { name: exId, sets: '3', reps: '12', rest: 60, img: '', category: 'petto' };
-                const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
-                const last = h.length > 0 ? h[h.length-1].w : '--';
-                const todayVal = isHistory ? (hist[exId] || '--') : (activeSession[exId] || '');
+                const ex = exerciseData[exId] || { name: exId, sets: 3, reps: '12', rest: 60, img: '' };
                 const ov = overrides[idx] || {};
-                const sets = ov.sets || ex.sets;
-                const reps = ov.reps || ex.reps;
-                const rest = ov.rest !== undefined ? ov.rest : ex.rest;
-                const isDrop = ov.isDropSet || false;
+                const setsNum = parseInt(ov.sets || ex.sets);
+                const restTime = ov.rest !== undefined ? ov.rest : ex.rest;
                 const isSuper = ov.isSuperset || false;
+
+                let setsHtml = `<div class="set-grid mb-3"><span class="label-style text-center">SET</span><span class="label-style text-center">KG</span><span class="label-style text-center">REPS</span><span class="label-style text-center">RPE</span></div>`;
+                for(let i=1; i<=setsNum; i++) {
+                    const sessionKey = `${exId}_s${i}`;
+                    const val = activeSession[sessionKey] || { w: '', r: '', rpe: '' };
+                    setsHtml += `
+                        <div class="set-grid mb-2.5">
+                            <span class="text-[10px] font-black text-gray-700 text-center">${i}</span>
+                            <input type="number" class="input-log" placeholder="--" value="${val.w}" onchange="logSet('${exId}', ${i}, 'w', this.value)">
+                            <input type="number" class="input-log" placeholder="--" value="${val.r}" onchange="logSet('${exId}', ${i}, 'r', this.value)">
+                            <select class="input-log text-[9px] font-black" onchange="logSet('${exId}', ${i}, 'rpe', this.value)">
+                                <option value="">-</option>${[10,9,8,7,6].map(v => `<option value="${v}" ${val.rpe==v ? 'selected' : ''}>${v}</option>`).join('')}
+                            </select>
+                        </div>`;
+                }
 
                 return `
                 <div class="flex flex-col">
-                    <div class="apple-card overflow-hidden animate-slide">
-                        <div class="img-card">
+                    <div class="apple-card overflow-hidden">
+                        <div class="img-container">
                             <img src="${ex.img}" onerror="handleImgError(this)">
-                            <div class="absolute top-4 right-4 flex gap-2">
-                                <button onclick="openInfo('${exId}')" class="bg-black/60 backdrop-blur-md p-3 rounded-full border border-white/10 active:scale-90"><i data-lucide="info" class="w-4 h-4 text-white"></i></button>
-                                ${!isHistory ? `<button onclick="openLibrary(${idx}, '${ex.category}')" class="bg-black/60 backdrop-blur-md p-3 rounded-full border border-white/10 active:scale-90"><i data-lucide="refresh-cw" class="w-4 h-4 text-blue-400"></i></button>` : ''}
+                            <div class="absolute top-5 right-5 flex gap-2.5">
+                                <button onclick="openInfo('${exId}')" class="bg-black/70 p-3.5 rounded-full backdrop-blur-xl border border-white/10"><i data-lucide="info" class="w-4 h-4 text-white"></i></button>
+                                <button onclick="openLibrary(${idx}, '${ex.category}')" class="bg-black/70 p-3.5 rounded-full backdrop-blur-xl border border-white/10"><i data-lucide="refresh-cw" class="w-4 h-4 text-blue-400"></i></button>
                             </div>
-                            ${isDrop ? `<div class="absolute top-4 left-4 bg-red-500 text-white text-[8px] font-black px-2 py-1 rounded-md shadow-lg">DROP SET</div>` : ''}
+                            ${ov.isDropSet ? `<div class="absolute top-5 left-5 bg-red-500 text-white text-[8px] font-black px-2.5 py-1 rounded-md shadow-2xl">DROP SET</div>` : ''}
                         </div>
-                        <div class="p-6">
-                            <div class="flex justify-between items-start mb-6 text-white">
+                        <div class="p-7">
+                            <div class="flex justify-between items-start mb-8">
                                 <div>
-                                    <h3 class="text-lg font-bold">${ex.name}</h3>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <div class="bg-blue-500/10 px-2 py-1 rounded-lg border border-blue-500/20">
-                                            <span class="text-[10px] font-black text-blue-500 uppercase">${sets} serie x ${reps}</span>
-                                        </div>
-                                        ${!isHistory ? `<button onclick="openEditParams(${idx})" class="text-gray-600 active:text-white p-1"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>` : ''}
+                                    <h3 class="text-2xl font-black italic tracking-tighter uppercase leading-none mb-2">${ex.name}</h3>
+                                    <div class="flex items-center gap-3">
+                                        <span class="label-style text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-md">${ov.sets || ex.sets} x ${ov.reps || ex.reps}</span>
+                                        <button onclick="openEditParams(${idx})" class="p-1.5 bg-white/5 rounded-lg active:scale-75 transition-all"><i data-lucide="edit-3" class="w-3.5 h-3.5 text-gray-500"></i></button>
                                     </div>
                                 </div>
-                                ${(!isHistory && !isSuper) ? `<button id="timer-${exId}" onclick="toggleTimer('${exId}', ${rest})" class="bg-white/5 text-gray-400 text-[10px] font-black px-3 py-2 rounded-xl flex items-center gap-1.5 border border-white/5"><i data-lucide="timer" class="w-3 h-3"></i> ${rest}s</button>` : ''}
-                                ${isSuper ? `<div class="text-[#AF52DE] text-[10px] font-black uppercase flex items-center gap-1 bg-[#AF52DE]/10 px-3 py-2 rounded-xl border border-[#AF52DE]/20"><i data-lucide="zap" class="w-3 h-3"></i> Super Set</div>` : ''}
+                                ${!isSuper ? `<button id="timer-${exId}" onclick="toggleTimer('${exId}', ${restTime})" class="bg-[#1C1C1E] border border-white/5 px-4 py-2.5 rounded-2xl text-[10px] font-black flex items-center gap-2 text-blue-500 shadow-xl"><i data-lucide="timer" class="w-4 h-4"></i> ${restTime}s</button>` : `<div class="text-purple-500 text-[10px] font-black uppercase flex items-center gap-1.5 bg-purple-500/10 px-4 py-2.5 rounded-2xl border border-purple-500/20"><i data-lucide="zap" class="w-4 h-4"></i> SUPER SET</div>`}
                             </div>
-                            ${isHistory ? `<div class="bg-blue-500/10 p-5 rounded-2xl text-center text-white"><span class="text-4xl font-black">${todayVal} <small class="text-sm">kg</small></span></div>` : `
-                                <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5">
-                                    <div class="flex-1"><div class="flex gap-2"><input type="number" id="in-${exId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}"><button onclick="saveWeight('${exId}', document.getElementById('in-${exId}').value)" class="btn-primary px-5 text-xs text-white">OK</button></div></div>
-                                    <div class="w-[1px] h-10 bg-white/10"></div>
-                                    <div class="text-center px-2 cursor-pointer" onclick="showChart('${exId}', '${ex.name}')"><label>Ultimo</label><span class="text-xl font-black italic underline text-white">${last}</span></div>
-                                </div>
-                            `}
+                            <div>${setsHtml}</div>
                         </div>
                     </div>
-                    ${isSuper && idx < items.length - 1 ? `<div class="superset-connector"></div>` : ''}
+                    ${isSuper && idx < items.length-1 ? `<div class="superset-link"></div>` : ''}
                 </div>`;
             }).join('');
             lucide.createIcons();
         }
 
-        function goHome() { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-home').classList.remove('hidden'); updateNav('home'); renderHomeCards(); renderDashboardCharts(); }
-        function openWorkout(id) { currentWorkoutId = id; document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-workout').classList.remove('hidden'); document.getElementById('workout-title-text').innerText = userPlan[id].title; renderWorkout(id); }
-        function openCalendar() { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-calendar').classList.remove('hidden'); updateNav('calendar'); renderCalendar(); }
-        function updateNav(active) { ['home', 'calendar', 'settings'].forEach(n => { const btn = document.getElementById(`nav-${n}`); if (btn) { btn.classList.toggle('text-blue-500', active === n); btn.classList.toggle('text-gray-500', active !== n); } }); }
+        function logSet(exId, setNum, field, val) {
+            const key = `${exId}_s${setNum}`;
+            if(!activeSession[key]) activeSession[key] = { w: '', r: '', rpe: '' };
+            activeSession[key][field] = val;
+            if(field === 'w' && val > 0) {
+                const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
+                const m = h.length > 0 ? Math.max(...h.map(i => i.w)) : 0;
+                if(val > m && m > 0) showMessage("🚀 NUOVO RECORD STORICO!");
+            }
+        }
+
+        function finishWorkout() {
+            if(Object.keys(activeSession).length === 0) return alert("Inserisci dati prima di chiudere.");
+            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+            const date = new Date().toISOString().split('T')[0];
+            let v = 0;
+            Object.entries(activeSession).forEach(([k, s]) => { if(s.w && s.r) v += (s.w * s.r); });
+            Object.entries(activeSession).forEach(([k, s]) => {
+                const id = k.split('_s')[0];
+                if(s.w > 0) {
+                    const h = JSON.parse(localStorage.getItem(`h_${id}`)) || [];
+                    h.push({ d: date, w: parseFloat(s.w) });
+                    localStorage.setItem(`h_${id}`, JSON.stringify(h.slice(-20)));
+                }
+            });
+            journal[date] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, volume: v, duration: document.getElementById('session-timer').innerText };
+            localStorage.setItem('workout_journal', JSON.stringify(journal));
+            clearInterval(timerInterval); goHome(); showMessage("Sessione salvata!");
+        }
+
+        // --- EDIT PARAMS ---
+        function openEditParams(idx) {
+            // Check robustezza: assicurati che currentWorkoutId e idx siano validi
+            if (!currentWorkoutId || !userPlan[currentWorkoutId]) {
+                console.error("Workout non trovato");
+                return;
+            }
+            if (!userPlan[currentWorkoutId].overrides) userPlan[currentWorkoutId].overrides = {};
+            
+            editingIdx = idx;
+            const exId = userPlan[currentWorkoutId].items[idx];
+            const ov = userPlan[currentWorkoutId].overrides[idx] || {};
+            const exBase = exerciseData[exId] || { sets: 3, reps: '10', rest: 60 };
+
+            document.getElementById('edit-sets').value = ov.sets || exBase.sets;
+            document.getElementById('edit-reps').value = ov.reps || exBase.reps;
+            document.getElementById('edit-rest').value = ov.rest !== undefined ? ov.rest : exBase.rest;
+            
+            tempDrop = ov.isDropSet || false;
+            tempSuper = ov.isSuperset || false;
+            
+            updateToggleUI();
+            document.getElementById('modal-edit-params').style.display = 'flex';
+        }
+
+        function toggleSupersetLocal() { 
+            tempSuper = !tempSuper; 
+            if (tempSuper) document.getElementById('edit-rest').value = 0;
+            else document.getElementById('edit-rest').value = exerciseData[userPlan[currentWorkoutId].items[editingIdx]]?.rest || 90;
+            updateToggleUI(); 
+        }
+
+        function updateToggleUI() {
+            const d = document.getElementById('btn-toggle-drop'), s = document.getElementById('btn-toggle-super');
+            d.innerText = `Drop Set: ${tempDrop ? 'ON' : 'OFF'}`;
+            d.style.background = tempDrop ? 'rgba(255,69,58,0.2)' : '#1C1C1E';
+            d.style.color = tempDrop ? '#FF453A' : '#8E8E93';
+            s.innerText = `Super Set: ${tempSuper ? 'ON' : 'OFF'}`;
+            s.style.background = tempSuper ? 'rgba(191,90,242,0.2)' : '#1C1C1E';
+            s.style.color = tempSuper ? '#BF5AF2' : '#8E8E93';
+        }
+
+        function confirmParams() {
+            userPlan[currentWorkoutId].overrides[editingIdx] = { 
+                sets: document.getElementById('edit-sets').value, 
+                reps: document.getElementById('edit-reps').value, 
+                rest: parseInt(document.getElementById('edit-rest').value), 
+                isDropSet: tempDrop, 
+                isSuperset: tempSuper 
+            };
+            localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
+            document.getElementById('modal-edit-params').style.display = 'none';
+            renderWorkout(currentWorkoutId);
+            showMessage("Configurazione salvata");
+        }
+
+        function closeEditParams() { document.getElementById('modal-edit-params').style.display = 'none'; }
+
+        // --- UTILS ---
+        function goHome() { 
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+            document.getElementById('view-home').classList.remove('hidden'); 
+            renderHomeCards(); updateVTaperUI();
+        }
 
         function renderHomeCards() {
             const container = document.getElementById('workout-cards-container');
             container.innerHTML = Object.entries(userPlan).map(([id, p]) => `
-                <div onclick="openWorkout(${id})" class="apple-card relative h-32 overflow-hidden transform active:scale-[0.98] transition-all">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent p-6 flex flex-col justify-center z-10">
-                        <p class="text-[10px] font-black uppercase mb-1" style="color: ${p.color || '#007AFF'}">Giorno ${id}</p>
-                        <h3 class="text-2xl font-extrabold text-white">${p.title}</h3>
+                <div onclick="openWorkout('${id}')" class="apple-card relative h-48 overflow-hidden active:scale-[0.98] transition-all">
+                    <div class="absolute inset-0 bg-gradient-to-br from-black/90 via-black/30 to-transparent p-9 flex flex-col justify-center z-10">
+                        <p class="label-style text-[10px] mb-2" style="color: ${p.color}">GIORNO ${id}</p>
+                        <h3 class="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">${p.title}</h3>
                     </div>
-                    <div class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 z-10"><i data-lucide="play" class="w-5 h-5 text-white ml-0.5"></i></div>
+                    <div class="absolute right-10 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center z-10 shadow-2xl">
+                        <i data-lucide="play" class="text-white fill-white w-7 h-7"></i>
+                    </div>
                 </div>`).join('');
             lucide.createIcons();
         }
 
-        function saveWeight(exId, val) {
-            if (!val || isNaN(val)) return;
-            const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
-            h.push({ d: new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}), w: parseFloat(val) });
-            localStorage.setItem(`h_${exId}`, JSON.stringify(h.slice(-15)));
-            activeSession[exId] = parseFloat(val);
-            localStorage.setItem('active_session_buffer', JSON.stringify(activeSession));
-            renderWorkout(currentWorkoutId);
-        }
-        
-        function finishWorkout() {
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            journal[new Date().toISOString().split('T')[0]] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, exercises: { ...activeSession }, volume: Object.values(activeSession).reduce((a,b)=>a+b,0) };
-            localStorage.setItem('workout_journal', JSON.stringify(journal));
-            activeSession = {}; localStorage.removeItem('active_session_buffer'); goHome();
-        }
-
-        function openLibrary(index, cat) { swappingIndex = index; renderLibrary(cat); document.getElementById('modal-library').style.display = 'flex'; }
-        function renderLibrary(filter) {
-            const cats = [...new Set(Object.values(exerciseData).map(e => e.category))].sort();
-            document.getElementById('library-categories').innerHTML = cats.map(c => `<button onclick="renderLibraryList('${c}')" class="px-5 py-2.5 rounded-full bg-white/5 text-[10px] font-black uppercase whitespace-nowrap ${filter === c ? 'bg-blue-500 text-white' : 'text-gray-400'}">${c}</button>`).join('');
-            renderLibraryList(filter || cats[0]);
-        }
-        function renderLibraryList(cat) {
-            const list = document.getElementById('library-list');
-            const items = userPlan[currentWorkoutId].items;
-            list.innerHTML = Object.entries(exerciseData).filter(([id, data]) => data.category === cat).map(([id, ex]) => `
-                <div onclick="processSelection('${id}')" class="apple-card p-4 flex items-center gap-4 border border-white/5 active:bg-blue-500/20">
-                    <div class="img-thumb"><img src="${ex.img}" onerror="handleImgError(this)"></div>
-                    <div class="flex-1 text-left"><h4 class="font-bold text-sm text-white">${ex.name}</h4><p class="text-[10px] text-gray-500 uppercase font-black">${ex.sets}x${ex.reps}</p></div>
-                    <i data-lucide="${items.includes(id) ? 'alert-circle' : 'plus'}" class="${items.includes(id) ? 'text-red-500' : 'text-blue-500'} w-5 h-5"></i>
-                </div>`).join('');
-            lucide.createIcons();
-        }
-        function processSelection(newId) {
-            if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Già presente!"); return; }
-            if (swappingIndex === null) userPlan[currentWorkoutId].items.push(newId);
-            else { userPlan[currentWorkoutId].items[swappingIndex] = newId; if(userPlan[currentWorkoutId].overrides[swappingIndex]) delete userPlan[currentWorkoutId].overrides[swappingIndex]; }
-            localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
-            closeLibrary(); renderWorkout(currentWorkoutId);
-        }
-        function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
-        
-        function renderCalendar() {
-            const container = document.getElementById('calendar-days');
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            container.innerHTML = '';
-            const year = calendarDate.getFullYear(); const month = calendarDate.getMonth();
-            document.getElementById('calendar-month').innerText = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' }).format(calendarDate);
-            const firstDay = new Date(year, month, 1).getDay();
-            const offset = firstDay === 0 ? 6 : firstDay - 1;
-            for(let i=0; i<offset; i++) container.innerHTML += `<div></div>`;
-            for(let d=1; d<=new Date(year, month + 1, 0).getDate(); d++) {
-                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                container.innerHTML += `<div class="calendar-day ${new Date().toISOString().split('T')[0] === key ? 'today' : ''} ${journal[key] ? 'workout' : ''}">${d}</div>`;
+        function updateVTaperUI() {
+            const last = (k) => biometrics[k].length > 0 ? biometrics[k][biometrics[k].length-1].v : 0;
+            const w = last('weight'), s = last('shoulders'), waist = last('waist');
+            document.getElementById('v-weight').innerText = (w || '--') + ' kg';
+            document.getElementById('v-shoulders').innerText = (s || '--') + ' cm';
+            document.getElementById('v-waist').innerText = (waist || '--') + ' cm';
+            if(s > 0 && waist > 0) {
+                const ratio = (s/waist).toFixed(2);
+                document.getElementById('v-index-val').innerText = ratio;
             }
         }
-        function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); renderCalendar(); }
 
-        function renderDashboardCharts() {
-            const cats = ['volume', 'petto', 'dorso', 'spalle', 'gambe', 'bicipiti', 'tricipiti'];
-            const entries = Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).sort((a,b) => new Date(a[0]) - new Date(b[0])).slice(-10);
-            cats.forEach(cat => {
-                const canvas = document.getElementById(`chart-${cat}`); if (!canvas) return;
-                if (homeCharts[cat]) homeCharts[cat].destroy();
-                let pts = entries.map(e => {
-                    if (cat === 'volume') return e[1].volume || 0;
-                    let sum = 0; Object.entries(e[1].exercises || {}).forEach(([id, w]) => { if (exerciseData[id]?.category === cat) sum += (parseFloat(w) || 0); });
-                    return sum;
-                });
-                if (pts.length < 5) while(pts.length < 5) pts.unshift(0);
-                homeCharts[cat] = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: pts.map((_,i)=>i), datasets: [{ data: pts, borderColor: '#007AFF', borderWidth: 2, pointRadius: 0, tension: 0.4, spanGaps: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } } });
-            });
+        function openBiometrics() {
+            const last = (k) => biometrics[k].length > 0 ? biometrics[k][biometrics[k].length-1].v : '';
+            ['weight','bf','shoulders','waist','arms'].forEach(f => document.getElementById(`bio-${f}`).value = last(f));
+            document.getElementById('modal-biometrics').style.display = 'flex';
         }
+        function closeBiometrics() { document.getElementById('modal-biometrics').style.display = 'none'; }
+        function saveBiometrics() {
+            const d = new Date().toISOString().split('T')[0];
+            ['weight','bf','shoulders','waist','arms'].forEach(f => {
+                const v = document.getElementById(`bio-${f}`).value;
+                if(v) biometrics[f].push({ d, v: parseFloat(v) });
+            });
+            localStorage.setItem('biometrics', JSON.stringify(biometrics));
+            updateVTaperUI(); closeBiometrics(); showMessage("Misure aggiornate!");
+        }
+
         function toggleTimer(id, sec) {
             const btn = document.getElementById(`timer-${id}`);
-            if (activeTimers[id]) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="timer" class="w-3 h-3"></i> ${sec}s`; btn.className = "bg-white/5 text-gray-400 text-[10px] font-black px-3 py-2 rounded-xl flex items-center gap-1.5 border border-white/5"; lucide.createIcons(); return; }
-            let rem = sec; btn.className = "bg-orange-500/20 text-orange-500 text-[10px] font-black px-3 py-2 rounded-xl flex items-center gap-1.5 border border-orange-500/20";
-            activeTimers[id] = { int: setInterval(() => { rem--; btn.innerHTML = `<i data-lucide="timer" class="w-3 h-3"></i> ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; lucide.createIcons(); if (rem <= 0) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i> GO!`; btn.className = "bg-green-500 text-black text-[10px] font-black px-3 py-2 rounded-xl flex items-center gap-1.5"; if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); setTimeout(() => { btn.innerHTML = `<i data-lucide="timer" class="w-3 h-3"></i> ${sec}s`; btn.className = "bg-white/5 text-gray-400 text-[10px] font-black px-3 py-2 rounded-xl flex items-center gap-1.5 border border-white/5"; lucide.createIcons(); }, 5000); } }, 1000) };
+            if (activeTimers[id]) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.style.color = 'var(--apple-blue)'; lucide.createIcons(); return; }
+            let rem = sec; btn.style.color = '#FF9500';
+            activeTimers[id] = { int: setInterval(() => { rem--; btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; lucide.createIcons(); if (rem <= 0) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; btn.style.color = '#30D158'; if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); } }, 1000) };
         }
-        function openInfo(exId) {
-            const ex = exerciseData[exId];
-            if (!ex || !ex.coach) { showMessage("Focus tecnico in arrivo!"); return; }
-            const modal = document.getElementById('modal-info');
-            const content = document.getElementById('info-content');
-            document.getElementById('info-title').innerText = ex.name;
-            content.innerHTML = `<div class="space-y-4"><div class="apple-card p-5 border border-blue-500/10"><h4 class="text-blue-500 font-bold text-[10px] uppercase mb-2 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Esecuzione</h4><p class="text-sm leading-relaxed text-white">${ex.coach.esecuzione}</p></div><div class="apple-card p-5 border border-green-500/10"><h4 class="text-green-500 font-bold text-[10px] uppercase mb-2 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Obiettivo</h4><p class="text-sm leading-relaxed text-white">${ex.coach.target}</p></div><div class="apple-card p-5 border border-orange-500/10"><h4 class="text-orange-500 font-bold text-[10px] uppercase mb-2 flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i> Tempo</h4><p class="text-sm leading-relaxed text-white">${ex.coach.tempo}</p></div></div>`;
-            modal.style.display = 'flex'; lucide.createIcons();
+
+        function openLibrary(idx, cat) { swappingIndex = idx; renderLibrary(cat); document.getElementById('modal-library').style.display = 'flex'; }
+        function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
+        function renderLibrary(filter) { const cats = [...new Set(Object.values(exerciseData).map(e => e.category))].sort(); document.getElementById('library-categories').innerHTML = cats.map(c => `<button onclick="renderLibraryList('${c}')" class="px-6 py-3 rounded-full bg-[#1C1C1E] label-style ${filter === c ? 'bg-blue-600 text-white' : 'text-gray-500'}">${c}</button>`).join(''); renderLibraryList(filter || cats[0]); }
+        function renderLibraryList(cat) { document.getElementById('library-list').innerHTML = Object.entries(exerciseData).filter(([id, data]) => data.category === cat).map(([id, ex]) => `<div onclick="confirmSelection('${id}')" class="apple-card p-5 flex items-center gap-5 active:bg-white/10"><div class="img-thumb"><img src="${ex.img}" onerror="this.style.display='none'"></div><div class="flex-1"><h4 class="text-lg font-black uppercase italic leading-none mb-1">${ex.name}</h4><p class="label-style text-gray-600">${ex.category}</p></div><i data-lucide="plus-circle" class="w-6 h-6 text-blue-500"></i></div>`).join(''); lucide.createIcons(); }
+        function confirmSelection(newId) { if(swappingIndex === null) userPlan[currentWorkoutId].items.push(newId); else userPlan[currentWorkoutId].items[swappingIndex] = newId; localStorage.setItem('user_workout_plan', JSON.stringify(userPlan)); closeLibrary(); renderWorkout(currentWorkoutId); }
+        function openAddMenu() { swappingIndex = null; renderLibrary(); document.getElementById('modal-library').style.display = 'flex'; }
+        
+        function openInfo(id) { 
+            const ex = exerciseData[id]; 
+            if(!ex) return; 
+            document.getElementById('info-title').innerText = ex.name; 
+            document.getElementById('info-content').innerHTML = `
+                <div class="apple-card p-7 border border-blue-500/20 mb-4"><p class="label-style text-blue-500 mb-3">Esecuzione</p><p class="text-sm leading-relaxed">${ex.coach?.esecuzione || 'Esecuzione controllata e ROM completo.'}</p></div>
+                <div class="apple-card p-7 border border-green-500/20"><p class="label-style text-green-500 mb-3">Obiettivo</p><p class="text-sm leading-relaxed">${ex.coach?.target || 'Ipertrofia specifica per il distretto ' + ex.category + '.'}</p></div>`; 
+            document.getElementById('modal-info').style.display = 'flex'; 
+            lucide.createIcons(); 
         }
         function closeInfo() { document.getElementById('modal-info').style.display = 'none'; }
-        function showChart(id, name) {
-            document.getElementById('chart-modal').style.display = 'flex';
-            document.getElementById('chart-title').innerText = name;
-            const h = JSON.parse(localStorage.getItem(`h_${id}`)) || [];
-            if (myChart) myChart.destroy();
-            myChart = new Chart(document.getElementById('progressChart').getContext('2d'), { type: 'line', data: { labels: h.map(i => i.d), datasets: [{ data: h.map(i => i.w), borderColor: '#007AFF', fill: true, backgroundColor: 'rgba(0,122,255,0.1)', tension: 0.4, spanGaps: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-        }
-        function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
-        function exportData() { const dl = document.createElement('a'); dl.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage)); dl.download = "powerlog_backup.json"; dl.click(); }
-        function importData(e) { const r = new FileReader(); r.onload = (ev) => { const d = JSON.parse(ev.target.result); Object.entries(d).forEach(([k,v]) => localStorage.setItem(k, v)); location.reload(); }; r.readAsText(e.target.files[0]); }
-        function resetAllData() { if(confirm("Cancellare tutto?")) { localStorage.clear(); location.reload(); } }
-        function openSettings() { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-settings').classList.remove('hidden'); updateNav('settings'); }
+        function exportData() { const dl = document.createElement('a'); dl.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage)); dl.download = "powerlog_pro_backup.json"; dl.click(); }
+        function resetAllData() { if(confirm("Reset Totale? Perderai tutti i tuoi pesi.")) { localStorage.clear(); location.reload(); } }
 
         window.onload = () => {
-            document.getElementById('date-label').innerText = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+            const d = new Date();
+            document.getElementById('date-label').innerText = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
             goHome();
             lucide.createIcons();
         };
