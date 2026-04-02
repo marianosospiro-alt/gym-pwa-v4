@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PowerLog Pro</title>
+    <title>Allenamento Mariano</title>
     
-    <!-- Icona Personalizzata Utente Ripristinata -->
     <link rel="apple-touch-icon" href="icon_gym.png">
     <link rel="icon" type="image/png" href="icon_gym.png">
     <meta name="apple-mobile-web-app-title" content="PowerLog">
@@ -150,6 +149,10 @@
             -webkit-backdrop-filter: blur(30px) saturate(200%);
             border: 1px solid rgba(255,255,255,0.1);
         }
+        
+        .vshape-gradient {
+            background: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(10,132,255,0.1) 100%);
+        }
     </style>
 </head>
 <body class="pt-safe">
@@ -163,9 +166,7 @@
                     <p id="date-label" class="text-blue-500 font-bold text-[11px] uppercase tracking-widest mb-1.5"></p>
                     <h1 class="text-4xl font-black tracking-tight">Riepilogo</h1>
                 </div>
-                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/5">
-                    <i data-lucide="user" class="w-6 h-6 text-white"></i>
-                </div>
+                <!-- Rimossa la sagoma omino in alto a destra -->
             </header>
             
             <section class="mb-12">
@@ -198,7 +199,7 @@
             <main id="exercise-list" class="p-5 space-y-8 mt-2 animate-slide"></main>
             
             <div class="p-5 space-y-6">
-                <button onclick="openAddMenu()" class="w-full bg-[#1C1C1E] border-2 border-dashed border-[#2C2C2E] rounded-[28px] py-10 flex flex-col items-center justify-center gap-3 active:scale-[0.98] transition-transform">
+                <button onclick="openAddMenu()" class="w-full bg-[#1C1C1E] border-2 border-dashed border-[#2C2C2E] rounded-[28px] py-10 flex flex-col items-center justify-center gap-3 active:scale-[0.98] transition-transform hover:border-blue-500/50">
                     <div class="w-14 h-14 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
                         <i data-lucide="plus" class="text-blue-500 w-7 h-7"></i>
                     </div>
@@ -232,6 +233,59 @@
             
             <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1">Dettagli</h2>
             <div id="calendar-selection" class="space-y-4"></div>
+        </div>
+
+        <!-- VISTA FISICO / BIOMETRIA -->
+        <div id="view-body" class="view hidden p-6 pb-40 animate-slide">
+            <h1 class="text-4xl font-black text-white mb-8 mt-2 tracking-tight">Fisico</h1>
+
+            <div class="apple-card p-6 mb-8 vshape-gradient border border-emerald-500/20 relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 opacity-10">
+                    <i data-lucide="triangle" class="w-32 h-32 rotate-180"></i>
+                </div>
+                <h3 class="font-bold text-white mb-1">Analisi V-Shape</h3>
+                <p class="text-xs text-white/70 mb-4">Rapporto tra la larghezza superiore e la vita.</p>
+                <div class="flex items-end gap-4 relative z-10">
+                    <div id="vshape-icon-container" class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center border border-white/20">
+                        <i id="vshape-icon" data-lucide="activity" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <div>
+                        <p id="vshape-status" class="text-xl font-black text-white leading-tight">In attesa di dati...</p>
+                        <p id="vshape-subtext" class="text-[10px] text-white/60 font-bold uppercase tracking-widest mt-1">Inserisci spalle e vita</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="apple-card p-6 mb-8">
+                <h3 class="font-bold text-white mb-1">Trend Misure</h3>
+                <p class="text-xs text-gray-500 mb-4">Andamento Spalle, Petto e Vita (cm)</p>
+                <div class="w-full h-48">
+                    <canvas id="chart-body-measurements"></canvas>
+                </div>
+            </div>
+
+            <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1">Nuova Misurazione</h2>
+            <div class="apple-card p-5 space-y-4 mb-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label>Altezza (cm)</label><input type="number" id="bio-height" placeholder="es. 180"></div>
+                    <div><label>Peso (kg)</label><input type="number" id="bio-weight" step="0.1" placeholder="es. 80.5"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label>Massa Magra (%)</label><input type="number" id="bio-lean" step="0.1" placeholder="es. 45"></div>
+                    <div><label>Massa Grassa (%)</label><input type="number" id="bio-fat" step="0.1" placeholder="es. 15"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
+                    <div><label>Spalle (cm)</label><input type="number" id="bio-shoulders" placeholder="es. 120"></div>
+                    <div><label>Petto (cm)</label><input type="number" id="bio-chest" placeholder="es. 105"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label>Vita (cm)</label><input type="number" id="bio-waist" placeholder="es. 82"></div>
+                    <div><label>Braccia (cm)</label><input type="number" id="bio-arms" placeholder="es. 38"></div>
+                </div>
+            </div>
+            <button onclick="saveBiometrics()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-500/20">
+                SALVA MISURAZIONI
+            </button>
         </div>
 
         <!-- VISTA IMPOSTAZIONI -->
@@ -325,7 +379,7 @@
             </div>
         </div>
         
-        <!-- MODALE GRAFICO -->
+        <!-- MODALE GRAFICO ALLENAMENTO -->
         <div id="chart-modal" class="modal-sheet" onclick="closeChart()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="sheet-pill"></div>
@@ -339,13 +393,31 @@
             </div>
         </div>
 
-        <!-- NUOVA NAVBAR FLUTTUANTE (Premium iOS Style) -->
-        <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[360px] glass-nav rounded-full px-4 py-2.5 flex justify-between items-center z-50 shadow-2xl">
+        <!-- MODALE CUSTOM CONFIRM -->
+        <div id="modal-confirm" class="modal-sheet" style="align-items: center; justify-content: center; padding: 20px;">
+            <div class="bg-[#1C1C1E] p-6 rounded-[28px] w-full max-w-sm border border-white/10 text-center shadow-2xl" onclick="event.stopPropagation()">
+                <div class="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+                    <i data-lucide="alert-triangle" class="w-7 h-7 text-red-500"></i>
+                </div>
+                <h3 id="confirm-title" class="text-xl font-black mb-2 text-white tracking-tight"></h3>
+                <p id="confirm-msg" class="text-sm text-gray-400 mb-8 leading-relaxed"></p>
+                <div class="flex gap-3">
+                    <button onclick="closeConfirm()" class="flex-1 bg-[#2C2C2E] hover:bg-[#3a3a3c] py-4 rounded-2xl font-black text-white uppercase tracking-widest text-[10px] transition-colors">Annulla</button>
+                    <button id="confirm-btn" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl font-black text-white uppercase tracking-widest text-[10px] transition-colors">Conferma</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVBAR FLUTTUANTE -->
+        <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-[400px] glass-nav rounded-full px-3 py-2.5 flex justify-between items-center z-50 shadow-2xl">
             <button onclick="goHome()" id="nav-home" class="flex-1 flex flex-col items-center gap-1 text-blue-500 py-1 transition-all rounded-2xl active:bg-white/5">
                 <i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[9px] font-black uppercase tracking-widest hidden">Home</span>
             </button>
             <button onclick="openCalendar()" id="nav-calendar" class="flex-1 flex flex-col items-center gap-1 text-gray-500 py-1 transition-all rounded-2xl active:bg-white/5">
                 <i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[9px] font-black uppercase tracking-widest hidden">Diario</span>
+            </button>
+            <button onclick="openBody()" id="nav-body" class="flex-1 flex flex-col items-center gap-1 text-gray-500 py-1 transition-all rounded-2xl active:bg-white/5">
+                <i data-lucide="user" class="w-6 h-6"></i><span class="text-[9px] font-black uppercase tracking-widest hidden">Fisico</span>
             </button>
             <button onclick="openSettings()" id="nav-settings" class="flex-1 flex flex-col items-center gap-1 text-gray-500 py-1 transition-all rounded-2xl active:bg-white/5">
                 <i data-lucide="settings" class="w-6 h-6"></i><span class="text-[9px] font-black uppercase tracking-widest hidden">Opzioni</span>
@@ -353,42 +425,117 @@
         </nav>
     </div>
 
-    <!-- LOGICA JS (INTATTA, MODIFICATI SOLO I TEMPLATE HTML GENERATI) -->
+    <!-- LOGICA JS -->
     <script>
+        // Database esteso e sincronizzato con il file CSV e le tue miniature
         const exerciseData = {
-            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5', reps: '5-8', rest: 180, img: 'img/panca_piana.png', category: 'petto', coach: { esecuzione: "Arco moderato, scapole incollate. Scendi allo sterno.", target: "Massa pettorale centrale.", tempo: "3s discesa, 1s pausa, salita esplosiva." } },
-            'spinte_inc': { name: 'Spinte Inclinata 30° Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/spinte_inc.png', category: 'petto', coach: { esecuzione: "Panca a 30°. Gomiti a 45°. Stretch massimo.", target: "Petto alto (V-Shape).", tempo: "4s negativa controllata." } },
-            'pectoral': { name: 'Pectoral Machine', sets: '4', reps: '12-15', rest: 75, img: 'img/pectoral.png', category: 'petto' },
-            'crossover': { name: 'Crossover ai Cavi', sets: '3', reps: '15-20', rest: 60, img: 'img/crossover.png', category: 'petto' },
-            'chest_press_g1': { name: 'Chest Press (Piana/Alta)', sets: '4', reps: '8-10', rest: 120, img: 'img/chest_press_g1.png', category: 'petto' },
-            'trazioni': { name: 'Trazioni alla Sbarra', sets: '5', reps: '6-8', rest: 120, img: 'img/trazioni.png', category: 'dorso', coach: { esecuzione: "Petto alla sbarra. Depressione scapolare.", target: "Ampiezza dorsale ('ali').", tempo: "3s discesa." } },
-            'tbar_row': { name: 'Rematore T-Bar', sets: '4', reps: '8-10', rest: 120, img: 'img/tbar_row.png', category: 'dorso' },
-            'lat_larga': { name: 'Lat Machine Presa Larga', sets: '4', reps: '12-15', rest: 75, img: 'img/lat_larga.png', category: 'dorso' },
+            // SPALLE
+            'alzate_90': { name: 'Alzate a 90°', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_90.png', category: 'spalle' },
+            'alzate_cavi': { name: 'Alzate Laterali ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_cavi.png', category: 'spalle' },
+            'alzate_cavi_dietro': { name: 'Alzate Posteriori ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_cavi_dietro.png', category: 'spalle' },
+            'alzate_inclinata': { name: 'Alzate su Panca Inclinata', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_inclinata.png', category: 'spalle' },
+            'alzate_lat': { name: 'Alzate Laterali Manubri', sets: '4', reps: '12-15', rest: 60, img: 'img/alzate_lat.png', category: 'spalle' },
+            'alzate_lat1': { name: 'Alzate Laterali (Variante)', sets: '4', reps: '12-15', rest: 60, img: 'img/alzate_lat1.png', category: 'spalle' },
+            'alzate_lean_away': { name: 'Lean Away Lateral Raises', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_lean_away.png', category: 'spalle' },
+            'alzate_seduto': { name: 'Alzate Laterali Seduto', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_seduto.png', category: 'spalle' },
+            'arnold_press': { name: 'Arnold Press', sets: '3', reps: '10-12', rest: 90, img: 'img/arnold_press.png', category: 'spalle' },
+            'landmine_press': { name: 'Landmine Press', sets: '3', reps: '8-10', rest: 90, img: 'img/landmine_press.png', category: 'spalle' },
             'lento_avanti': { name: 'Lento Avanti Bilanciere', sets: '4', reps: '6-8', rest: 120, img: 'img/lento_avanti.png', category: 'spalle' },
-            'alzate_lat': { name: 'Alzate Laterali Manubri', sets: '3', reps: '10-12', rest: 75, img: 'img/alzate_lat.png', category: 'spalle' },
-            'alzate_90': { name: 'Alzate a 90°', sets: '3', reps: '12-15', rest: 75, img: 'img/alzate_90.png', category: 'spalle' },
-            'curl_ez': { name: 'Curl EZ', sets: '3', reps: '8-10', rest: 90, img: 'img/curl_ez.png', category: 'bicipiti' },
-            'hammer_curl': { name: 'Hammer Curl', sets: '3', reps: '8-10', rest: 75, img: 'img/hammer_curl.png', category: 'bicipiti' },
-            'skullcrusher': { name: 'Skullcrusher Manubri', sets: '3', reps: '8-10', rest: 90, img: 'img/skullcrusher.png', category: 'tricipiti' },
-            'pushdown': { name: 'Push Down Sbarra', sets: '3', reps: '10-12', rest: 75, img: 'img/pushdown.png', category: 'tricipiti' },
-            'french_press_db': { name: 'French Press Manubri', sets: '3', reps: '10-12', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
+            'lento_manubri': { name: 'Lento Avanti Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/lento_manubri.png', category: 'spalle' },
+            'lu_raises': { name: 'Lu Raises', sets: '3', reps: '10-12', rest: 60, img: 'img/lu_raises.png', category: 'spalle' },
+            'shrugs': { name: 'Shrugs (Scrollate)', sets: '4', reps: '12-15', rest: 60, img: 'img/shrugs.png', category: 'spalle' },
+
+            // GAMBE E POLPACCI
+            'belt_squat': { name: 'Belt Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/belt_squat.png', category: 'gambe' },
+            'bulgarian_split': { name: 'Bulgarian Split Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/bulgarian_split.png', category: 'gambe' },
             'hack_squat': { name: 'Hack Squat', sets: '4', reps: '10-12', rest: 120, img: 'img/hack_squat.png', category: 'gambe' },
-            'leg_press': { name: 'Leg Press 45°', sets: '3', reps: '15-20', rest: 90, img: 'img/leg_press.png', category: 'gambe' },
-            'russian_twist': { name: 'Russian Twist', sets: '3', reps: '15-20', rest: 60, img: 'img/russian_twist.png', category: 'core' },
-            'hanging_leg': { name: 'Hanging Leg Raises', sets: '3', reps: '15-20', rest: 60, img: 'img/hanging_leg.png', category: 'core' }
+            'hip_thrust': { name: 'Hip Thrust', sets: '4', reps: '10-12', rest: 90, img: 'img/hip_thrust.png', category: 'gambe' },
+            'leg_ext': { name: 'Leg Extension', sets: '3', reps: '15-20', rest: 60, img: 'img/leg_ext.png', category: 'gambe' },
+            'leg_press': { name: 'Leg Press 45°', sets: '4', reps: '10-12', rest: 120, img: 'img/leg_press.png', category: 'gambe' },
+            'polpacci': { name: 'Calf Seduto/In Piedi', sets: '4', reps: '15-20', rest: 45, img: 'img/polpacci.png', category: 'gambe' },
+            'sissy_squat': { name: 'Sissy Squat', sets: '3', reps: '10-12', rest: 60, img: 'img/sissy_squat.png', category: 'gambe' },
+            'split_squat': { name: 'Split Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/split_squat.png', category: 'gambe' },
+            'squat': { name: 'Squat Bilanciere', sets: '4', reps: '6-8', rest: 150, img: 'img/squat.png', category: 'gambe' },
+            'stacchi_rumeni': { name: 'Stacchi Rumeni (RDL)', sets: '4', reps: '8-10', rest: 120, img: 'img/stacchi_rumeni.png', category: 'gambe' },
+            'step_up': { name: 'Step-up', sets: '3', reps: '10-12', rest: 90, img: 'img/step_up.png', category: 'gambe' },
+
+            // CORE
+            'cable_crunch': { name: 'Cable Crunch', sets: '3', reps: '15-20', rest: 60, img: 'img/cable_crunch.png', category: 'core' },
+            'decline_crunch': { name: 'Crunch Panca Declinata', sets: '3', reps: '15-20', rest: 60, img: 'img/decline_crunch.png', category: 'core' },
+            'hanging_leg': { name: 'Hanging Leg Raises', sets: '3', reps: '15', rest: 60, img: 'img/hanging_leg.png', category: 'core' },
+            'plank': { name: 'Plank', sets: '3', reps: '60s', rest: 60, img: 'img/plank.png', category: 'core' },
+            'rope_crunch': { name: 'Rope Crunch', sets: '3', reps: '15-20', rest: 60, img: 'img/rope_crunch.png', category: 'core' },
+            'russian_twist': { name: 'Russian Twist', sets: '3', reps: '20', rest: 60, img: 'img/russian_twist.png', category: 'core' },
+            'situp': { name: 'Sit-up', sets: '3', reps: '15-20', rest: 60, img: 'img/situp.png', category: 'core' },
+
+            // PETTO
+            'chest_press': { name: 'Chest Press', sets: '3', reps: '10-12', rest: 90, img: 'img/chest_press.png', category: 'petto' },
+            'chest_press_g1': { name: 'Chest Press Convergente', sets: '4', reps: '8-10', rest: 90, img: 'img/chest_press_g1.png', category: 'petto' },
+            'croci_cavi_bassi': { name: 'Croci Cavi Bassi', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_cavi_bassi.png', category: 'petto' },
+            'croci_inc': { name: 'Croci Panca Inclinata', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_inc.png', category: 'petto' },
+            'crossover': { name: 'Crossover ai Cavi', sets: '3', reps: '15-20', rest: 60, img: 'img/crossover.png', category: 'petto' },
+            'dips_petto': { name: 'Dip Parallele (Petto)', sets: '4', reps: '8-10', rest: 90, img: 'img/dips_petto.png', category: 'petto' },
+            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5', reps: '5-8', rest: 120, img: 'img/panca_piana.png', category: 'petto', coach: { esecuzione: "Arco moderato, scapole addotte e depresse.", target: "Petto totale.", tempo: "3s eccentrica, 1s pausa." } },
+            'pectoral': { name: 'Pectoral Machine', sets: '4', reps: '12-15', rest: 60, img: 'img/pectoral.png', category: 'petto' },
+            'spinte_inc': { name: 'Spinte Inclinata Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/spinte_inc.png', category: 'petto' },
+
+            // BICIPITI
+            'curl_cavi': { name: 'Curl ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/curl_cavi.png', category: 'bicipiti' },
+            'curl_concentrazione': { name: 'Curl Concentrazione', sets: '3', reps: '10-12', rest: 60, img: 'img/curl_concentrazione.png', category: 'bicipiti' },
+            'curl_ez': { name: 'Curl Bilanciere EZ', sets: '4', reps: '8-10', rest: 90, img: 'img/curl_ez.png', category: 'bicipiti' },
+            'hammer_curl': { name: 'Hammer Curl Manubri', sets: '3', reps: '10-12', rest: 60, img: 'img/hammer_curl.png', category: 'bicipiti' },
+            'hammer_curl_cavi': { name: 'Hammer Curl Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/hammer_curl_cavi.png', category: 'bicipiti' },
+            'incline_curl': { name: 'Incline Dumbbell Curl', sets: '3', reps: '10-12', rest: 60, img: 'img/incline_curl.png', category: 'bicipiti' },
+            'preacher_curl': { name: 'Preacher Curl (Panca Scott)', sets: '3', reps: '10-12', rest: 90, img: 'img/preacher_curl.png', category: 'bicipiti' },
+
+            // TRICIPITI
+            'dips_tricipiti': { name: 'Dip Parallele (Tricipiti)', sets: '3', reps: '10-12', rest: 90, img: 'img/dips_tricipiti.png', category: 'tricipiti' },
+            'estensioni_testa': { name: 'Estensioni Dietro Nuca', sets: '3', reps: '12-15', rest: 60, img: 'img/estensioni_testa.png', category: 'tricipiti' },
+            'french_press': { name: 'French Press', sets: '3', reps: '8-10', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
+            'kickback': { name: 'Kickback Manubri', sets: '3', reps: '12-15', rest: 60, img: 'img/kickback.png', category: 'tricipiti' },
+            'pushdown': { name: 'Push Down Cavi', sets: '4', reps: '10-12', rest: 60, img: 'img/pushdown.png', category: 'tricipiti' },
+            'pushdown_corda': { name: 'Pushdown Corda', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_corda.png', category: 'tricipiti' },
+            'pushdown_fune': { name: 'Pushdown Fune', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_fune.png', category: 'tricipiti' },
+            'skull_crusher': { name: 'Skull Crusher', sets: '3', reps: '10-12', rest: 90, img: 'img/skull_crusher.png', category: 'tricipiti' },
+
+            // DORSO
+            'lat_larga': { name: 'Lat Machine Presa Larga', sets: '4', reps: '12-15', rest: 90, img: 'img/lat_larga.png', category: 'dorso' },
+            'lat_neutra': { name: 'Lat Machine Presa Neutra', sets: '4', reps: '10-12', rest: 90, img: 'img/lat_neutra.png', category: 'dorso' },
+            'meadows_row': { name: 'Meadows Row', sets: '3', reps: '10-12', rest: 90, img: 'img/meadows_row.png', category: 'dorso' },
+            'pullover_cavi': { name: 'Pullover ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/pullover_cavi.png', category: 'dorso' },
+            'pullover_manubrio': { name: 'Pullover Manubrio', sets: '3', reps: '12-15', rest: 60, img: 'img/pullover_manubrio.png', category: 'dorso' },
+            'rematore_manubrio': { name: 'Rematore Manubrio', sets: '3', reps: '10-12', rest: 90, img: 'img/rematore_manubrio.png', category: 'dorso' },
+            'rematore_pendlay': { name: 'Pendlay Row', sets: '4', reps: '6-8', rest: 120, img: 'img/rematore_pendlay.png', category: 'dorso' },
+            'rematore_tbar': { name: 'Rematore T-Bar', sets: '4', reps: '8-10', rest: 120, img: 'img/rematore_tbar.png', category: 'dorso' },
+            'scapular_pullups': { name: 'Scapular Pullups', sets: '3', reps: '10-12', rest: 60, img: 'img/scapular_pullups.png', category: 'dorso' },
+            'seal_row': { name: 'Seal Row', sets: '3', reps: '10-12', rest: 90, img: 'img/seal_row.png', category: 'dorso' },
+            'trazioni': { name: 'Trazioni alla Sbarra', sets: '4', reps: '6-8', rest: 120, img: 'img/trazioni.png', category: 'dorso' },
+            'trazioni_anelli': { name: 'Trazioni Anelli', sets: '3', reps: '8-10', rest: 90, img: 'img/trazioni_anelli.png', category: 'dorso' },
+            'trazioni_assistite': { name: 'Trazioni Assistite', sets: '3', reps: '10-12', rest: 90, img: 'img/trazioni_assistite.png', category: 'dorso' },
+            'trazioni_supine': { name: 'Trazioni Supine (Chin-ups)', sets: '4', reps: '8-10', rest: 90, img: 'img/trazioni_supine.png', category: 'dorso' }
         };
 
         const defaultPlan = {
-            1: { title: 'PUSH (Forza)', color: '#007AFF', items: ['panca_piana', 'lento_avanti', 'spinte_inc', 'alzate_lat', 'skullcrusher', 'pushdown'], overrides: {} },
-            2: { title: 'PULL (Forza)', color: '#AF52DE', items: ['trazioni', 'tbar_row', 'curl_ez', 'alzate_90', 'hammer_curl', 'russian_twist'], overrides: {} },
-            3: { title: 'LEGS (Volume)', color: '#34C759', items: ['hack_squat', 'leg_press', 'russian_twist', 'hanging_leg'], overrides: {} },
+            1: { title: 'PUSH (Forza)', color: '#007AFF', items: ['panca_piana', 'lento_avanti', 'spinte_inc', 'alzate_lat', 'skull_crusher', 'pushdown'], overrides: {} },
+            2: { title: 'PULL (Forza)', color: '#AF52DE', items: ['trazioni', 'rematore_tbar', 'curl_ez', 'alzate_90', 'hammer_curl', 'russian_twist'], overrides: {} },
+            3: { title: 'LEGS (Volume)', color: '#34C759', items: ['squat', 'leg_press', 'leg_ext', 'stacchi_rumeni', 'polpacci'], overrides: {} },
             4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', items: ['pectoral', 'lat_larga', 'alzate_lat', 'crossover'], overrides: {} }
         };
 
+        // Mock data iniziale per la biometria
+        const defaultBiometrics = [
+            { date: "2025-12-01", weight: 76, lean: 41, fat: 18, shoulders: 112, chest: 100, waist: 86, arms: 35 },
+            { date: "2026-01-01", weight: 77, lean: 42, fat: 17, shoulders: 115, chest: 102, waist: 84, arms: 36 },
+            { date: "2026-02-01", weight: 78, lean: 43, fat: 16, shoulders: 118, chest: 104, waist: 82, arms: 37 }
+        ];
+
         let userPlan = JSON.parse(localStorage.getItem('user_workout_plan')) || defaultPlan;
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer')) || {};
+        let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || defaultBiometrics;
+        
         let activeTimers = {};
         let homeCharts = {}; 
+        let bodyChart = null;
         let currentWorkoutId = null;
         let swappingIndex = null; 
         let editingIdx = null;
@@ -396,6 +543,24 @@
         let tempSuperset = false;
         let calendarDate = new Date();
         let myChart = null;
+
+        // Custom Confirm Logic
+        let confirmCallback = null;
+        function openConfirm(title, msg, callback) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-msg').innerText = msg;
+            confirmCallback = callback;
+            document.getElementById('modal-confirm').style.display = 'flex';
+            lucide.createIcons();
+        }
+        function closeConfirm() {
+            document.getElementById('modal-confirm').style.display = 'none';
+            confirmCallback = null;
+        }
+        document.getElementById('confirm-btn').onclick = () => {
+            if(confirmCallback) confirmCallback();
+            closeConfirm();
+        };
 
         function showMessage(text) {
             const box = document.getElementById('message-box');
@@ -428,19 +593,12 @@
             document.getElementById('modal-edit-params').style.display = 'flex';
         }
 
-        function toggleDropSetLocal() { 
-            tempDropSet = !tempDropSet; 
-            updateLocalToggleUI(); 
-        }
+        function toggleDropSetLocal() { tempDropSet = !tempDropSet; updateLocalToggleUI(); }
 
         function toggleSupersetLocal() { 
             tempSuperset = !tempSuperset; 
-            if (tempSuperset) {
-                document.getElementById('edit-rest').value = 0;
-            } else {
-                const exId = userPlan[currentWorkoutId].items[editingIdx];
-                document.getElementById('edit-rest').value = exerciseData[exId].rest;
-            }
+            if (tempSuperset) { document.getElementById('edit-rest').value = 0; } 
+            else { document.getElementById('edit-rest').value = exerciseData[userPlan[currentWorkoutId].items[editingIdx]].rest; }
             updateLocalToggleUI(); 
         }
 
@@ -461,7 +619,6 @@
 
         function saveExerciseParams() {
             if (!userPlan[currentWorkoutId].overrides) userPlan[currentWorkoutId].overrides = {};
-            
             userPlan[currentWorkoutId].overrides[editingIdx] = {
                 sets: document.getElementById('edit-sets').value,
                 reps: document.getElementById('edit-reps').value,
@@ -469,7 +626,6 @@
                 isDropSet: tempDropSet,
                 isSuperset: tempSuperset
             };
-            
             localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
             closeEditParams();
             renderWorkout(currentWorkoutId);
@@ -478,7 +634,23 @@
 
         function closeEditParams() { document.getElementById('modal-edit-params').style.display = 'none'; }
 
-        // Mettiamo il nuovo design CSS Tailwind all'interno delle stringhe JS
+        function removeExerciseUI(idx) {
+            openConfirm("Rimuovi Esercizio", "Sei sicuro di voler rimuovere questo esercizio dalla sessione corrente?", () => {
+                userPlan[currentWorkoutId].items.splice(idx, 1);
+                if(userPlan[currentWorkoutId].overrides) {
+                    const newOverrides = {};
+                    Object.keys(userPlan[currentWorkoutId].overrides).forEach(k => {
+                        const keyIdx = parseInt(k);
+                        if(keyIdx < idx) newOverrides[keyIdx] = userPlan[currentWorkoutId].overrides[k];
+                        else if(keyIdx > idx) newOverrides[keyIdx - 1] = userPlan[currentWorkoutId].overrides[k];
+                    });
+                    userPlan[currentWorkoutId].overrides = newOverrides;
+                }
+                localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
+                renderWorkout(currentWorkoutId);
+            });
+        }
+
         function renderWorkout(id, isHistory = false, hist = null) {
             const container = document.getElementById('exercise-list');
             const items = userPlan[id].items;
@@ -489,7 +661,7 @@
             if (document.getElementById('notes-area')) document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
 
             container.innerHTML = items.map((exId, idx) => {
-                const ex = exerciseData[exId] || { name: exId, sets: '3', reps: '12', rest: 60, img: '', category: 'petto' };
+                const ex = exerciseData[exId] || { name: exId, sets: '3', reps: '12', rest: 60, img: '', category: 'custom' };
                 const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
                 const last = h.length > 0 ? h[h.length-1].w : '--';
                 const todayVal = isHistory ? (hist[exId] || '--') : (activeSession[exId] || '');
@@ -504,26 +676,18 @@
                 return `
                 <div class="flex flex-col">
                     <div class="bg-[#1C1C1E] rounded-[32px] overflow-hidden shadow-2xl border border-white/5 animate-slide relative">
-                        
-                        <!-- Header Immagine con Gradiente -->
                         <div class="relative h-44 w-full bg-black">
                             <img src="${ex.img}" onerror="handleImgError(this)" class="w-full h-full object-cover opacity-60">
                             <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/40 to-transparent"></div>
-                            
                             ${isDrop ? `<div class="absolute top-5 left-5 bg-red-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-lg">Drop Set</div>` : ''}
-                            
                             <div class="absolute top-5 right-5 flex gap-2">
                                 <button onclick="openInfo('${exId}')" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white active:scale-90 transition-transform"><i data-lucide="info" class="w-5 h-5"></i></button>
-                                ${!isHistory ? `<button onclick="openLibrary(${idx}, '${ex.category}')" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-blue-400 active:scale-90 transition-transform"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>` : ''}
                             </div>
-                            
                             <div class="absolute bottom-4 left-5 right-5">
                                 <span class="text-blue-400 text-[10px] font-black uppercase tracking-widest block mb-1">${ex.category}</span>
                                 <h3 class="text-[22px] font-black text-white leading-tight drop-shadow-md">${ex.name}</h3>
                             </div>
                         </div>
-
-                        <!-- Corpo Card -->
                         <div class="px-5 pb-6 pt-2">
                             <div class="flex justify-between items-center mb-6">
                                 <div class="bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-2">
@@ -535,7 +699,6 @@
                                     ${!isHistory ? `<button onclick="openEditParams(${idx})" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl text-gray-400 active:text-white active:scale-90 transition-transform"><i data-lucide="settings-2" class="w-5 h-5"></i></button>` : ''}
                                 </div>
                             </div>
-                            
                             ${isHistory ? `
                                 <div class="bg-blue-500/15 p-6 rounded-2xl text-center border border-blue-500/20">
                                     <span class="text-4xl font-black text-white">${todayVal} <span class="text-sm text-blue-400">kg</span></span>
@@ -552,6 +715,10 @@
                                         <span class="text-xl font-black text-white">${last}</span>
                                     </div>
                                 </div>
+                                <div class="flex gap-3 mt-5 pt-5 border-t border-white/5">
+                                    <button onclick="openLibrary(${idx}, '${ex.category}')" class="flex-1 bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-[10px] font-black uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Cambia</button>
+                                    <button onclick="removeExerciseUI(${idx})" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i> Rimuovi</button>
+                                </div>
                             `}
                         </div>
                     </div>
@@ -561,12 +728,9 @@
             lucide.createIcons();
         }
 
-        function goHome() { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-home').classList.remove('hidden'); updateNav('home'); renderHomeCards(); renderDashboardCharts(); }
-        function openWorkout(id) { currentWorkoutId = id; document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-workout').classList.remove('hidden'); document.getElementById('workout-title-text').innerText = userPlan[id].title; renderWorkout(id); }
-        function openCalendar() { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-calendar').classList.remove('hidden'); updateNav('calendar'); renderCalendar(); }
-        
+        // --- NAVIGATION LOGIC ---
         function updateNav(active) { 
-            ['home', 'calendar', 'settings'].forEach(n => { 
+            ['home', 'calendar', 'body', 'settings'].forEach(n => { 
                 const btn = document.getElementById(`nav-${n}`); 
                 if (btn) { 
                     btn.classList.toggle('text-blue-500', active === n); 
@@ -575,7 +739,23 @@
             }); 
         }
 
-        // Home Cards: Aggiunti gradienti in stile Apple Fitness
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+            document.getElementById(`view-${viewId}`).classList.remove('hidden'); 
+            updateNav(viewId);
+        }
+
+        function goHome() { switchView('home'); renderHomeCards(); renderDashboardCharts(); }
+        function openCalendar() { switchView('calendar'); renderCalendar(); }
+        function openSettings() { switchView('settings'); }
+        function openWorkout(id) { 
+            currentWorkoutId = id; 
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+            document.getElementById('view-workout').classList.remove('hidden'); 
+            document.getElementById('workout-title-text').innerText = userPlan[id].title; 
+            renderWorkout(id); 
+        }
+
         function renderHomeCards() {
             const container = document.getElementById('workout-cards-container');
             const colorGradients = {
@@ -617,6 +797,7 @@
             journal[new Date().toISOString().split('T')[0]] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, exercises: { ...activeSession }, volume: Object.values(activeSession).reduce((a,b)=>a+b,0) };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
             activeSession = {}; localStorage.removeItem('active_session_buffer'); 
+            showMessage("Sessione Salvata!");
             goHome();
         }
 
@@ -650,7 +831,7 @@
         }
 
         function processSelection(newId) {
-            if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Già presente!"); return; }
+            if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Esercizio già in scheda!"); return; }
             if (swappingIndex === null) userPlan[currentWorkoutId].items.push(newId);
             else { userPlan[currentWorkoutId].items[swappingIndex] = newId; if(userPlan[currentWorkoutId].overrides) delete userPlan[currentWorkoutId].overrides[swappingIndex]; }
             localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
@@ -692,13 +873,154 @@
             });
         }
 
+        // --- SEZIONE CORPO / BIOMETRIA ---
+        function openBody() {
+            switchView('body');
+            renderBodyStats();
+        }
+
+        function saveBiometrics() {
+            const data = {
+                date: new Date().toISOString().split('T')[0],
+                height: parseFloat(document.getElementById('bio-height').value) || null,
+                weight: parseFloat(document.getElementById('bio-weight').value) || null,
+                lean: parseFloat(document.getElementById('bio-lean').value) || null,
+                fat: parseFloat(document.getElementById('bio-fat').value) || null,
+                shoulders: parseFloat(document.getElementById('bio-shoulders').value) || null,
+                chest: parseFloat(document.getElementById('bio-chest').value) || null,
+                waist: parseFloat(document.getElementById('bio-waist').value) || null,
+                arms: parseFloat(document.getElementById('bio-arms').value) || null
+            };
+
+            if(!data.weight && !data.waist) {
+                showMessage("Inserisci almeno il peso o la vita.");
+                return;
+            }
+
+            // Aggiungi o sovrascrivi per il giorno corrente
+            const existingIndex = biometricsHistory.findIndex(b => b.date === data.date);
+            if (existingIndex !== -1) {
+                // Aggiorna solo i campi inseriti
+                biometricsHistory[existingIndex] = { ...biometricsHistory[existingIndex], ...Object.fromEntries(Object.entries(data).filter(([_, v]) => v != null)) };
+            } else {
+                biometricsHistory.push(data);
+            }
+            
+            biometricsHistory.sort((a,b) => new Date(a.date) - new Date(b.date));
+            localStorage.setItem('biometrics_history', JSON.stringify(biometricsHistory));
+            
+            // Pulisci i campi
+            document.querySelectorAll('#view-body input').forEach(i => i.value = '');
+            
+            showMessage("Misurazioni Salvate!");
+            renderBodyStats();
+        }
+
+        function renderBodyStats() {
+            if (biometricsHistory.length === 0) return;
+
+            // 1. Calcolo V-Shape (Spalle / Vita) o (Petto / Vita)
+            const latest = biometricsHistory[biometricsHistory.length - 1];
+            const previous = biometricsHistory.length > 1 ? biometricsHistory[biometricsHistory.length - 2] : null;
+            
+            let currentRatio = null;
+            let previousRatio = null;
+            
+            const getRatio = (entry) => {
+                if (!entry || !entry.waist) return null;
+                const upper = entry.shoulders || entry.chest; // Preferisce spalle, sennò petto
+                return upper ? (upper / entry.waist) : null;
+            };
+
+            currentRatio = getRatio(latest);
+            previousRatio = getRatio(previous);
+
+            const statusEl = document.getElementById('vshape-status');
+            const subtextEl = document.getElementById('vshape-subtext');
+            const iconEl = document.getElementById('vshape-icon');
+            const iconContainer = document.getElementById('vshape-icon-container');
+
+            if (currentRatio) {
+                let statusText = "In Costruzione";
+                let iconName = "activity";
+                let colorClass = "text-blue-500";
+                let bgClass = "bg-blue-500/20 border-blue-500/30";
+
+                if (currentRatio >= 1.6) {
+                    statusText = "V-Shape Eccellente";
+                    iconName = "triangle";
+                    colorClass = "text-yellow-400";
+                    bgClass = "bg-yellow-400/20 border-yellow-400/30";
+                    iconEl.classList.add("rotate-180"); // Il triangolo rovesciato è la forma a V perfetta
+                } else if (currentRatio >= 1.4) {
+                    statusText = "Ottimo V-Shape";
+                    iconName = "trending-up";
+                    colorClass = "text-emerald-400";
+                    bgClass = "bg-emerald-400/20 border-emerald-400/30";
+                    iconEl.classList.remove("rotate-180");
+                }
+
+                let subText = `Rapporto Upper/Vita: ${currentRatio.toFixed(2)}`;
+                if (previousRatio) {
+                    if (currentRatio > previousRatio) subText += " (In Crescita 🚀)";
+                    else if (currentRatio < previousRatio) subText += " (In Calo 📉)";
+                }
+
+                statusEl.innerText = statusText;
+                subtextEl.innerText = subText;
+                iconEl.setAttribute('data-lucide', iconName);
+                iconEl.className = `w-7 h-7 ${colorClass}`;
+                iconContainer.className = `w-14 h-14 rounded-full flex items-center justify-center border ${bgClass}`;
+            } else {
+                statusEl.innerText = "Dati Insufficienti";
+                subtextEl.innerText = "Inserisci spalle/petto e vita per l'analisi";
+            }
+            lucide.createIcons();
+
+            // 2. Grafico Trend Misure (Spalle, Petto, Vita)
+            const canvas = document.getElementById('chart-body-measurements');
+            if(bodyChart) bodyChart.destroy();
+
+            // Estraiamo date e valori, filtrando i null per rendere il grafico continuo
+            const labels = biometricsHistory.map(b => b.date.substring(5)); // mostra MM-DD
+            const dataShoulders = biometricsHistory.map(b => b.shoulders || null);
+            const dataChest = biometricsHistory.map(b => b.chest || null);
+            const dataWaist = biometricsHistory.map(b => b.waist || null);
+
+            bodyChart = new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Spalle', data: dataShoulders, borderColor: '#0A84FF', backgroundColor: '#0A84FF', tension: 0.3, spanGaps: true, borderWidth: 3 },
+                        { label: 'Petto', data: dataChest, borderColor: '#AF52DE', backgroundColor: '#AF52DE', tension: 0.3, spanGaps: true, borderWidth: 3 },
+                        { label: 'Vita', data: dataWaist, borderColor: '#34C759', backgroundColor: '#34C759', tension: 0.3, spanGaps: true, borderWidth: 3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#8E8E93', boxWidth: 10, font: {family: 'Inter', weight:'bold'} } }
+                    },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } },
+                        x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }
+                    }
+                }
+            });
+        }
+
+        // --- END SEZIONE CORPO ---
+
         function toggleTimer(id, sec) {
             const btn = document.getElementById(`timer-${id}`);
             if (activeTimers[id]) { 
                 clearInterval(activeTimers[id].int); 
                 delete activeTimers[id]; 
                 btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; 
-                btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all"; 
+                btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; 
                 lucide.createIcons(); return; 
             }
             let rem = sec; 
@@ -716,7 +1038,7 @@
                     if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); 
                     setTimeout(() => { 
                         btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; 
-                        btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all"; 
+                        btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; 
                         lucide.createIcons(); 
                     }, 5000); 
                 } 
@@ -763,8 +1085,12 @@
         
         function exportData() { const dl = document.createElement('a'); dl.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage)); dl.download = "powerlog_backup.json"; dl.click(); }
         function importData(e) { const r = new FileReader(); r.onload = (ev) => { const d = JSON.parse(ev.target.result); Object.entries(d).forEach(([k,v]) => localStorage.setItem(k, v)); location.reload(); }; r.readAsText(e.target.files[0]); }
-        function resetAllData() { if(confirm("Cancellare tutto?")) { localStorage.clear(); location.reload(); } }
-        function openSettings() { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-settings').classList.remove('hidden'); updateNav('settings'); }
+        function resetAllData() { 
+            openConfirm("Attenzione!", "Sei sicuro di voler cancellare tutto lo storico e i programmi salvati?", () => {
+                localStorage.clear(); 
+                location.reload(); 
+            }); 
+        }
 
         window.onload = () => {
             document.getElementById('date-label').innerText = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
