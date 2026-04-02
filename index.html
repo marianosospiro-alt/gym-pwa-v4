@@ -158,7 +158,7 @@
         /* Stile extra per Drag and Drop */
         .drag-handle { touch-action: none; cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
-        .sortable-ghost { opacity: 0.4; }
+        .sortable-ghost { opacity: 0.3; background: #2C2C2E; }
         .sortable-drag { cursor: grabbing !important; }
     </style>
 </head>
@@ -433,6 +433,7 @@
 
     <!-- LOGICA JS -->
     <script>
+        // Database esteso e sincronizzato con il file CSV e le tue miniature
         const exerciseData = {
             // SPALLE
             'alzate_90': { name: 'Alzate a 90°', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_90.png', category: 'spalle' },
@@ -457,6 +458,7 @@
             'hip_thrust': { name: 'Hip Thrust', sets: '4', reps: '10-12', rest: 90, img: 'img/hip_thrust.png', category: 'gambe' },
             'leg_ext': { name: 'Leg Extension', sets: '3', reps: '15-20', rest: 60, img: 'img/leg_ext.png', category: 'gambe' },
             'leg_press': { name: 'Leg Press 45°', sets: '4', reps: '10-12', rest: 120, img: 'img/leg_press.png', category: 'gambe' },
+            'leg_curl': { name: 'Leg Curl', sets: '3', reps: '12-15', rest: 60, img: 'img/leg_curl.png', category: 'gambe' },
             'polpacci': { name: 'Calf Seduto/In Piedi', sets: '4', reps: '15-20', rest: 45, img: 'img/polpacci.png', category: 'gambe' },
             'sissy_squat': { name: 'Sissy Squat', sets: '3', reps: '10-12', rest: 60, img: 'img/sissy_squat.png', category: 'gambe' },
             'split_squat': { name: 'Split Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/split_squat.png', category: 'gambe' },
@@ -475,7 +477,7 @@
 
             // PETTO
             'chest_press': { name: 'Chest Press', sets: '3', reps: '10-12', rest: 90, img: 'img/chest_press.png', category: 'petto' },
-            'chest_press_g1': { name: 'Chest Press Convergente', sets: '4', reps: '8-10', rest: 90, img: 'img/chest_press_g1.png', category: 'petto' },
+            'chest_press_inc': { name: 'Inclined Chest Press', sets: '3', reps: '10-12', rest: 90, img: 'img/chest_press_g1.png', category: 'petto' },
             'croci_cavi_bassi': { name: 'Croci Cavi Bassi', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_cavi_bassi.png', category: 'petto' },
             'croci_inc': { name: 'Croci Panca Inclinata', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_inc.png', category: 'petto' },
             'crossover': { name: 'Crossover ai Cavi', sets: '3', reps: '15-20', rest: 60, img: 'img/crossover.png', category: 'petto' },
@@ -496,7 +498,7 @@
             // TRICIPITI
             'dips_tricipiti': { name: 'Dip Parallele (Tricipiti)', sets: '3', reps: '10-12', rest: 90, img: 'img/dips_tricipiti.png', category: 'tricipiti' },
             'estensioni_testa': { name: 'Estensioni Dietro Nuca', sets: '3', reps: '12-15', rest: 60, img: 'img/estensioni_testa.png', category: 'tricipiti' },
-            'french_press': { name: 'French Press', sets: '3', reps: '8-10', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
+            'french_press': { name: 'French Press con Manubri', sets: '3', reps: '8-10', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
             'kickback': { name: 'Kickback Manubri', sets: '3', reps: '12-15', rest: 60, img: 'img/kickback.png', category: 'tricipiti' },
             'pushdown': { name: 'Push Down Cavi', sets: '4', reps: '10-12', rest: 60, img: 'img/pushdown.png', category: 'tricipiti' },
             'pushdown_corda': { name: 'Pushdown Corda', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_corda.png', category: 'tricipiti' },
@@ -520,36 +522,34 @@
             'trazioni_supine': { name: 'Trazioni Supine (Chin-ups)', sets: '4', reps: '8-10', rest: 90, img: 'img/trazioni_supine.png', category: 'dorso' }
         };
 
+        // Aggiornato con chiave 'user_workout_plan_v3' per forzare l'aggiornamento automatico della scheda all'utente
         const defaultPlan = {
             1: { 
                 title: 'PUSH (Forza)', color: '#007AFF', 
-                items: ['panca_piana', 'lento_avanti', 'spinte_inc', 'alzate_lat', 'skull_crusher', 'pushdown'], 
+                items: ['panca_piana', 'lento_avanti', 'spinte_inc', 'alzate_lat', 'french_press', 'pushdown'], 
                 overrides: {
-                    3: { isDropSet: true }, 
-                    5: { isDropSet: true }
+                    3: { isDropSet: true }
                 } 
             },
             2: { 
                 title: 'PULL (Forza)', color: '#AF52DE', 
-                items: ['trazioni', 'tbar_row', 'lat_larga', 'pulley', 'alzate_90', 'curl_ez', 'hammer_curl'], 
+                items: ['trazioni', 'tbar_row', 'pullover_cavi', 'alzate_90', 'curl_ez', 'hammer_curl', 'hanging_leg'], 
                 overrides: {
-                    2: { isDropSet: true }, 
-                    6: { isDropSet: true }
+                    3: { isDropSet: true }
                 } 
             },
             3: { 
                 title: 'LEGS (Volume)', color: '#34C759', 
-                items: ['squat', 'leg_press', 'affondi', 'leg_ext', 'stacchi_rumeni', 'leg_curl', 'polpacci'], 
+                items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'leg_curl', 'polpacci'], 
                 overrides: {
-                    3: { isDropSet: true }, 
+                    4: { isDropSet: true }, 
                     5: { isDropSet: true }
                 } 
             },
             4: { 
                 title: 'UPPER (Ipertrofia)', color: '#FF9500', 
-                items: ['chest_press', 'rematore_manubrio', 'arnold_press', 'crossover', 'curl_cavi', 'french_press'], 
+                items: ['chest_press_inc', 'pectoral', 'lat_larga', 'crossover', 'alzate_cavi', 'curl_cavi', 'pushdown_corda'], 
                 overrides: {
-                    3: { isDropSet: true, isSuperset: true }, 
                     4: { isDropSet: true }
                 } 
             }
@@ -561,7 +561,7 @@
             { date: "2026-02-01", weight: 78, lean: 43, fat: 16, shoulders: 118, chest: 104, waist: 82, arms: 37 }
         ];
 
-        let userPlan = JSON.parse(localStorage.getItem('user_workout_plan')) || defaultPlan;
+        let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v3')) || defaultPlan;
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer')) || {};
         let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || defaultBiometrics;
         
@@ -659,7 +659,7 @@
                 isDropSet: tempDropSet,
                 isSuperset: tempSuperset
             };
-            localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
+            localStorage.setItem('user_workout_plan_v3', JSON.stringify(userPlan));
             closeEditParams();
             renderWorkout(currentWorkoutId);
             showMessage("Programma aggiornato.");
@@ -679,7 +679,7 @@
                     });
                     userPlan[currentWorkoutId].overrides = newOverrides;
                 }
-                localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
+                localStorage.setItem('user_workout_plan_v3', JSON.stringify(userPlan));
                 renderWorkout(currentWorkoutId);
             });
         }
@@ -750,7 +750,7 @@
                                 </div>
                                 <div class="flex gap-2 mt-5 pt-5 border-t border-white/5">
                                     <div class="drag-handle w-14 bg-[#2C2C2E] hover:bg-[#3a3a3c] text-white rounded-xl flex justify-center items-center transition-colors">
-                                        <i data-lucide="grip-horizontal" class="w-5 h-5"></i>
+                                        <i data-lucide="grip-horizontal" class="w-5 h-5 text-gray-400"></i>
                                     </div>
                                     <button onclick="openLibrary(${idx}, '${ex.category}')" class="flex-1 bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-[10px] font-black uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors">
                                         <i data-lucide="refresh-cw" class="w-4 h-4"></i> Cambia
@@ -783,10 +783,10 @@
                         const planItems = [...userPlan[currentWorkoutId].items];
                         const planOverrides = { ...(userPlan[currentWorkoutId].overrides || {}) };
 
-                        // Costruisci un array con item e il suo override
+                        // Costruisci array combinato (item + override) per mantenere sincronia
                         let arr = planItems.map((id, i) => ({ id, ov: planOverrides[i] }));
                         
-                        // Sposta l'elemento nell'array combinato
+                        // Spostamento
                         const moved = arr.splice(oldIdx, 1)[0];
                         arr.splice(newIdx, 0, moved);
 
@@ -796,9 +796,9 @@
                         arr.forEach((a, i) => { if (a.ov) newOverrides[i] = a.ov; });
                         userPlan[currentWorkoutId].overrides = newOverrides;
 
-                        localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
+                        localStorage.setItem('user_workout_plan_v3', JSON.stringify(userPlan));
                         
-                        // Ri-renderizza per sincronizzare gli indici nel DOM
+                        // Ri-renderizza per allineare gli indici nel DOM
                         renderWorkout(currentWorkoutId);
                     }
                 });
@@ -911,7 +911,7 @@
             if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Esercizio già in scheda!"); return; }
             if (swappingIndex === null) userPlan[currentWorkoutId].items.push(newId);
             else { userPlan[currentWorkoutId].items[swappingIndex] = newId; if(userPlan[currentWorkoutId].overrides) delete userPlan[currentWorkoutId].overrides[swappingIndex]; }
-            localStorage.setItem('user_workout_plan', JSON.stringify(userPlan));
+            localStorage.setItem('user_workout_plan_v3', JSON.stringify(userPlan));
             closeLibrary(); renderWorkout(currentWorkoutId);
         }
 
@@ -1117,7 +1117,7 @@
             }, 1000) };
         }
 
-        // Info dinamica ricostruita: Mostra sempre qualcosa basato sul DB
+        // Info dinamica: Mostra sempre un fallback logico se mancano info
         function openInfo(exId) {
             const ex = exerciseData[exId];
             if (!ex) return;
