@@ -29,8 +29,11 @@
         @keyframes slide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .modal-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: flex-end; }
-        .sheet-content { background: #1C1C1E; width: 100%; border-top-left-radius: 32px; border-top-right-radius: 32px; padding: 24px; max-height: 90vh; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sheet-content { background: #1C1C1E; width: 100%; border-top-left-radius: 32px; border-top-right-radius: 32px; padding: 24px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; border-top: 1px solid rgba(255,255,255,0.1); }
         
+        /* Area scorribile specifica per la libreria */
+        .scrollable-area { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
+
         input[type="number"], input[type="text"], select, textarea { background: #2C2C2E; border: none; border-radius: 12px; color: white; padding: 12px; text-align: center; font-size: 16px; font-weight: 600; width: 100%; appearance: none; }
         label { color: #8E8E93; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
         
@@ -43,7 +46,7 @@
         .superset-connector { width: 4px; height: 30px; background: linear-gradient(to bottom, #AF52DE, #AF52DE44); margin: -16px auto; position: relative; z-index: 1; border-radius: 2px; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .horizontal-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 4px 24px; margin: 0 -24px; scroll-snap-type: x mandatory; }
+        .horizontal-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 4px 0; scroll-snap-type: x mandatory; }
         .scroll-item { flex: 0 0 140px; scroll-snap-align: start; }
         
         #message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 16px 24px; border-radius: 16px; background: rgba(0, 122, 255, 0.95); backdrop-filter: blur(10px); color: white; font-weight: 700; text-align: center; display: none; width: 90%; max-width: 400px; }
@@ -69,7 +72,7 @@
             </header>
             <section class="mb-10">
                 <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-1">Andamento Distretti</h2>
-                <div class="horizontal-scroll no-scrollbar">
+                <div class="horizontal-scroll no-scrollbar -mx-6 px-6">
                     <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Volume Tot.</p><div class="h-14"><canvas id="chart-volume"></canvas></div></div>
                     <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Petto</p><div class="h-14"><canvas id="chart-petto"></canvas></div></div>
                     <div class="scroll-item apple-card p-4"><p class="text-[9px] font-bold text-gray-400 uppercase text-center mb-2">Dorso</p><div class="h-14"><canvas id="chart-dorso"></canvas></div></div>
@@ -147,7 +150,7 @@
                     <h3 class="text-xl font-bold">Parametri Esercizio</h3>
                     <button onclick="closeEditParams()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <div class="space-y-6 pb-10">
+                <div class="scrollable-area space-y-6">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label>Serie</label>
@@ -182,19 +185,27 @@
             </div>
         </div>
 
-        <!-- ALTRI MODALI -->
+        <!-- MODALE LIBRERIA (Fix Scorrimento) -->
         <div id="modal-library" class="modal-sheet" onclick="closeLibrary()">
             <div class="sheet-content" onclick="event.stopPropagation()">
-                <div class="flex justify-between items-center mb-6 text-white"><h3 class="text-xl font-bold">Libreria</h3><button onclick="closeLibrary()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x"></i></button></div>
-                <div id="library-categories" class="flex overflow-x-auto gap-2 no-scrollbar mb-6"></div>
-                <div id="library-list" class="space-y-4 pb-10"></div>
+                <div class="flex justify-between items-center mb-6 text-white">
+                    <h3 id="library-title" class="text-xl font-bold">Libreria Esercizi</h3>
+                    <button onclick="closeLibrary()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x"></i></button>
+                </div>
+                <div id="library-categories" class="flex overflow-x-auto gap-2 no-scrollbar mb-6 pb-2"></div>
+                <div class="scrollable-area" id="library-list-container">
+                    <div id="library-list" class="space-y-4"></div>
+                </div>
             </div>
         </div>
 
         <div id="modal-info" class="modal-sheet" onclick="closeInfo()">
             <div class="sheet-content" onclick="event.stopPropagation()">
-                <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4"><h3 id="info-title" class="text-xl font-extrabold">Focus Tecnico</h3><button onclick="closeInfo()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x"></i></button></div>
-                <div id="info-content" class="space-y-6 pb-12"></div>
+                <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4">
+                    <h3 id="info-title" class="text-xl font-extrabold">Focus Tecnico</h3>
+                    <button onclick="closeInfo()" class="bg-white/10 p-2 rounded-full"><i data-lucide="x"></i></button>
+                </div>
+                <div class="scrollable-area" id="info-content"></div>
             </div>
         </div>
         
@@ -213,9 +224,9 @@
 
         <!-- NAVBAR -->
         <nav class="fixed bottom-0 left-0 right-0 glass border-t border-white/10 px-12 py-4 flex justify-around items-center z-50 pb-safe">
-            <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500 transition-all"><i data-lucide="layout-grid" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Home</span></button>
-            <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500 transition-all"><i data-lucide="calendar" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Diario</span></button>
-            <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500 transition-all"><i data-lucide="settings" class="w-6 h-6"></i><span class="text-[10px] font-bold uppercase">Opzioni</span></button>
+            <button onclick="goHome()" id="nav-home" class="flex flex-col items-center gap-1 text-blue-500 transition-all"><i data-lucide="layout-grid"></i><span class="text-[10px] font-bold uppercase">Home</span></button>
+            <button onclick="openCalendar()" id="nav-calendar" class="flex flex-col items-center gap-1 text-gray-500 transition-all"><i data-lucide="calendar"></i><span class="text-[10px] font-bold uppercase">Diario</span></button>
+            <button onclick="openSettings()" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-500 transition-all"><i data-lucide="settings"></i><span class="text-[10px] font-bold uppercase">Opzioni</span></button>
         </nav>
     </div>
 
@@ -287,7 +298,7 @@
             
             document.getElementById('edit-sets').value = override.sets || exerciseData[exId].sets;
             document.getElementById('edit-reps').value = override.reps || exerciseData[exId].reps;
-            document.getElementById('edit-rest').value = override.rest || exerciseData[exId].rest;
+            document.getElementById('edit-rest').value = override.rest !== undefined ? override.rest : exerciseData[exId].rest;
             
             tempDropSet = override.isDropSet || false;
             tempSuperset = override.isSuperset || false;
@@ -465,7 +476,6 @@
             closeLibrary(); renderWorkout(currentWorkoutId);
         }
         function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
-
         function openCalendar() { 
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
             document.getElementById('view-calendar').classList.remove('hidden'); 
