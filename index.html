@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>PowerLog Pro</title>
     
-    <!-- Icona App PWA (Sincronizzata) -->
+    <!-- Icona App PWA (Sincronizzata e Potenziata) -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23007AFF'/><path d='M30 70 L30 45 M50 70 L50 25 M70 70 L70 35' stroke='white' stroke-width='10' stroke-linecap='round'/></svg>">
     <meta name="apple-mobile-web-app-title" content="PowerLog">
     <meta name="mobile-web-app-capable" content="yes">
@@ -34,12 +34,12 @@
         input[type="number"], textarea { background: #2C2C2E; border: none; border-radius: 12px; color: white; padding: 12px; text-align: center; font-size: 18px; font-weight: 700; width: 100%; }
         textarea { text-align: left; font-size: 14px; font-weight: 400; resize: none; }
         
-        /* Proporzioni Immagini Corrette */
-        .img-card { width: 100%; aspect-ratio: 16 / 9; background: #2C2C2E; position: relative; overflow: hidden; }
-        .img-card img { width: 100%; height: 100%; object-fit: cover; }
+        /* Fix Proporzioni Immagini - Nessuna distorsione */
+        .img-card { width: 100%; aspect-ratio: 16 / 9; background: #2C2C2E; position: relative; overflow: hidden; border-radius: 24px 24px 0 0; }
+        .img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
         
-        .img-thumb { width: 60px; height: 60px; aspect-ratio: 1 / 1; background: #2C2C2E; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
-        .img-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .img-thumb { width: 64px !important; height: 64px !important; background: #2C2C2E; border-radius: 12px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; }
+        .img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .horizontal-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 4px 24px; margin: 0 -24px; scroll-snap-type: x mandatory; }
@@ -174,7 +174,7 @@
     </div>
 
     <script>
-        // --- DATABASE ESERCIZI (Sincronizzato v9.2) ---
+        // --- DATABASE ESERCIZI (Sincronizzato v9.2 + Fix French Press) ---
         const exerciseData = {
             // PETTO
             'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5x5-8', target: '32.5kg', rest: 180, img: 'img/panca_piana.png', category: 'petto', coach: { esecuzione: "Arco moderato, scapole incollate. Scendi allo sterno.", target: "Massa pettorale centrale.", tempo: "3s discesa, 1s pausa, salita esplosiva." } },
@@ -223,7 +223,7 @@
             'pushdown_corda': { name: 'Push Down Corda', sets: '3x12-15', target: '20kg', rest: 60, img: 'img/pushdown_corda.png', category: 'tricipiti' },
             'estensioni_testa': { name: 'Estensioni sopra Testa', sets: '3x12-15', target: '10kg', rest: 60, img: 'img/estensioni_testa.png', category: 'tricipiti' },
             'kickback': { name: 'Kickback ai Cavi', sets: '3x15-20', target: '5kg', rest: 45, img: 'img/kickback.png', category: 'tricipiti' },
-            'french_press': { name: 'French Press Manubri', sets: '3x10-12', target: '12kg', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
+            'french_press': { name: 'French Press Manubri', sets: '3x10-12', target: '12kg', rest: 90, img: 'img/french_press.png', category: 'tricipiti' }, // FIX: Puntato a french_press.png
 
             // GAMBE & CORE
             'hack_squat': { name: 'Hack Squat', sets: '4x10-12', target: '65kg', rest: 120, img: 'img/hack_squat.png', category: 'gambe' },
@@ -262,11 +262,12 @@
             setTimeout(() => { box.style.display = 'none'; }, 3000);
         }
 
+        // Funzione gestione errori immagini migliorata
         function handleImgError(el) {
             el.style.display = 'none';
             const placeholder = document.createElement('div');
             placeholder.className = "absolute inset-0 flex items-center justify-center bg-[#2C2C2E]";
-            placeholder.innerHTML = '<i data-lucide="dumbbell" class="w-12 h-12 text-gray-700 opacity-20"></i>';
+            placeholder.innerHTML = '<i data-lucide="dumbbell" class="w-12 h-12 text-gray-700 opacity-30"></i>';
             el.parentElement.appendChild(placeholder);
             lucide.createIcons();
         }
