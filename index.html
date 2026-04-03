@@ -251,7 +251,6 @@
                 </div>
             </div>
             
-            <!-- Grafici Volumi (Spostati dalla Home) -->
             <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1 mt-10">Andamento Volumi Allenamento (Kg)</h2>
             <div class="horizontal-scroll no-scrollbar -mx-6 px-6 mb-8">
                 <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Volume Tot.</p><div class="h-16"><canvas id="chart-volume"></canvas></div></div>
@@ -316,9 +315,7 @@
                     <h3 id="log-title" class="text-xl font-black tracking-tight leading-tight w-3/4">Registra Serie</h3>
                     <button onclick="closeLogModal()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <div class="scrollable-area" id="log-rows-container">
-                    <!-- Generato dinamicamente -->
-                </div>
+                <div class="scrollable-area" id="log-rows-container"></div>
                 <button onclick="confirmLogs()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest mt-4">CONFERMA</button>
             </div>
         </div>
@@ -468,10 +465,7 @@
             'leg_press': { name: 'Leg Press 45°', sets: '4', reps: '10-12', rest: 120, img: 'img/leg_press.png', category: 'gambe' },
             'leg_curl': { name: 'Leg Curl', sets: '3', reps: '12-15', rest: 60, img: 'img/leg_curl.png', category: 'gambe' },
             'polpacci': { name: 'Calf Seduto/In Piedi', sets: '4', reps: '15-20', rest: 45, img: 'img/polpacci.png', category: 'gambe' },
-            'sissy_squat': { name: 'Sissy Squat', sets: '3', reps: '10-12', rest: 60, img: 'img/sissy_squat.png', category: 'gambe' },
-            'split_squat': { name: 'Split Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/split_squat.png', category: 'gambe' },
             'squat': { name: 'Squat Bilanciere', sets: '4', reps: '6-8', rest: 150, img: 'img/squat.png', category: 'gambe' },
-            'stacchi_rumeni': { name: 'Stacchi Rumeni (RDL)', sets: '4', reps: '8-10', rest: 120, img: 'img/stacchi_rumeni.png', category: 'gambe' },
             'step_up': { name: 'Step-up', sets: '3', reps: '10-12', rest: 90, img: 'img/step_up.png', category: 'gambe' },
 
             // CORE
@@ -521,12 +515,10 @@
             'pullover_manubrio': { name: 'Pullover Manubrio', sets: '3', reps: '12-15', rest: 60, img: 'img/pullover_manubrio.png', category: 'dorso' },
             'rematore_manubrio': { name: 'Rematore Manubrio', sets: '3', reps: '10-12', rest: 90, img: 'img/rematore_manubrio.png', category: 'dorso' },
             'rematore_pendlay': { name: 'Pendlay Row', sets: '4', reps: '6-8', rest: 120, img: 'img/rematore_pendlay.png', category: 'dorso' },
-            'tbar_row': { name: 'T-Bar Row', sets: '4', reps: '8-10', rest: 120, img: 'img/rematore_tbar.png', category: 'dorso' },
+            'tbar_row': { name: 'T-Bar Row', sets: '4', reps: '8-10', rest: 120, img: 'img/tbar_row.png', category: 'dorso' },
             'scapular_pullups': { name: 'Scapular Pullups', sets: '3', reps: '10-12', rest: 60, img: 'img/scapular_pullups.png', category: 'dorso' },
             'seal_row': { name: 'Seal Row', sets: '3', reps: '10-12', rest: 90, img: 'img/seal_row.png', category: 'dorso' },
             'trazioni': { name: 'Trazioni alla Sbarra', sets: '4', reps: '6-8', rest: 120, img: 'img/trazioni.png', category: 'dorso' },
-            'trazioni_anelli': { name: 'Trazioni Anelli', sets: '3', reps: '8-10', rest: 90, img: 'img/trazioni_anelli.png', category: 'dorso' },
-            'trazioni_assistite': { name: 'Trazioni Assistite', sets: '3', reps: '10-12', rest: 90, img: 'img/trazioni_assistite.png', category: 'dorso' },
             'trazioni_supine': { name: 'Trazioni Supine (Chin-ups)', sets: '4', reps: '8-10', rest: 90, img: 'img/trazioni_supine.png', category: 'dorso' }
         };
 
@@ -540,16 +532,17 @@
             },
             2: { 
                 title: 'PULL (Forza)', color: '#AF52DE', 
-                items: ['trazioni', 'tbar_row', 'pullover_cavi', 'alzate_90', 'curl_ez', 'hammer_curl', 'hanging_leg'], 
+                items: ['trazioni_supine', 'tbar_row', 'pullover_cavi', 'alzate_90', 'curl_ez', 'hammer_curl', 'hanging_leg'], 
                 overrides: {
                     3: { isDropSet: true }
                 } 
             },
             3: { 
                 title: 'LEGS (Volume)', color: '#34C759', 
-                items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'polpacci'], 
+                items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'leg_curl', 'polpacci'], 
                 overrides: {
-                    4: { isDropSet: true }
+                    4: { isDropSet: true },
+                    5: { isDropSet: true }
                 } 
             },
             4: { 
@@ -567,8 +560,8 @@
             { date: "2026-02-01", weight: 78, lean: 43, fat: 16, shoulders: 118, chest: 104, waist: 82, arms: 37 }
         ];
 
-        let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v4')) || defaultPlan;
-        let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v4')) || {};
+        let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v5')) || defaultPlan;
+        let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v5')) || {};
         let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || defaultBiometrics;
         
         let activeTimers = {};
@@ -665,7 +658,7 @@
                 isDropSet: tempDropSet,
                 isSuperset: tempSuperset
             };
-            localStorage.setItem('user_workout_plan_v4', JSON.stringify(userPlan));
+            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
             closeEditParams();
             renderWorkout(currentWorkoutId);
             showMessage("Programma aggiornato.");
@@ -685,7 +678,7 @@
                     });
                     userPlan[currentWorkoutId].overrides = newOverrides;
                 }
-                localStorage.setItem('user_workout_plan_v4', JSON.stringify(userPlan));
+                localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
                 renderWorkout(currentWorkoutId);
             });
         }
@@ -749,7 +742,7 @@
 
             if (hasData) {
                 activeSession[currentLoggingExId] = logs;
-                localStorage.setItem('active_session_buffer_v4', JSON.stringify(activeSession));
+                localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession));
 
                 const validLogs = logs.filter(l => l.r !== null && l.r > 0);
                 if(validLogs.length > 0) {
@@ -767,7 +760,7 @@
                 }
             } else {
                 delete activeSession[currentLoggingExId];
-                localStorage.setItem('active_session_buffer_v4', JSON.stringify(activeSession));
+                localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession));
             }
 
             closeLogModal();
@@ -914,7 +907,7 @@
                         arr.forEach((a, i) => { if (a.ov) newOverrides[i] = a.ov; });
                         userPlan[currentWorkoutId].overrides = newOverrides;
 
-                        localStorage.setItem('user_workout_plan_v4', JSON.stringify(userPlan));
+                        localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
                         renderWorkout(currentWorkoutId);
                     }
                 });
@@ -993,7 +986,7 @@
                 volume: totalVolume 
             };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
-            activeSession = {}; localStorage.removeItem('active_session_buffer_v4'); 
+            activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); 
             showMessage("Sessione Salvata!");
             goHome();
         }
@@ -1031,7 +1024,7 @@
             if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Esercizio già in scheda!"); return; }
             if (swappingIndex === null) userPlan[currentWorkoutId].items.push(newId);
             else { userPlan[currentWorkoutId].items[swappingIndex] = newId; if(userPlan[currentWorkoutId].overrides) delete userPlan[currentWorkoutId].overrides[swappingIndex]; }
-            localStorage.setItem('user_workout_plan_v4', JSON.stringify(userPlan));
+            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
             closeLibrary(); renderWorkout(currentWorkoutId);
         }
 
@@ -1054,10 +1047,9 @@
         }
         function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); renderCalendar(); }
 
-        // --- SEZIONE CORPO / BIOMETRIA ---
         function openBody() {
             switchView('body');
-            renderDashboardCharts(); // Genera i grafici dei volumi muscolari qui
+            renderDashboardCharts(); 
             renderBodyStats();
         }
 
@@ -1209,8 +1201,6 @@
             });
         }
 
-        // --- END SEZIONE CORPO ---
-
         function toggleTimer(id, sec) {
             const btn = document.getElementById(`timer-${id}`);
             if (activeTimers[id]) { 
@@ -1307,7 +1297,6 @@
             const options = { weekday: 'long', day: 'numeric', month: 'long' };
             const today = new Date();
             const dateStr = today.toLocaleDateString('it-IT', options);
-            // Capitalizza la prima lettera del giorno della settimana
             document.getElementById('date-label').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
             goHome();
             lucide.createIcons();
