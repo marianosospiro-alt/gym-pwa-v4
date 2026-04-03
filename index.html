@@ -14,7 +14,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Aggiunta libreria SortableJS per Drag & Drop fluido su Mobile -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -63,7 +62,6 @@
             to { opacity: 1; transform: translateY(0); } 
         }
         
-        /* Modals */
         .modal-sheet { 
             position: fixed; inset: 0; 
             background: rgba(0,0,0,0.8); 
@@ -88,7 +86,6 @@
 
         .scrollable-area { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
         
-        /* Inputs */
         input[type="number"], input[type="text"], select, textarea { 
             background: #2C2C2E; border: 2px solid transparent; 
             border-radius: 16px; color: white; padding: 16px; 
@@ -103,7 +100,6 @@
             margin-bottom: 6px; display: block; 
         }
         
-        /* Img Thumb per Libreria */
         .img-thumb { 
             width: 64px !important; height: 64px !important; 
             background: #2C2C2E; border-radius: 16px; overflow: hidden; 
@@ -155,7 +151,6 @@
             background: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(10,132,255,0.1) 100%);
         }
 
-        /* Stile extra per Drag and Drop */
         .drag-handle { touch-action: none; cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
         .sortable-ghost { opacity: 0.3; background: #2C2C2E; }
@@ -168,25 +163,11 @@
         
         <!-- VISTA HOME -->
         <div id="view-home" class="view p-6 pb-40 animate-slide">
-            <header class="flex justify-between items-end mb-8 mt-2">
-                <div>
-                    <p id="date-label" class="text-blue-500 font-bold text-[11px] uppercase tracking-widest mb-1.5"></p>
-                    <h1 class="text-4xl font-black tracking-tight">Riepilogo</h1>
-                </div>
+            <header class="mb-10 mt-2">
+                <p id="date-label" class="text-blue-500 font-bold text-[11px] uppercase tracking-widest mb-2"></p>
+                <h2 class="text-2xl font-bold text-gray-400 leading-tight">Bentornato Mariano,</h2>
+                <h1 class="text-4xl font-black tracking-tight text-white mt-1">cosa alleniamo oggi?</h1>
             </header>
-            
-            <section class="mb-12">
-                <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1">Andamento Distretti</h2>
-                <div class="horizontal-scroll no-scrollbar -mx-6 px-6">
-                    <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Volume Tot.</p><div class="h-16"><canvas id="chart-volume"></canvas></div></div>
-                    <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Petto</p><div class="h-16"><canvas id="chart-petto"></canvas></div></div>
-                    <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Dorso</p><div class="h-16"><canvas id="chart-dorso"></canvas></div></div>
-                    <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Spalle</p><div class="h-16"><canvas id="chart-spalle"></canvas></div></div>
-                    <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Gambe</p><div class="h-16"><canvas id="chart-gambe"></canvas></div></div>
-                    <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Bicipiti</p><div class="h-16"><canvas id="chart-bicipiti"></canvas></div></div>
-                    <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Tricipiti</p><div class="h-16"><canvas id="chart-tricipiti"></canvas></div></div>
-                </div>
-            </section>
             
             <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1">I Tuoi Programmi</h2>
             <section id="workout-cards-container" class="space-y-5"></section>
@@ -269,8 +250,20 @@
                     <canvas id="chart-body-measurements"></canvas>
                 </div>
             </div>
+            
+            <!-- Grafici Volumi (Spostati dalla Home) -->
+            <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1 mt-10">Andamento Volumi Allenamento (Kg)</h2>
+            <div class="horizontal-scroll no-scrollbar -mx-6 px-6 mb-8">
+                <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Volume Tot.</p><div class="h-16"><canvas id="chart-volume"></canvas></div></div>
+                <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Petto</p><div class="h-16"><canvas id="chart-petto"></canvas></div></div>
+                <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Dorso</p><div class="h-16"><canvas id="chart-dorso"></canvas></div></div>
+                <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Spalle</p><div class="h-16"><canvas id="chart-spalle"></canvas></div></div>
+                <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Gambe</p><div class="h-16"><canvas id="chart-gambe"></canvas></div></div>
+                <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Bicipiti</p><div class="h-16"><canvas id="chart-bicipiti"></canvas></div></div>
+                <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Tricipiti</p><div class="h-16"><canvas id="chart-tricipiti"></canvas></div></div>
+            </div>
 
-            <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1">Nuova Misurazione</h2>
+            <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1 mt-10">Nuova Misurazione</h2>
             <div class="apple-card p-5 space-y-4 mb-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div><label>Altezza (cm)</label><input type="number" id="bio-height" placeholder="es. 180"></div>
@@ -312,6 +305,21 @@
                 <h3 class="font-bold text-red-500 text-xl mb-2">Area Pericolo</h3>
                 <p class="text-sm text-red-400/80 mb-8 leading-relaxed">Questa azione è irreversibile ed eliminerà tutto lo storico e le schede modificate.</p>
                 <button onclick="resetAllData()" class="text-red-500 text-xs font-black bg-red-500/10 w-full py-4 rounded-xl border border-red-500/30 uppercase tracking-widest active:scale-[0.98] transition-transform">CANCELLA TUTTO</button>
+            </div>
+        </div>
+
+        <!-- MODALE REGISTRA SERIE -->
+        <div id="modal-log-sets" class="modal-sheet" onclick="closeLogModal()">
+            <div class="sheet-content" onclick="event.stopPropagation()">
+                <div class="sheet-pill"></div>
+                <div class="flex justify-between items-center mb-6 text-white">
+                    <h3 id="log-title" class="text-xl font-black tracking-tight leading-tight w-3/4">Registra Serie</h3>
+                    <button onclick="closeLogModal()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="scrollable-area" id="log-rows-container">
+                    <!-- Generato dinamicamente -->
+                </div>
+                <button onclick="confirmLogs()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest mt-4">CONFERMA</button>
             </div>
         </div>
 
@@ -366,7 +374,7 @@
                     <h3 id="library-title" class="text-2xl font-black tracking-tight">Catalogo</h3>
                     <button onclick="closeLibrary()" class="bg-[#2C2C2E] p-2.5 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <div id="library-categories" class="flex overflow-x-auto gap-3 no-scrollbar mb-6 pb-2"></div>
+                <div id="library-categories" class="flex overflow-x-auto gap-3 no-scrollbar mb-6 pb-2 border-b border-white/5"></div>
                 <div class="scrollable-area" id="library-list-container">
                     <div id="library-list" class="space-y-4"></div>
                 </div>
@@ -433,7 +441,6 @@
 
     <!-- LOGICA JS -->
     <script>
-        // Database esteso e sincronizzato con il file CSV e le tue miniature
         const exerciseData = {
             // SPALLE
             'alzate_90': { name: 'Alzate a 90°', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_90.png', category: 'spalle' },
@@ -450,6 +457,7 @@
             'lento_manubri': { name: 'Lento Avanti Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/lento_manubri.png', category: 'spalle' },
             'lu_raises': { name: 'Lu Raises', sets: '3', reps: '10-12', rest: 60, img: 'img/lu_raises.png', category: 'spalle' },
             'shrugs': { name: 'Shrugs (Scrollate)', sets: '4', reps: '12-15', rest: 60, img: 'img/shrugs.png', category: 'spalle' },
+            'tirate_mento': { name: 'Tirate al Mento', sets: '3', reps: '10-12', rest: 90, img: 'img/tirate_mento.png', category: 'spalle' },
 
             // GAMBE E POLPACCI
             'belt_squat': { name: 'Belt Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/belt_squat.png', category: 'gambe' },
@@ -498,7 +506,7 @@
             // TRICIPITI
             'dips_tricipiti': { name: 'Dip Parallele (Tricipiti)', sets: '3', reps: '10-12', rest: 90, img: 'img/dips_tricipiti.png', category: 'tricipiti' },
             'estensioni_testa': { name: 'Estensioni Dietro Nuca', sets: '3', reps: '12-15', rest: 60, img: 'img/estensioni_testa.png', category: 'tricipiti' },
-            'french_press': { name: 'French Press con Manubri', sets: '3', reps: '8-10', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
+            'french_press': { name: 'French Press', sets: '3', reps: '8-10', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
             'kickback': { name: 'Kickback Manubri', sets: '3', reps: '12-15', rest: 60, img: 'img/kickback.png', category: 'tricipiti' },
             'pushdown': { name: 'Push Down Cavi', sets: '4', reps: '10-12', rest: 60, img: 'img/pushdown.png', category: 'tricipiti' },
             'pushdown_corda': { name: 'Pushdown Corda', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_corda.png', category: 'tricipiti' },
@@ -513,7 +521,7 @@
             'pullover_manubrio': { name: 'Pullover Manubrio', sets: '3', reps: '12-15', rest: 60, img: 'img/pullover_manubrio.png', category: 'dorso' },
             'rematore_manubrio': { name: 'Rematore Manubrio', sets: '3', reps: '10-12', rest: 90, img: 'img/rematore_manubrio.png', category: 'dorso' },
             'rematore_pendlay': { name: 'Pendlay Row', sets: '4', reps: '6-8', rest: 120, img: 'img/rematore_pendlay.png', category: 'dorso' },
-            'tbar_row': { name: 'T-Bar Row', sets: '4', reps: '8-10', rest: 120, img: 'img/tbar_row.png', category: 'dorso' },
+            'tbar_row': { name: 'T-Bar Row', sets: '4', reps: '8-10', rest: 120, img: 'img/rematore_tbar.png', category: 'dorso' },
             'scapular_pullups': { name: 'Scapular Pullups', sets: '3', reps: '10-12', rest: 60, img: 'img/scapular_pullups.png', category: 'dorso' },
             'seal_row': { name: 'Seal Row', sets: '3', reps: '10-12', rest: 90, img: 'img/seal_row.png', category: 'dorso' },
             'trazioni': { name: 'Trazioni alla Sbarra', sets: '4', reps: '6-8', rest: 120, img: 'img/trazioni.png', category: 'dorso' },
@@ -522,11 +530,10 @@
             'trazioni_supine': { name: 'Trazioni Supine (Chin-ups)', sets: '4', reps: '8-10', rest: 90, img: 'img/trazioni_supine.png', category: 'dorso' }
         };
 
-        // Aggiornato con chiave 'user_workout_plan_v3' per forzare l'aggiornamento automatico della scheda all'utente
         const defaultPlan = {
             1: { 
                 title: 'PUSH (Forza)', color: '#007AFF', 
-                items: ['panca_piana', 'lento_avanti', 'spinte_inc', 'alzate_lat', 'french_press', 'pushdown'], 
+                items: ['panca_piana', 'lento_avanti', 'chest_press_g1', 'alzate_lat', 'french_press', 'pushdown'], 
                 overrides: {
                     3: { isDropSet: true }
                 } 
@@ -540,10 +547,9 @@
             },
             3: { 
                 title: 'LEGS (Volume)', color: '#34C759', 
-                items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'leg_curl', 'polpacci'], 
+                items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'polpacci'], 
                 overrides: {
-                    4: { isDropSet: true }, 
-                    5: { isDropSet: true }
+                    4: { isDropSet: true }
                 } 
             },
             4: { 
@@ -561,15 +567,16 @@
             { date: "2026-02-01", weight: 78, lean: 43, fat: 16, shoulders: 118, chest: 104, waist: 82, arms: 37 }
         ];
 
-        let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v3')) || defaultPlan;
-        let activeSession = JSON.parse(localStorage.getItem('active_session_buffer')) || {};
+        let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v4')) || defaultPlan;
+        let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v4')) || {};
         let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || defaultBiometrics;
         
         let activeTimers = {};
         let homeCharts = {}; 
         let bodyChart = null;
-        let workoutSortable = null; // Istanza di SortableJS
+        let workoutSortable = null;
         let currentWorkoutId = null;
+        let currentLoggingExId = null;
         let swappingIndex = null; 
         let editingIdx = null;
         let tempDropSet = false;
@@ -577,7 +584,6 @@
         let calendarDate = new Date();
         let myChart = null;
 
-        // Custom Confirm Logic
         let confirmCallback = null;
         function openConfirm(title, msg, callback) {
             document.getElementById('confirm-title').innerText = title;
@@ -659,7 +665,7 @@
                 isDropSet: tempDropSet,
                 isSuperset: tempSuperset
             };
-            localStorage.setItem('user_workout_plan_v3', JSON.stringify(userPlan));
+            localStorage.setItem('user_workout_plan_v4', JSON.stringify(userPlan));
             closeEditParams();
             renderWorkout(currentWorkoutId);
             showMessage("Programma aggiornato.");
@@ -679,9 +685,93 @@
                     });
                     userPlan[currentWorkoutId].overrides = newOverrides;
                 }
-                localStorage.setItem('user_workout_plan_v3', JSON.stringify(userPlan));
+                localStorage.setItem('user_workout_plan_v4', JSON.stringify(userPlan));
                 renderWorkout(currentWorkoutId);
             });
+        }
+
+        function openLogModal(exId, expectedSets, expectedReps) {
+            currentLoggingExId = exId;
+            const exName = exerciseData[exId].name;
+            document.getElementById('log-title').innerText = exName;
+
+            let existingData = activeSession[exId] || [];
+            let html = '';
+
+            html += `<div class="grid grid-cols-[30px_1fr_1fr] gap-4 px-2 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+                        <div class="text-center">Set</div>
+                        <div class="text-center">Kg</div>
+                        <div class="text-center">Reps</div>
+                     </div>`;
+
+            let phReps = expectedReps.split('-')[0]; 
+
+            for (let i = 0; i < expectedSets; i++) {
+                let w = existingData[i] && existingData[i].w !== null ? existingData[i].w : '';
+                let r = existingData[i] && existingData[i].r !== null ? existingData[i].r : '';
+                
+                html += `
+                <div class="grid grid-cols-[30px_1fr_1fr] gap-4 items-center bg-[#2C2C2E] p-3 rounded-2xl">
+                    <div class="text-center font-bold text-gray-500">${i + 1}</div>
+                    <div><input type="number" step="0.5" id="log-w-${i}" value="${w}" placeholder="kg" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
+                    <div><input type="number" id="log-r-${i}" value="${r}" placeholder="${phReps}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
+                </div>`;
+            }
+
+            document.getElementById('log-rows-container').innerHTML = html;
+            document.getElementById('modal-log-sets').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeLogModal() {
+            document.getElementById('modal-log-sets').style.display = 'none';
+        }
+
+        function confirmLogs() {
+            const rowCount = document.querySelectorAll('input[id^="log-w-"]').length;
+            let logs = [];
+            let hasData = false;
+
+            for (let i = 0; i < rowCount; i++) {
+                let wStr = document.getElementById(`log-w-${i}`).value;
+                let rStr = document.getElementById(`log-r-${i}`).value;
+                
+                let w = wStr === '' ? 0 : parseFloat(wStr);
+                let r = rStr === '' ? 0 : parseInt(rStr);
+
+                if (w > 0 || r > 0) {
+                    logs.push({ w: w, r: r });
+                    hasData = true;
+                } else {
+                    logs.push({ w: null, r: null }); 
+                }
+            }
+
+            if (hasData) {
+                activeSession[currentLoggingExId] = logs;
+                localStorage.setItem('active_session_buffer_v4', JSON.stringify(activeSession));
+
+                const validLogs = logs.filter(l => l.r !== null && l.r > 0);
+                if(validLogs.length > 0) {
+                    let bestSet = validLogs[0];
+                    for (let l of validLogs) {
+                        if (l.w > bestSet.w) bestSet = l;
+                        else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l;
+                    }
+                    
+                    const h = JSON.parse(localStorage.getItem(`h_${currentLoggingExId}`)) || [];
+                    const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'});
+                    const filteredH = h.filter(entry => entry.d !== todayStr);
+                    filteredH.push({ d: todayStr, w: bestSet.w, r: bestSet.r });
+                    localStorage.setItem(`h_${currentLoggingExId}`, JSON.stringify(filteredH.slice(-15)));
+                }
+            } else {
+                delete activeSession[currentLoggingExId];
+                localStorage.setItem('active_session_buffer_v4', JSON.stringify(activeSession));
+            }
+
+            closeLogModal();
+            renderWorkout(currentWorkoutId);
         }
 
         function renderWorkout(id, isHistory = false, hist = null) {
@@ -696,8 +786,13 @@
             container.innerHTML = items.map((exId, idx) => {
                 const ex = exerciseData[exId] || { name: exId, sets: '3', reps: '12', rest: 60, img: '', category: 'custom' };
                 const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
-                const last = h.length > 0 ? h[h.length-1].w : '--';
-                const todayVal = isHistory ? (hist[exId] || '--') : (activeSession[exId] || '');
+                
+                const lastEntry = h.length > 0 ? h[h.length-1] : null;
+                let last = '--';
+                if (lastEntry) {
+                    if (lastEntry.w > 0) last = `${lastEntry.w}kg x${lastEntry.r}`;
+                    else if (lastEntry.r > 0) last = `${lastEntry.r} reps`;
+                }
                 
                 const ov = overrides[idx] || {};
                 const sets = ov.sets || ex.sets;
@@ -705,6 +800,40 @@
                 const rest = ov.rest !== undefined ? ov.rest : ex.rest;
                 const isDrop = ov.isDropSet || false;
                 const isSuper = ov.isSuperset || false;
+
+                const logs = activeSession[exId] || [];
+                const validLogs = logs.filter(l => l.w !== null && l.r !== null && l.r > 0);
+                const logCount = validLogs.length;
+                let summaryHTML = '';
+                
+                if (logCount > 0 && !isHistory) {
+                    let exVol = validLogs.reduce((acc, curr) => acc + (curr.w * curr.r), 0);
+                    summaryHTML = `<div class="bg-green-500/10 border border-green-500/20 px-4 py-2.5 rounded-xl text-center mb-4">
+                                      <span class="text-green-500 font-black text-xs uppercase tracking-widest">${logCount}/${sets} Serie completate (Vol: ${exVol}kg)</span>
+                                   </div>`;
+                }
+
+                let historyVolHTML = '';
+                if(isHistory && hist[exId]) {
+                    const histValid = hist[exId].filter(l => l.w !== null && l.r !== null && l.r > 0);
+                    if(histValid.length > 0) {
+                        let hVol = histValid.reduce((acc, curr) => acc + (curr.w * curr.r), 0);
+                        let bestSet = histValid[0];
+                        for (let l of histValid) {
+                            if (l.w > bestSet.w) bestSet = l;
+                            else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l;
+                        }
+                        
+                        let bestSetStr = bestSet.w > 0 ? `${bestSet.w} <span class="text-sm text-blue-400">kg x${bestSet.r}</span>` : `${bestSet.r} <span class="text-sm text-blue-400">reps</span>`;
+
+                        historyVolHTML = `
+                            <div class="bg-blue-500/15 p-6 rounded-2xl text-center border border-blue-500/20">
+                                <span class="text-3xl font-black text-white">${bestSetStr}</span>
+                                <div class="text-xs text-blue-400/70 uppercase font-black tracking-widest mt-2">Volume: ${hVol}kg in ${histValid.length} serie</div>
+                            </div>
+                        `;
+                    }
+                }
 
                 return `
                 <div class="flex flex-col exercise-item" data-id="${exId}">
@@ -732,20 +861,14 @@
                                     ${!isHistory ? `<button onclick="openEditParams(${idx})" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl text-gray-400 active:text-white active:scale-90 transition-transform"><i data-lucide="settings-2" class="w-5 h-5"></i></button>` : ''}
                                 </div>
                             </div>
-                            ${isHistory ? `
-                                <div class="bg-blue-500/15 p-6 rounded-2xl text-center border border-blue-500/20">
-                                    <span class="text-4xl font-black text-white">${todayVal} <span class="text-sm text-blue-400">kg</span></span>
-                                </div>
-                            ` : `
-                                <div class="flex items-stretch gap-3">
-                                    <div class="flex-1 bg-black/50 border border-white/5 rounded-2xl p-2.5 flex items-center shadow-inner">
-                                        <input type="number" id="in-${exId}" value="${todayVal}" placeholder="${last !== '--' ? last : '0'}" class="flex-1 bg-transparent text-center text-[28px] font-black text-white outline-none w-full placeholder-white/10" style="padding: 0;">
-                                        <span class="text-gray-500 font-bold mr-3 text-sm">kg</span>
-                                        <button onclick="saveWeight('${exId}', document.getElementById('in-${exId}').value)" class="bg-blue-600 active:bg-blue-500 text-white rounded-xl px-6 py-3.5 font-bold shadow-lg transition-transform active:scale-95 text-sm tracking-wider">OK</button>
-                                    </div>
-                                    <div class="w-[80px] bg-[#2C2C2E] rounded-2xl flex flex-col items-center justify-center cursor-pointer active:bg-white/10 transition-colors" onclick="showChart('${exId}', '${ex.name}')">
+                            
+                            ${isHistory ? historyVolHTML : `
+                                ${summaryHTML}
+                                <div class="flex gap-3">
+                                    <button onclick="openLogModal('${exId}', ${sets}, '${reps}')" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white rounded-xl py-3.5 font-black text-sm tracking-widest shadow-lg transition-transform active:scale-95 uppercase">Registra</button>
+                                    <div class="min-w-[80px] px-3 bg-[#2C2C2E] rounded-xl flex flex-col items-center justify-center cursor-pointer active:bg-white/10 transition-colors" onclick="showChart('${exId}', '${ex.name}')">
                                         <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Ultimo</span>
-                                        <span class="text-xl font-black text-white">${last}</span>
+                                        <span class="text-sm font-black text-white whitespace-nowrap">${last}</span>
                                     </div>
                                 </div>
                                 <div class="flex gap-2 mt-5 pt-5 border-t border-white/5">
@@ -767,7 +890,6 @@
             }).join('');
             lucide.createIcons();
 
-            // Inizializza Drag & Drop
             if (!isHistory) {
                 if (workoutSortable) workoutSortable.destroy();
                 workoutSortable = new Sortable(document.getElementById('exercise-list'), {
@@ -783,29 +905,22 @@
                         const planItems = [...userPlan[currentWorkoutId].items];
                         const planOverrides = { ...(userPlan[currentWorkoutId].overrides || {}) };
 
-                        // Costruisci array combinato (item + override) per mantenere sincronia
                         let arr = planItems.map((id, i) => ({ id, ov: planOverrides[i] }));
-                        
-                        // Spostamento
                         const moved = arr.splice(oldIdx, 1)[0];
                         arr.splice(newIdx, 0, moved);
 
-                        // Scrivi indietro in userPlan
                         userPlan[currentWorkoutId].items = arr.map(a => a.id);
                         const newOverrides = {};
                         arr.forEach((a, i) => { if (a.ov) newOverrides[i] = a.ov; });
                         userPlan[currentWorkoutId].overrides = newOverrides;
 
-                        localStorage.setItem('user_workout_plan_v3', JSON.stringify(userPlan));
-                        
-                        // Ri-renderizza per allineare gli indici nel DOM
+                        localStorage.setItem('user_workout_plan_v4', JSON.stringify(userPlan));
                         renderWorkout(currentWorkoutId);
                     }
                 });
             }
         }
 
-        // --- NAVIGATION LOGIC ---
         function updateNav(active) { 
             ['home', 'calendar', 'body', 'settings'].forEach(n => { 
                 const btn = document.getElementById(`nav-${n}`); 
@@ -822,7 +937,7 @@
             updateNav(viewId);
         }
 
-        function goHome() { switchView('home'); renderHomeCards(); renderDashboardCharts(); }
+        function goHome() { switchView('home'); renderHomeCards(); }
         function openCalendar() { switchView('calendar'); renderCalendar(); }
         function openSettings() { switchView('settings'); }
         function openWorkout(id) { 
@@ -859,21 +974,26 @@
             lucide.createIcons();
         }
 
-        function saveWeight(exId, val) {
-            if (!val || isNaN(val)) return;
-            const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
-            h.push({ d: new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}), w: parseFloat(val) });
-            localStorage.setItem(`h_${exId}`, JSON.stringify(h.slice(-15)));
-            activeSession[exId] = parseFloat(val);
-            localStorage.setItem('active_session_buffer', JSON.stringify(activeSession));
-            renderWorkout(currentWorkoutId);
-        }
-
         function finishWorkout() {
+            let totalVolume = 0;
+            
+            Object.values(activeSession).forEach(setsArray => {
+                setsArray.forEach(set => {
+                    if (set.w !== null && set.r !== null) {
+                        totalVolume += (set.w * set.r);
+                    }
+                });
+            });
+
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            journal[new Date().toISOString().split('T')[0]] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, exercises: { ...activeSession }, volume: Object.values(activeSession).reduce((a,b)=>a+b,0) };
+            journal[new Date().toISOString().split('T')[0]] = { 
+                id: currentWorkoutId, 
+                title: userPlan[currentWorkoutId].title, 
+                exercises: { ...activeSession }, 
+                volume: totalVolume 
+            };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
-            activeSession = {}; localStorage.removeItem('active_session_buffer'); 
+            activeSession = {}; localStorage.removeItem('active_session_buffer_v4'); 
             showMessage("Sessione Salvata!");
             goHome();
         }
@@ -911,7 +1031,7 @@
             if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Esercizio già in scheda!"); return; }
             if (swappingIndex === null) userPlan[currentWorkoutId].items.push(newId);
             else { userPlan[currentWorkoutId].items[swappingIndex] = newId; if(userPlan[currentWorkoutId].overrides) delete userPlan[currentWorkoutId].overrides[swappingIndex]; }
-            localStorage.setItem('user_workout_plan_v3', JSON.stringify(userPlan));
+            localStorage.setItem('user_workout_plan_v4', JSON.stringify(userPlan));
             closeLibrary(); renderWorkout(currentWorkoutId);
         }
 
@@ -934,26 +1054,32 @@
         }
         function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); renderCalendar(); }
 
+        // --- SEZIONE CORPO / BIOMETRIA ---
+        function openBody() {
+            switchView('body');
+            renderDashboardCharts(); // Genera i grafici dei volumi muscolari qui
+            renderBodyStats();
+        }
+
         function renderDashboardCharts() {
             const cats = ['volume', 'petto', 'dorso', 'spalle', 'gambe', 'bicipiti', 'tricipiti'];
             const entries = Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).sort((a,b) => new Date(a[0]) - new Date(b[0])).slice(-10);
+            
             cats.forEach(cat => {
                 const canvas = document.getElementById(`chart-${cat}`); if (!canvas) return;
                 if (homeCharts[cat]) homeCharts[cat].destroy();
                 let pts = entries.map(e => {
                     if (cat === 'volume') return e[1].volume || 0;
-                    let sum = 0; Object.entries(e[1].exercises || {}).forEach(([id, w]) => { if (exerciseData[id]?.category === cat) sum += (parseFloat(w) || 0); });
+                    let sum = 0; Object.entries(e[1].exercises || {}).forEach(([id, logs]) => { 
+                        if (exerciseData[id]?.category === cat) {
+                            logs.forEach(l => sum += (l.w * l.r));
+                        }
+                    });
                     return sum;
                 });
                 if (pts.length < 5) while(pts.length < 5) pts.unshift(0);
                 homeCharts[cat] = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: pts.map((_,i)=>i), datasets: [{ data: pts, borderColor: '#0A84FF', borderWidth: 2.5, pointRadius: 0, tension: 0.4, spanGaps: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } } });
             });
-        }
-
-        // --- SEZIONE CORPO / BIOMETRIA ---
-        function openBody() {
-            switchView('body');
-            renderBodyStats();
         }
 
         function saveBiometrics() {
@@ -974,7 +1100,6 @@
                 return;
             }
 
-            // Aggiungi o sovrascrivi per il giorno corrente
             const existingIndex = biometricsHistory.findIndex(b => b.date === data.date);
             if (existingIndex !== -1) {
                 biometricsHistory[existingIndex] = { ...biometricsHistory[existingIndex], ...Object.fromEntries(Object.entries(data).filter(([_, v]) => v != null)) };
@@ -1117,7 +1242,6 @@
             }, 1000) };
         }
 
-        // Info dinamica: Mostra sempre un fallback logico se mancano info
         function openInfo(exId) {
             const ex = exerciseData[exId];
             if (!ex) return;
@@ -1159,9 +1283,12 @@
             document.getElementById('chart-title').innerText = name;
             const h = JSON.parse(localStorage.getItem(`h_${id}`)) || [];
             if (myChart) myChart.destroy();
+            
+            const plotData = h.map(i => i.w > 0 ? i.w : (i.r || 0));
+            
             myChart = new Chart(document.getElementById('progressChart').getContext('2d'), { 
                 type: 'line', 
-                data: { labels: h.map(i => i.d), datasets: [{ data: h.map(i => i.w), borderColor: '#0A84FF', fill: true, backgroundColor: 'rgba(10, 132, 255, 0.1)', tension: 0.4, spanGaps: true }] }, 
+                data: { labels: h.map(i => i.d), datasets: [{ data: plotData, borderColor: '#0A84FF', fill: true, backgroundColor: 'rgba(10, 132, 255, 0.1)', tension: 0.4, spanGaps: true }] }, 
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } } } 
             });
         }
@@ -1177,7 +1304,11 @@
         }
 
         window.onload = () => {
-            document.getElementById('date-label').innerText = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('it-IT', options);
+            // Capitalizza la prima lettera del giorno della settimana
+            document.getElementById('date-label').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
             goHome();
             lucide.createIcons();
         };
