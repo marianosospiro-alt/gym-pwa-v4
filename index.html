@@ -991,7 +991,15 @@
             goHome();
         }
 
-        function openLibrary(index, cat) { swappingIndex = index; renderLibrary(cat); document.getElementById('modal-library').style.display = 'flex'; }
+        function renderLibrary(filter) {
+    const cats = [...new Set(Object.values(exerciseData).map(e => e.category))].sort();
+    document.getElementById('library-categories').innerHTML = cats.map(c => `
+        <button onclick="renderLibrary('${c}')" class="px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${filter === c ? 'bg-blue-600 text-white' : 'bg-[#2C2C2E] text-gray-400'}">
+            ${c}
+        </button>
+    `).join('');
+    renderLibraryList(filter || cats[0]);
+}
         
         function renderLibrary(filter) {
             const cats = [...new Set(Object.values(exerciseData).map(e => e.category))].sort();
