@@ -991,24 +991,23 @@
             goHome();
         }
 
-        function renderLibrary(filter) {
-    const cats = [...new Set(Object.values(exerciseData).map(e => e.category))].sort();
-    document.getElementById('library-categories').innerHTML = cats.map(c => `
-        <button onclick="renderLibrary('${c}')" class="px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${filter === c ? 'bg-blue-600 text-white' : 'bg-[#2C2C2E] text-gray-400'}">
-            ${c}
-        </button>
-    `).join('');
-    renderLibraryList(filter || cats[0]);
-}
+        function openLibrary(index, cat) { swappingIndex = index; renderLibrary(cat); document.getElementById('modal-library').style.display = 'flex'; }
         
+        // --- QUESTA È LA FUNZIONE CORRETTA E RISOLTA ---
         function renderLibrary(filter) {
             const cats = [...new Set(Object.values(exerciseData).map(e => e.category))].sort();
+            
+            // Definiamo con certezza quale categoria deve essere attiva e colorata.
+            // Se non passiamo nulla (es: pulsante Esercizio Extra), prende la prima di default.
+            const activeCat = filter || cats[0];
+            
             document.getElementById('library-categories').innerHTML = cats.map(c => `
-                <button onclick="renderLibraryList('${c}')" class="px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${filter === c ? 'bg-blue-600 text-white' : 'bg-[#2C2C2E] text-gray-400'}">
+                <button onclick="renderLibrary('${c}')" class="px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${activeCat === c ? 'bg-blue-600 text-white' : 'bg-[#2C2C2E] text-gray-400'}">
                     ${c}
                 </button>
             `).join('');
-            renderLibraryList(filter || cats[0]);
+            
+            renderLibraryList(activeCat);
         }
 
         function renderLibraryList(cat) {
@@ -1161,8 +1160,8 @@
 
                 let subText = `Rapporto Upper/Vita: ${currentRatio.toFixed(2)}`;
                 if (previousRatio) {
-                    if (currentRatio > previousRatio) subText += " (In Crescita 🚀)";
-                    else if (currentRatio < previousRatio) subText += " (In Calo 📉)";
+                    if (currentRatio > previousRatio) subText += " (In Crescita )";
+                    else if (currentRatio < previousRatio) subText += " (In Calo )";
                 }
 
                 statusEl.innerText = statusText;
