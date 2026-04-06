@@ -129,8 +129,10 @@
         
         .calendar-day { 
             aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            border-radius: 14px; font-size: 15px; font-weight: 700; position: relative; color: #8E8E93; 
+            border-radius: 14px; font-size: 15px; font-weight: 700; position: relative; color: #8E8E93; cursor: pointer;
+            transition: all 0.2s;
         }
+        .calendar-day:active { transform: scale(0.9); }
         .calendar-day.today { border: 2px solid var(--apple-blue); color: var(--apple-blue); }
         .calendar-day.workout { background-color: rgba(52, 199, 89, 0.1); color: white; }
         .calendar-day.workout::after { 
@@ -204,7 +206,20 @@
         <div id="view-calendar" class="view hidden p-6 pb-40 animate-slide">
             <h1 class="text-4xl font-black text-white mb-8 mt-2 tracking-tight">Diario</h1>
             
-            <div id="calendar-container" class="apple-card p-6 mb-10 text-white">
+            <!-- SUMMARY KCAL -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="apple-card p-5 bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] border border-orange-500/20 shadow-lg">
+                    <h4 class="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><i data-lucide="flame" class="w-3.5 h-3.5"></i> Questa Settimana</h4>
+                    <p id="kcal-week" class="text-3xl font-black text-white mt-1">0</p>
+                </div>
+                <div class="apple-card p-5 bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] border border-blue-500/20 shadow-lg">
+                    <h4 class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i> Questo Mese</h4>
+                    <p id="kcal-month" class="text-3xl font-black text-white mt-1">0</p>
+                </div>
+            </div>
+
+            <!-- CALENDARIO -->
+            <div id="calendar-container" class="apple-card p-6 mb-6 text-white shadow-lg">
                 <div class="flex justify-between items-center mb-8">
                     <h3 id="calendar-month" class="font-bold text-xl capitalize">Mese</h3>
                     <div class="flex gap-3">
@@ -217,8 +232,18 @@
                 </div>
                 <div id="calendar-days" class="grid grid-cols-7 gap-3"></div>
             </div>
+
+            <!-- GRAFICO KCAL -->
+            <div class="apple-card p-6 mb-10 shadow-lg">
+                <h3 class="font-bold text-white mb-1">Trend Calorie</h3>
+                <p class="text-xs text-gray-500 mb-4">Andamento mensile (Kcal)</p>
+                <div class="w-full h-32">
+                    <canvas id="chart-kcal"></canvas>
+                </div>
+            </div>
             
-            <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1">Dettagli</h2>
+            <!-- DETTAGLI GIORNO -->
+            <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1">Dettagli Sessione</h2>
             <div id="calendar-selection" class="space-y-4"></div>
         </div>
 
@@ -404,6 +429,26 @@
             </div>
         </div>
 
+        <!-- MODALE CONCLUDI E INSERIMENTO KCAL -->
+        <div id="modal-finish" class="modal-sheet" style="align-items: center; justify-content: center; padding: 20px;">
+            <div class="bg-[#1C1C1E] p-6 rounded-[28px] w-full max-w-sm border border-white/10 text-center shadow-2xl" onclick="event.stopPropagation()">
+                <div class="w-14 h-14 rounded-full bg-orange-500/20 flex items-center justify-center mx-auto mb-4 border border-orange-500/30">
+                    <i data-lucide="flame" class="w-7 h-7 text-orange-500"></i>
+                </div>
+                <h3 class="text-2xl font-black mb-2 text-white tracking-tight">Ottimo Lavoro!</h3>
+                <p class="text-sm text-gray-400 mb-8 leading-relaxed">Inserisci le calorie attive lette dal tuo Apple Watch per questa sessione.</p>
+                
+                <div class="mb-8">
+                    <input type="number" id="session-kcal" placeholder="Kcal bruciate (es. 450)" class="!text-xl !py-5 bg-[#2C2C2E] border-2 focus:border-orange-500 transition-colors">
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <button onclick="saveWorkoutFinal(false)" class="w-full bg-orange-500 hover:bg-orange-400 py-4 rounded-2xl font-black text-black uppercase tracking-widest text-[11px] transition-colors shadow-lg shadow-orange-500/20">Salva Sessione</button>
+                    <button onclick="saveWorkoutFinal(true)" class="w-full bg-transparent border border-white/10 hover:bg-white/5 py-4 rounded-2xl font-black text-gray-400 uppercase tracking-widest text-[11px] transition-colors">Salta Inserimento</button>
+                </div>
+            </div>
+        </div>
+
         <!-- MODALE CUSTOM CONFIRM -->
         <div id="modal-confirm" class="modal-sheet" style="align-items: center; justify-content: center; padding: 20px;">
             <div class="bg-[#1C1C1E] p-6 rounded-[28px] w-full max-w-sm border border-white/10 text-center shadow-2xl" onclick="event.stopPropagation()">
@@ -567,6 +612,7 @@
         let activeTimers = {};
         let homeCharts = {}; 
         let bodyChart = null;
+        let chartKcalTrend = null;
         let workoutSortable = null;
         let currentWorkoutId = null;
         let currentLoggingExId = null;
@@ -931,8 +977,15 @@
         }
 
         function goHome() { switchView('home'); renderHomeCards(); }
-        function openCalendar() { switchView('calendar'); renderCalendar(); }
+        
+        function openCalendar() { 
+            switchView('calendar'); 
+            renderCalendar(); 
+            showDayDetails(new Date().toISOString().split('T')[0]); // Mostra i dettagli di oggi di default
+        }
+        
         function openSettings() { switchView('settings'); }
+        
         function openWorkout(id) { 
             currentWorkoutId = id; 
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
@@ -967,7 +1020,14 @@
             lucide.createIcons();
         }
 
+        // --- GESTIONE CONCLUSIONE WORKOUT E KCAL ---
         function finishWorkout() {
+            document.getElementById('session-kcal').value = '';
+            document.getElementById('modal-finish').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function saveWorkoutFinal(skipKcal = false) {
             let totalVolume = 0;
             
             Object.values(activeSession).forEach(setsArray => {
@@ -978,27 +1038,28 @@
                 });
             });
 
+            const kcalValue = skipKcal ? 0 : (parseInt(document.getElementById('session-kcal').value) || 0);
+
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
             journal[new Date().toISOString().split('T')[0]] = { 
                 id: currentWorkoutId, 
                 title: userPlan[currentWorkoutId].title, 
                 exercises: { ...activeSession }, 
-                volume: totalVolume 
+                volume: totalVolume,
+                kcal: kcalValue
             };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
             activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); 
+            
+            document.getElementById('modal-finish').style.display = 'none';
             showMessage("Sessione Salvata!");
             goHome();
         }
 
         function openLibrary(index, cat) { swappingIndex = index; renderLibrary(cat); document.getElementById('modal-library').style.display = 'flex'; }
         
-        // --- QUESTA È LA FUNZIONE CORRETTA E RISOLTA ---
         function renderLibrary(filter) {
             const cats = [...new Set(Object.values(exerciseData).map(e => e.category))].sort();
-            
-            // Definiamo con certezza quale categoria deve essere attiva e colorata.
-            // Se non passiamo nulla (es: pulsante Esercizio Extra), prende la prima di default.
             const activeCat = filter || cats[0];
             
             document.getElementById('library-categories').innerHTML = cats.map(c => `
@@ -1038,6 +1099,7 @@
         function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
         function openAddMenu() { swappingIndex = null; renderLibrary(); document.getElementById('modal-library').style.display = 'flex'; }
 
+        // --- GESTIONE DIARIO E STATISTICHE KCAL ---
         function renderCalendar() {
             const container = document.getElementById('calendar-days');
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
@@ -1046,13 +1108,117 @@
             document.getElementById('calendar-month').innerText = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' }).format(calendarDate);
             const firstDay = new Date(year, month, 1).getDay();
             const offset = firstDay === 0 ? 6 : firstDay - 1;
+            
             for(let i=0; i<offset; i++) container.innerHTML += `<div></div>`;
+            
             for(let d=1; d<=new Date(year, month + 1, 0).getDate(); d++) {
                 const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                container.innerHTML += `<div class="calendar-day ${new Date().toISOString().split('T')[0] === key ? 'today' : ''} ${journal[key] ? 'workout' : ''}">${d}</div>`;
+                container.innerHTML += `<div class="calendar-day ${new Date().toISOString().split('T')[0] === key ? 'today' : ''} ${journal[key] ? 'workout' : ''}" onclick="showDayDetails('${key}')">${d}</div>`;
             }
+            
+            updateCalendarStats();
         }
+        
         function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); renderCalendar(); }
+
+        function showDayDetails(key) {
+            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+            const entry = journal[key];
+            const selContainer = document.getElementById('calendar-selection');
+            
+            if (!entry) {
+                selContainer.innerHTML = `<div class="bg-[#1C1C1E] p-6 rounded-3xl border border-white/5 text-center"><p class="text-sm text-gray-500">Nessun allenamento registrato il ${key.split('-').reverse().join('/')}.</p></div>`;
+                return;
+            }
+
+            selContainer.innerHTML = `
+                <div class="apple-card p-6 border border-white/5 relative overflow-hidden shadow-lg animate-slide">
+                    <div class="absolute -right-6 -top-6 opacity-[0.03]"><i data-lucide="dumbbell" class="w-40 h-40"></i></div>
+                    <div class="relative z-10">
+                        <span class="text-blue-500 font-black text-[10px] uppercase tracking-widest block mb-1">${key.split('-').reverse().join('/')}</span>
+                        <h3 class="text-2xl font-black text-white mb-6 leading-tight">${entry.title}</h3>
+                        <div class="flex gap-4">
+                            <div class="bg-[#2C2C2E] px-4 py-3 rounded-2xl flex-1 text-center border border-white/5">
+                                <span class="block text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1.5">Volume Totale</span>
+                                <span class="text-lg font-black text-white">${entry.volume} <span class="text-[10px] text-gray-500">kg</span></span>
+                            </div>
+                            <div class="bg-orange-500/10 border border-orange-500/20 px-4 py-3 rounded-2xl flex-1 text-center">
+                                <span class="block text-[9px] text-orange-400 font-black uppercase tracking-widest mb-1.5">Calorie (Watch)</span>
+                                <span class="text-lg font-black text-orange-500 flex items-center justify-center gap-1.5"><i data-lucide="flame" class="w-4 h-4"></i> ${entry.kcal || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function updateCalendarStats() {
+            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+            let monthlyKcal = 0;
+            let weeklyKcal = 0;
+            
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            const monthPrefix = `${year}-${String(month+1).padStart(2,'0')}`;
+            
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+            const currentDayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; 
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - currentDayOfWeek);
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const labels = [];
+            const data = [];
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for(let d=1; d<=daysInMonth; d++) {
+                labels.push(d);
+                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const dailyKcal = journal[key]?.kcal || 0;
+                data.push(dailyKcal);
+                
+                if (dailyKcal > 0) {
+                    monthlyKcal += dailyKcal;
+                    const entryDate = new Date(key);
+                    if (entryDate >= startOfWeek && entryDate <= today) {
+                        weeklyKcal += dailyKcal;
+                    }
+                }
+            }
+
+            document.getElementById('kcal-week').innerText = weeklyKcal;
+            document.getElementById('kcal-month').innerText = monthlyKcal;
+
+            const canvas = document.getElementById('chart-kcal');
+            if(chartKcalTrend) chartKcalTrend.destroy();
+            
+            chartKcalTrend = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Kcal',
+                        data: data,
+                        backgroundColor: '#FF9500',
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false, beginAtZero: true },
+                        x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {size: 10, family: 'Inter'} } }
+                    }
+                }
+            });
+        }
+
+        // --- FINE GESTIONE DIARIO ---
 
         function openBody() {
             switchView('body');
