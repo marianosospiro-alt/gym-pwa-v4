@@ -1028,34 +1028,34 @@
         }
 
         function saveWorkoutFinal(skipKcal = false) {
-            let totalVolume = 0;
-            
-            Object.values(activeSession).forEach(setsArray => {
-                setsArray.forEach(set => {
-                    if (set.w !== null && set.r !== null) {
-                        totalVolume += (set.w * set.r);
-                    }
-                });
-            });
+    let totalVolume = 0;
+    Object.values(activeSession).forEach(setsArray => {
+        setsArray.forEach(set => {
+            if (set.w !== null && set.r !== null) totalVolume += (set.w * set.r);
+        });
+    });
 
-            const kcalValue = skipKcal ? 0 : (parseInt(document.getElementById('session-kcal').value) || 0);
+    const kcalValue = skipKcal ? 0 : (parseInt(document.getElementById('session-kcal').value) || 0);
+    const sessionNotes = document.getElementById('session-note').value; // Recupera le note
 
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            journal[new Date().toISOString().split('T')[0]] = { 
-                id: currentWorkoutId, 
-                title: userPlan[currentWorkoutId].title, 
-                exercises: { ...activeSession }, 
-                volume: totalVolume,
-                kcal: kcalValue
-            };
-            localStorage.setItem('workout_journal', JSON.stringify(journal));
-            activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); 
-            
-            document.getElementById('modal-finish').style.display = 'none';
-            showMessage("Sessione Salvata!");
-            goHome();
-        }
-
+    const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+    journal[new Date().toISOString().split('T')[0]] = { 
+        id: currentWorkoutId, 
+        title: userPlan[currentWorkoutId].title, 
+        exercises: { ...activeSession }, 
+        volume: totalVolume,
+        kcal: kcalValue,
+        notes: sessionNotes // Salva le note
+    };
+    
+    localStorage.setItem('workout_journal', JSON.stringify(journal));
+    activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); 
+    document.getElementById('session-note').value = ''; // Pulisce il campo
+    
+    document.getElementById('modal-finish').style.display = 'none';
+    showMessage("Sessione Salvata!");
+    goHome();
+}
         function openLibrary(index, cat) { swappingIndex = index; renderLibrary(cat); document.getElementById('modal-library').style.display = 'flex'; }
         
         function renderLibrary(filter) {
