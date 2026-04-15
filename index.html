@@ -192,7 +192,7 @@
             
             <div class="grid grid-cols-2 gap-3 mt-6">
                 <button onclick="openProgramModal()" class="bg-[#1C1C1E] border border-white/10 text-gray-300 rounded-[24px] py-5 flex flex-col items-center justify-center gap-2 font-black uppercase tracking-widest text-[10px] active:scale-[0.98] transition-transform shadow-lg">
-                    <i data-lucide="plus" class="w-6 h-6"></i> Nuova Scheda
+                    <i data-lucide="plus" class="w-6 h-6"></i> Crea Scheda
                 </button>
                 <button onclick="openAIGenerator()" class="bg-gradient-to-br from-purple-600 to-indigo-900 border border-purple-500/30 text-white rounded-[24px] py-5 flex flex-col items-center justify-center gap-2 font-black uppercase tracking-widest text-[10px] active:scale-[0.98] transition-transform shadow-[0_10px_30px_rgba(175,82,222,0.4)]">
                     <i data-lucide="sparkles" class="w-6 h-6"></i> Genera con AI
@@ -278,6 +278,14 @@
             <div id="recovery-heatmap" class="grid grid-cols-2 gap-3 mb-8">
                 </div>
 
+            <div class="apple-card p-6 mb-8 relative">
+                <h3 class="font-bold text-white mb-1">Simmetria Muscolare</h3>
+                <p class="text-xs text-gray-500 mb-4">Distribuzione volumi (ultimi 30gg)</p>
+                <div class="w-full h-64">
+                    <canvas id="chart-radar"></canvas>
+                </div>
+            </div>
+
             <div class="apple-card p-6 mb-8 vshape-gradient border border-emerald-500/20 relative overflow-hidden">
                 <div class="absolute -right-6 -bottom-6 opacity-10">
                     <i data-lucide="triangle" class="w-32 h-32 rotate-180"></i>
@@ -327,7 +335,6 @@
                 <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
                     <div><label>Spalle (cm)</label><input type="number" id="bio-shoulders" placeholder="es. 120"></div>
                     <div><label>Petto (cm)</label><input type="number" id="bio-chest" placeholder="es. 105"></div>
-                    <div><label>Vita (cm)</label><input type="number" id="bio-waist" placeholder="es. 82"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
                     <div><label>Braccio Sx (cm)</label><input type="number" id="bio-arm-sx" step="0.1" placeholder="es. 38"></div>
@@ -340,6 +347,9 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div><label>Polpaccio Sx (cm)</label><input type="number" id="bio-calf-sx" step="0.1" placeholder="es. 40"></div>
                     <div><label>Polpaccio Dx (cm)</label><input type="number" id="bio-calf-dx" step="0.1" placeholder="es. 40.5"></div>
+                </div>
+                <div class="border-t border-white/5 pt-4 mt-4">
+                    <label>Vita (cm)</label><input type="number" id="bio-waist" placeholder="es. 82">
                 </div>
             </div>
             <button onclick="saveBiometrics()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-500/20">
@@ -358,11 +368,11 @@
             </div>
             
             <div class="apple-card p-6 mb-6">
-                <h3 class="font-bold text-xl mb-2">Gestione Dati</h3>
-                <p class="text-sm text-gray-400 mb-8 leading-relaxed">Salva o ripristina un backup locale dei tuoi progressi e schede in formato JSON.</p>
+                <h3 class="font-bold text-xl mb-2">Gestione Dati & Cloud</h3>
+                <p class="text-sm text-gray-400 mb-8 leading-relaxed">Salva o ripristina un backup dei tuoi dati. Esporta sfrutta il salvataggio nativo su iCloud/Google Drive tramite la scheda File.</p>
                 <div class="flex flex-col gap-4">
-                    <button onclick="exportData()" class="btn-primary py-4 flex items-center justify-center gap-2 text-sm uppercase tracking-widest"><i data-lucide="download" class="w-5 h-5"></i> ESPORTA JSON</button>
-                    <button onclick="document.getElementById('importFile').click()" class="bg-[#2C2C2E] rounded-2xl py-4 flex items-center justify-center gap-2 font-bold text-sm text-white uppercase tracking-widest active:scale-95 transition-transform"><i data-lucide="upload" class="w-5 h-5"></i> IMPORTA JSON</button>
+                    <button onclick="exportData()" class="btn-primary py-4 flex items-center justify-center gap-2 text-sm uppercase tracking-widest"><i data-lucide="cloud-upload" class="w-5 h-5"></i> ESPORTA (CLOUD/LOCAL)</button>
+                    <button onclick="document.getElementById('importFile').click()" class="bg-[#2C2C2E] rounded-2xl py-4 flex items-center justify-center gap-2 font-bold text-sm text-white uppercase tracking-widest active:scale-95 transition-transform"><i data-lucide="download" class="w-5 h-5"></i> IMPORTA JSON</button>
                     <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
                 </div>
             </div>
@@ -650,10 +660,11 @@
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v5')) || {};
         let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || defaultBiometrics;
         
-        let activeTimers = {}; let homeCharts = {}; let bodyChart = null; let chartKcalTrend = null; let workoutSortable = null;
+        let activeTimers = {}; let homeCharts = {}; let bodyChart = null; let chartKcalTrend = null; let workoutSortable = null; let radarChart = null;
         let currentWorkoutId = null; let currentLoggingExId = null; let swappingIndex = null; let editingIdx = null; let editingProgramId = null;
         let selectedProgColor = '#0A84FF'; let tempDropSet = false; let tempSuperset = false; let calendarDate = new Date();
         let sessionChart = null; let historyChart = null;
+        let audioCtx = null; // Per il suono del timer
 
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
@@ -664,7 +675,7 @@
         async function askGemini(promptText, isJson = false) {
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) throw new Error("API Key mancante");
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
             const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
             if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
@@ -750,7 +761,6 @@
             closeCardioModal(); renderWorkout(currentWorkoutId);
         }
 
-        // --- SISTEMA SOVRACCARICO PROGRESSIVO ---
         function openLogModal(exId, expectedSets, expectedReps) {
             const isCardio = exerciseData[exId].category === 'aerobica';
             if (isCardio) { openCardioModal(exId); return; }
@@ -764,26 +774,17 @@
             const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
             const lastSessionSet = h.length > 0 ? h[h.length-1] : null;
 
-            // SUGGERITORE SOVRACCARICO
             if (lastSessionSet) {
                 if (lastSessionSet.w > 0) {
-                    const targetW = lastSessionSet.w + 2.5; // +2.5kg base
-                    html += `<div class="bg-green-500/10 border border-green-500/20 rounded-xl p-3 mb-4 flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(52,199,89,0.1)]">
-                                <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
-                                <span class="text-green-500 text-xs font-black uppercase tracking-widest">Obiettivo Sovraccarico: ${targetW} kg</span>
-                             </div>`;
+                    const targetW = lastSessionSet.w + 2.5; 
+                    html += `<div class="bg-green-500/10 border border-green-500/20 rounded-xl p-3 mb-4 flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(52,199,89,0.1)]"><i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i><span class="text-green-500 text-xs font-black uppercase tracking-widest">Obiettivo: ${targetW} kg</span></div>`;
                 } else if (lastSessionSet.r > 0) {
-                    const targetR = lastSessionSet.r + 1; // +1 Rep corpo libero
-                    html += `<div class="bg-green-500/10 border border-green-500/20 rounded-xl p-3 mb-4 flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(52,199,89,0.1)]">
-                                <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
-                                <span class="text-green-500 text-xs font-black uppercase tracking-widest">Obiettivo Sovraccarico: ${targetR} Reps</span>
-                             </div>`;
+                    const targetR = lastSessionSet.r + 1;
+                    html += `<div class="bg-green-500/10 border border-green-500/20 rounded-xl p-3 mb-4 flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(52,199,89,0.1)]"><i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i><span class="text-green-500 text-xs font-black uppercase tracking-widest">Obiettivo: ${targetR} Reps</span></div>`;
                 }
             }
 
-            html += `<div class="grid grid-cols-[30px_1fr_1fr] gap-4 px-2 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
-                        <div class="text-center">Set</div><div class="text-center">Kg</div><div class="text-center">Reps</div>
-                     </div>`;
+            html += `<div class="grid grid-cols-[30px_1fr_1fr] gap-4 px-2 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2"><div class="text-center">Set</div><div class="text-center">Kg</div><div class="text-center">Reps</div></div>`;
 
             let phReps = expectedReps.split('-')[0]; 
 
@@ -1010,7 +1011,6 @@
             chartKcalTrend = new Chart(canvas.getContext('2d'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Kcal', data: data, backgroundColor: '#FF9500', borderRadius: 4, barPercentage: 0.6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {size: 10, family: 'Inter'} } } } } });
         }
 
-        // --- NUOVO: HEATMAP RECUPERO MUSCOLARE ---
         function renderRecoveryHeatmap() {
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
             const dates = Object.keys(journal).sort((a, b) => new Date(b) - new Date(a));
@@ -1043,11 +1043,8 @@
                 const days = lastTrained[c.id];
                 let status = "Rilassato"; let colorClass = "text-green-500"; let bgClass = "bg-green-500/10 border-green-500/20"; let dotClass = "bg-green-500";
                 
-                if (days <= 1) {
-                    status = "Affaticato"; colorClass = "text-red-500"; bgClass = "bg-red-500/10 border-red-500/20"; dotClass = "bg-red-500 shadow-[0_0_10px_rgba(255,59,48,0.8)]";
-                } else if (days <= 3) {
-                    status = "In Recupero"; colorClass = "text-orange-500"; bgClass = "bg-orange-500/10 border-orange-500/20"; dotClass = "bg-orange-500 shadow-[0_0_10px_rgba(255,149,0,0.8)]";
-                }
+                if (days <= 1) { status = "Affaticato"; colorClass = "text-red-500"; bgClass = "bg-red-500/10 border-red-500/20"; dotClass = "bg-red-500 shadow-[0_0_10px_rgba(255,59,48,0.8)]"; } 
+                else if (days <= 3) { status = "In Recupero"; colorClass = "text-orange-500"; bgClass = "bg-orange-500/10 border-orange-500/20"; dotClass = "bg-orange-500 shadow-[0_0_10px_rgba(255,149,0,0.8)]"; }
 
                 return `<div class="flex items-center justify-between p-3 rounded-2xl border ${bgClass}"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center bg-black/20"><i data-lucide="${c.icon}" class="w-4 h-4 ${colorClass}"></i></div><div><p class="text-sm font-bold text-white capitalize">${c.name}</p><p class="text-[10px] uppercase tracking-widest font-black ${colorClass}">${status}</p></div></div><div class="w-3 h-3 rounded-full ${dotClass}"></div></div>`;
             }).join('');
@@ -1069,6 +1066,41 @@
                 });
                 if (pts.length < 5) while(pts.length < 5) pts.unshift(0);
                 homeCharts[cat] = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: pts.map((_,i)=>i), datasets: [{ data: pts, borderColor: '#0A84FF', borderWidth: 2.5, pointRadius: 0, tension: 0.4, spanGaps: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } } });
+            });
+
+            // NUOVO: GRAFICO RADAR SIMMETRIA
+            const radarCanvas = document.getElementById('chart-radar');
+            if (!radarCanvas) return;
+            if (radarChart) radarChart.destroy();
+            
+            const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            let radarData = { petto: 0, dorso: 0, gambe: 0, spalle: 0, bicipiti: 0, tricipiti: 0 };
+            
+            Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).forEach(([dateStr, entry]) => {
+                if (new Date(dateStr) >= thirtyDaysAgo) {
+                    Object.entries(entry.exercises || {}).forEach(([exId, logs]) => {
+                        const c = exerciseData[exId]?.category;
+                        if (radarData[c] !== undefined) { logs.forEach(l => radarData[c] += ((l.w||0) * l.r)); }
+                    });
+                }
+            });
+
+            radarChart = new Chart(radarCanvas.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels: ['Petto', 'Dorso', 'Gambe', 'Spalle', 'Bicipiti', 'Tricipiti'],
+                    datasets: [{
+                        label: 'Volume (Kg)',
+                        data: [radarData.petto, radarData.dorso, radarData.gambe, radarData.spalle, radarData.bicipiti, radarData.tricipiti],
+                        backgroundColor: 'rgba(10, 132, 255, 0.2)', borderColor: '#0A84FF',
+                        pointBackgroundColor: '#0A84FF', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#0A84FF'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { r: { angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: '#8E8E93', font: {family: 'Inter', size: 10, weight: 'bold'} }, ticks: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
             });
         }
 
@@ -1121,14 +1153,47 @@
             bodyChart = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: labels, datasets: [ { label: 'Spalle', data: dataShoulders, borderColor: '#0A84FF', backgroundColor: '#0A84FF', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Petto', data: dataChest, borderColor: '#AF52DE', backgroundColor: '#AF52DE', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Vita', data: dataWaist, borderColor: '#34C759', backgroundColor: '#34C759', tension: 0.3, spanGaps: true, borderWidth: 3 } ] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'bottom', labels: { color: '#8E8E93', boxWidth: 10, font: {family: 'Inter', weight:'bold'} } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } } } } });
         }
 
+        // --- GESTIONE TIMER E AUDIO ---
         function toggleTimer(id, sec) {
             const btn = document.getElementById(`timer-${id}`);
-            if (activeTimers[id]) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); return; }
+            
+            // Inizializza l'audio al primo tocco per sbloccare le restrizioni iOS
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (activeTimers[id]) { 
+                clearInterval(activeTimers[id].int); delete activeTimers[id]; 
+                btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; 
+                btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; 
+                lucide.createIcons(); return; 
+            }
+            
             const endTime = Date.now() + (sec * 1000);
             btn.className = "bg-orange-500/20 text-orange-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 border border-orange-500/20";
+            
             activeTimers[id] = { int: setInterval(() => { 
                 const rem = Math.ceil((endTime - Date.now()) / 1000);
-                if (rem <= 0) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; btn.className = "bg-green-500 text-black text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(52,199,89,0.4)]"; if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); setTimeout(() => { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); }, 5000); } 
+                if (rem <= 0) { 
+                    clearInterval(activeTimers[id].int); delete activeTimers[id]; 
+                    btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; 
+                    btn.className = "bg-green-500 text-black text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(52,199,89,0.4)]"; 
+                    
+                    // Vibrazione e BEEP
+                    if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); 
+                    if (audioCtx) {
+                        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                        osc.connect(gain); gain.connect(audioCtx.destination);
+                        osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Nota A5
+                        gain.gain.setValueAtTime(1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+                    }
+
+                    setTimeout(() => { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); }, 5000); 
+                } 
                 else { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; lucide.createIcons(); }
             }, 1000) };
         }
@@ -1194,7 +1259,25 @@
         }
         function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
         
-        function exportData() { const dl = document.createElement('a'); dl.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage)); dl.download = "powerlog_backup.json"; dl.click(); }
+        // --- NUOVO: ESPORTAZIONE NATIVA iCLOUD/DRIVE VIA SHARE SHEET ---
+        async function exportData() { 
+            const dataStr = JSON.stringify(localStorage);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const file = new File([blob], "powerlog_backup.json", {type: "application/json"});
+            
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file], title: 'Backup PowerLog', text: 'Ecco il backup dei miei allenamenti.'
+                    });
+                } catch (e) {
+                    console.log("Condivisione annullata o fallita.", e);
+                }
+            } else {
+                const dl = document.createElement('a'); dl.href = URL.createObjectURL(blob); dl.download = "powerlog_backup.json"; dl.click(); 
+            }
+        }
+
         function importData(e) { const r = new FileReader(); r.onload = (ev) => { const d = JSON.parse(ev.target.result); Object.entries(d).forEach(([k,v]) => localStorage.setItem(k, v)); location.reload(); }; r.readAsText(e.target.files[0]); }
         function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
 
