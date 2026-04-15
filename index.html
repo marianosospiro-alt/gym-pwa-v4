@@ -1642,19 +1642,73 @@
 
         function closeInfo() { document.getElementById('modal-info').style.display = 'none'; }
 
-        function showChart(id, name) {
+       function showChart(id, name) {
             document.getElementById('chart-modal').style.display = 'flex';
             document.getElementById('chart-title').innerText = name;
+            
             const h = JSON.parse(localStorage.getItem(`h_${id}`)) || [];
             if (myChart) myChart.destroy();
             
-            const plotData = h.map(i => i.w > 0 ? i.w : (i.r || 0));
-            
+            // Calcolo 1RM Stimato (Formula Epley) o solo Reps se a corpo libero
+            const plotData = h.map(i => {
+                if (i.w > 0) {
+                    return Math.round(i.w * (1 + (i.r || 0) / 30)); 
+                }
+                return i.r || 0; 
+            });
+
+            // Prepariamo i testi reali per i popup del grafico
+            const realData = h.map(i => i.w > 0 ? `${i.w}kg x ${i.r}` : `${i.r} reps`);
+            const isBodyweight = h.length > 0 && h.every(i => !i.w || i.w === 0);
+
             myChart = new Chart(document.getElementById('progressChart').getContext('2d'), { 
                 type: 'line', 
-                data: { labels: h.map(i => i.d), datasets: [{ data: plotData, borderColor: '#0A84FF', fill: true, backgroundColor: 'rgba(10, 132, 255, 0.1)', tension: 0.4, spanGaps: true }] }, 
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } } } 
+                data: { 
+                    labels: h.map(i => i.d), 
+                    datasets: [{ 
+                        label: isBodyweight ? 'Ripetizioni' : '1RM Stimato (Kg)',
+                        data: plotData, 
+                        borderColor: '#0A84FF', 
+                        backgroundColor: 'rgba(10, 132, 255, 0.1)', 
+                        fill: true, 
+                        tension: 0.4, 
+                        spanGaps: true,
+                        pointBackgroundColor: '#0A84FF',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: true, labels: { color: '#8E8E93', boxWidth: 12, font: {family: 'Inter', size: 10} } },
+                        tooltip: {
+                            backgroundColor: 'rgba(28, 28, 30, 0.95)',
+                            titleFont: { family: 'Inter', size: 11, weight: 'bold' },
+                            bodyFont: { family: 'Inter', size: 13, weight: 'bold' },
+                            padding: 12,
+                            cornerRadius: 16,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return isBodyweight 
+                                        ? `Completate: ${context.parsed.y} reps`
+                                        : `1RM Stimato: ${context.parsed.y} kg`;
+                                },
+                                afterLabel: function(context) {
+                                    return `Serie reale: ${realData[context.dataIndex]}`;
+                                }
+                            }
+                        }
+                    }, 
+                    scales: { 
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }, 
+                        x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } } 
+                    } 
+                } 
             });
+        }
         }
         function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
         
