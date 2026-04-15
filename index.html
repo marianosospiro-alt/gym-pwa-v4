@@ -1658,24 +1658,31 @@
             const h = JSON.parse(localStorage.getItem(`h_${id}`)) || [];
             if (myChart) myChart.destroy();
             
-            // Calcolo 1RM Stimato (Formula Epley) o solo Reps se a corpo libero
+            // Calcolo 1RM Stimato (Formula Epley) e sicurezza sui tipi di dato (parseFloat/parseInt)
             const plotData = h.map(i => {
-                if (i.w > 0) {
-                    return Math.round(i.w * (1 + (i.r || 0) / 30)); 
+                const w = parseFloat(i.w) || 0;
+                const r = parseInt(i.r) || 0;
+                if (w > 0) {
+                    return Math.round(w * (1 + (r / 30))); 
                 }
-                return i.r || 0; 
+                return r; 
             });
 
-            // Prepariamo i testi reali per i popup del grafico
-            const realData = h.map(i => i.w > 0 ? `${i.w}kg x ${i.r}` : `${i.r} reps`);
-            const isBodyweight = h.length > 0 && h.every(i => !i.w || i.w === 0);
+            // Etichette reali per i tooltip
+            const realData = h.map(i => {
+                const w = parseFloat(i.w) || 0;
+                const r = parseInt(i.r) || 0;
+                return w > 0 ? `${w}kg x ${r}` : `${r} reps`;
+            });
+            
+            const isBodyweight = h.length > 0 && h.every(i => !parseFloat(i.w) || parseFloat(i.w) === 0);
 
             myChart = new Chart(document.getElementById('progressChart').getContext('2d'), { 
                 type: 'line', 
                 data: { 
                     labels: h.map(i => i.d), 
                     datasets: [{ 
-                        label: isBodyweight ? 'Ripetizioni' : '1RM Stimato (Kg)',
+                        label: isBodyweight ? 'Ripetizioni (Corpo Libero)' : '1RM Stimato (Kg)',
                         data: plotData, 
                         borderColor: '#0A84FF', 
                         backgroundColor: 'rgba(10, 132, 255, 0.1)', 
@@ -1683,28 +1690,19 @@
                         tension: 0.4, 
                         spanGaps: true,
                         pointBackgroundColor: '#0A84FF',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        pointRadius: 4
                     }] 
                 }, 
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
                     plugins: { 
-                        legend: { display: true, labels: { color: '#8E8E93', boxWidth: 12, font: {family: 'Inter', size: 10} } },
+                        legend: { 
+                            display: true, 
+                            labels: { color: '#8E8E93', boxWidth: 12, font: {family: 'Inter', size: 11} } 
+                        },
                         tooltip: {
-                            backgroundColor: 'rgba(28, 28, 30, 0.95)',
-                            titleFont: { family: 'Inter', size: 11, weight: 'bold' },
-                            bodyFont: { family: 'Inter', size: 13, weight: 'bold' },
-                            padding: 12,
-                            cornerRadius: 16,
-                            displayColors: false,
                             callbacks: {
-                                label: function(context) {
-                                    return isBodyweight 
-                                        ? `Completate: ${context.parsed.y} reps`
-                                        : `1RM Stimato: ${context.parsed.y} kg`;
-                                },
                                 afterLabel: function(context) {
                                     return `Serie reale: ${realData[context.dataIndex]}`;
                                 }
@@ -1712,8 +1710,8 @@
                         }
                     }, 
                     scales: { 
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }, 
-                        x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } } 
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } }, 
+                        x: { grid: { display: false }, ticks: { color: '#8E8E93' } } 
                     } 
                 } 
             });
