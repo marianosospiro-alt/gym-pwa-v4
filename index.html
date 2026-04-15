@@ -1709,7 +1709,6 @@
                 } 
             });
         }
-        }
         function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
         
         function exportData() { const dl = document.createElement('a'); dl.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage)); dl.download = "powerlog_backup.json"; dl.click(); }
