@@ -745,18 +745,21 @@
 
             let phReps = expectedReps.split('-')[0]; 
 
-            for (let i = 0; i < expectedSets; i++) {
-                let w = existingData[i] && existingData[i].w !== null ? existingData[i].w : '';
-                let r = existingData[i] && existingData[i].r !== null ? existingData[i].r : '';
-                
-                html += `
-                <div class="grid grid-cols-[30px_1fr_1fr] gap-4 items-center bg-[#2C2C2E] p-3 rounded-2xl">
-                    <div class="text-center font-bold text-gray-500">${i + 1}</div>
-                    <div><input type="number" step="0.5" id="log-w-${i}" value="${w}" placeholder="kg" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
-                    <div><input type="number" id="log-r-${i}" value="${r}" placeholder="${phReps}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
-                </div>`;
-            }
+            // Recupera i dati storici
+            const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
+            const lastSessionSet = h.length > 0 ? h[h.length-1] : null;
 
+            for (let i = 0; i < expectedSets; i++) {
+    // Se c'è un dato in buffer lo usa, altrimenti usa lo storico, altrimenti lascia vuoto
+            let w = existingData[i] && existingData[i].w !== null ? existingData[i].w : (lastSessionSet ? lastSessionSet.w : '');
+            let r = existingData[i] && existingData[i].r !== null ? existingData[i].r : (lastSessionSet ? lastSessionSet.r : '');
+    
+            html += `<div class="grid grid-cols-[30px_1fr_1fr] gap-4 items-center bg-[#2C2C2E] p-3 rounded-2xl">
+                        <div class="text-center font-bold text-gray-500">${i + 1}</div>
+                        <div><input type="number" step="0.5" id="log-w-${i}" value="${w}" placeholder="kg" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
+                        <div><input type="number" id="log-r-${i}" value="${r}" placeholder="${phReps}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
+                    </div>`;
+}    
             document.getElementById('log-rows-container').innerHTML = html;
             document.getElementById('modal-log-sets').style.display = 'flex';
             lucide.createIcons();
