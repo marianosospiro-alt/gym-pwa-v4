@@ -1374,36 +1374,41 @@
             });
         }
 
-        function toggleTimer(id, sec) {
-            const btn = document.getElementById(`timer-${id}`);
-            if (activeTimers[id]) { 
-                clearInterval(activeTimers[id].int); 
-                delete activeTimers[id]; 
+        ffunction toggleTimer(id, sec) {
+    const btn = document.getElementById(`timer-${id}`);
+    if (activeTimers[id]) { 
+        clearInterval(activeTimers[id].int); 
+        delete activeTimers[id]; 
+        btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; 
+        btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; 
+        lucide.createIcons(); return; 
+    }
+    
+    // Calcoliamo il timestamp esatto di fine
+    const endTime = Date.now() + (sec * 1000);
+    btn.className = "bg-orange-500/20 text-orange-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 border border-orange-500/20";
+    
+    activeTimers[id] = { int: setInterval(() => { 
+        // Calcoliamo i secondi rimanenti reali
+        const rem = Math.ceil((endTime - Date.now()) / 1000);
+        
+        if (rem <= 0) { 
+            clearInterval(activeTimers[id].int); 
+            delete activeTimers[id]; 
+            btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; 
+            btn.className = "bg-green-500 text-black text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(52,199,89,0.4)]"; 
+            if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); 
+            setTimeout(() => { 
                 btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; 
                 btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; 
-                lucide.createIcons(); return; 
-            }
-            let rem = sec; 
-            btn.className = "bg-orange-500/20 text-orange-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 border border-orange-500/20";
-            
-            activeTimers[id] = { int: setInterval(() => { 
-                rem--; 
-                btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; 
                 lucide.createIcons(); 
-                if (rem <= 0) { 
-                    clearInterval(activeTimers[id].int); 
-                    delete activeTimers[id]; 
-                    btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; 
-                    btn.className = "bg-green-500 text-black text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(52,199,89,0.4)]"; 
-                    if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); 
-                    setTimeout(() => { 
-                        btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; 
-                        btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; 
-                        lucide.createIcons(); 
-                    }, 5000); 
-                } 
-            }, 1000) };
+            }, 5000); 
+        } else {
+            btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; 
+            lucide.createIcons(); 
         }
+    }, 1000) };
+}
 
         function openInfo(exId) {
             const ex = exerciseData[exId];
