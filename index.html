@@ -936,17 +936,26 @@
             const lastSessionSet = h.length > 0 ? h[h.length-1] : null;
 
             for (let i = 0; i < expectedSets; i++) {
-                let w = existingData[i] && existingData[i].w !== null ? existingData[i].w : (lastSessionSet ? lastSessionSet.w : '');
-                let r = existingData[i] && existingData[i].r !== null ? existingData[i].r : (lastSessionSet ? lastSessionSet.r : '');
+                // VALUE: Popolato solo se hai GIA' inserito il dato in QUESTA sessione
+                let wVal = existingData[i] && existingData[i].w !== null ? existingData[i].w : '';
+                let rVal = existingData[i] && existingData[i].r !== null ? existingData[i].r : '';
+                
+                // PLACEHOLDER: Mostra in grigio i dati dell'ultimo allenamento come suggerimento
+                let wPh = lastSessionSet && lastSessionSet.w ? lastSessionSet.w : 'kg';
+                let rPh = lastSessionSet && lastSessionSet.r ? lastSessionSet.r : phReps;
                 
                 html += `
                 <div class="grid grid-cols-[30px_1fr_1fr] gap-4 items-center bg-[#2C2C2E] p-3 rounded-2xl mb-2">
                     <div class="text-center font-bold text-gray-500">${i + 1}</div>
-                    <div><input type="number" step="0.5" id="log-w-${i}" value="${w}" placeholder="kg" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
-                    <div><input type="number" id="log-r-${i}" value="${r}" placeholder="${phReps}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
+                    <div><input type="number" step="0.5" id="log-w-${i}" value="${wVal}" placeholder="${wPh}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
+                    <div><input type="number" id="log-r-${i}" value="${rVal}" placeholder="${rPh}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
                 </div>`;
             }
 
+            document.getElementById('log-rows-container').innerHTML = html;
+            document.getElementById('modal-log-sets').style.display = 'flex';
+            lucide.createIcons();
+        }
             document.getElementById('log-rows-container').innerHTML = html;
             document.getElementById('modal-log-sets').style.display = 'flex';
             lucide.createIcons();
