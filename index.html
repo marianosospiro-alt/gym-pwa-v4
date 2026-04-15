@@ -1665,66 +1665,143 @@
         function showChart(id, name) {
             document.getElementById('chart-modal').style.display = 'flex';
             document.getElementById('chart-title').innerText = name;
+            lucide.createIcons();
             
-            const h = JSON.parse(localStorage.getItem(`h_${id}`)) || [];
-            if (myChart) myChart.destroy();
+            if (sessionChart) sessionChart.destroy();
+            if (historyChart) historyChart.destroy();
             
-            const plotData = h.map(i => {
-                const w = parseFloat(i.w) || 0;
-                const r = parseInt(i.r) || 0;
-                if (w > 0) {
-                    return Math.round(w * (1 + (r / 30))); 
+            // 1. ESTREZIONE DATI DAL DIARIO
+            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+            const dates = Object.keys(journal).sort((a,b) => new Date(a) - new Date(b));
+            
+            let historicalData = [];
+            let lastSessionSets = [];
+
+            // Legge i dati storici salvati
+            dates.forEach(date => {
+                const entry = journal[date];
+                if (entry.exercises && entry.exercises[id]) {
+                    const sets = entry.exercises[id].filter(s => s.w !== null && s.r !== null && s.r > 0);
+                    if (sets.length > 0) {
+                        let vol = 0; let top1RM = 0;
+                        sets.forEach(s => {
+                            const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0;
+                            vol += (w * r);
+                            const est1RM = w > 0 ? w * (1 + r/30) : r;
+                            if (est1RM > top1RM) top1RM = est1RM;
+                        });
+                        historicalData.push({
+                            date: date.split('-').reverse().join('/').substring(0, 5), // formato DD/MM
+                            volume: vol, top1RM: Math.round(top1RM),
+                            isBW: sets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0)
+                        });
+                        lastSessionSets = sets;
+                    }
                 }
-                return r; 
             });
 
-            const realData = h.map(i => {
-                const w = parseFloat(i.w) || 0;
-                const r = parseInt(i.r) || 0;
-                return w > 0 ? `${w}kg x ${r}` : `${r} reps`;
-            });
-            
-            const isBodyweight = h.length > 0 && h.every(i => !parseFloat(i.w) || parseFloat(i.w) === 0);
+            // Se l'utente sta compilando ORA la scheda, include anche la sessione attiva!
+            let activeSets = (activeSession[id] || []).filter(s => s.w !== null && s.r !== null && s.r > 0);
+            if (activeSets.length > 0) {
+                lastSessionSets = activeSets;
+                let vol = 0; let top1RM = 0;
+                activeSets.forEach(s => {
+                    const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0;
+                    vol += (w * r);
+                    const est1RM = w > 0 ? w * (1 + r/30) : r;
+                    if (est1RM > top1RM) top1RM = est1RM;
+                });
+                historicalData.push({
+                    date: 'Oggi', volume: vol, top1RM: Math.round(top1RM),
+                    isBW: activeSets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0)
+                });
+            }
 
-            myChart = new Chart(document.getElementById('progressChart').getContext('2d'), { 
-                type: 'line', 
-                data: { 
-                    labels: h.map(i => i.d), 
-                    datasets: [{ 
-                        label: isBodyweight ? 'Ripetizioni (Corpo Libero)' : '1RM Stimato (Kg)',
-                        data: plotData, 
-                        borderColor: '#0A84FF', 
-                        backgroundColor: 'rgba(10, 132, 255, 0.1)', 
-                        fill: true, 
-                        tension: 0.4, 
-                        spanGaps: true,
-                        pointBackgroundColor: '#0A84FF',
-                        pointRadius: 4
-                    }] 
-                }, 
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { 
-                            display: true, 
-                            labels: { color: '#8E8E93', boxWidth: 12, font: {family: 'Inter', size: 11} } 
-                        },
-                        tooltip: {
-                            callbacks: {
-                                afterLabel: function(context) {
-                                    return `Serie reale: ${realData[context.dataIndex]}`;
+            // GESTIONE GRAFICO 1: ULTIMA SESSIONE (FATICA)
+            if (lastSessionSets.length > 0) {
+                const isBW = lastSessionSets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0);
+                const sData = lastSessionSets.map(s => isBW ? parseInt(s.r) : parseFloat(s.w));
+                const sReps = lastSessionSets.map(s => parseInt(s.r));
+                
+                sessionChart = new Chart(document.getElementById('sessionChart').getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: lastSessionSets.map((_, i) => `Set ${i+1}`),
+                        datasets: [{
+                            label: isBW ? 'Reps' : 'Carico (Kg)',
+                            data: sData,
+                            borderColor: '#FF9500', backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                            fill: true, tension: 0.3, pointBackgroundColor: '#FF9500', pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    afterLabel: (ctx) => isBW ? '' : `Ripetizioni: ${sReps[ctx.dataIndex]}`
                                 }
                             }
+                        },
+                        scales: {
+                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } },
+                            x: { grid: { display: false }, ticks: { color: '#8E8E93' } }
                         }
-                    }, 
-                    scales: { 
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } }, 
-                        x: { grid: { display: false }, ticks: { color: '#8E8E93' } } 
-                    } 
-                } 
-            });
+                    }
+                });
+            }
+
+            // GESTIONE GRAFICO 2: TREND STORICO (FORZA + VOLUME)
+            if (historicalData.length > 0) {
+                const isHistoryBW = historicalData.every(d => d.isBW);
+                historyChart = new Chart(document.getElementById('historyChart').getContext('2d'), {
+                    type: 'line', // Tipo base, poi mixato con bar
+                    data: {
+                        labels: historicalData.map(d => d.date),
+                        datasets: [
+                            {
+                                type: 'line',
+                                label: isHistoryBW ? 'Max Reps' : 'Forza Max (1RM Stimato)',
+                                data: historicalData.map(d => d.top1RM),
+                                borderColor: '#0A84FF', backgroundColor: '#0A84FF',
+                                tension: 0.3, yAxisID: 'y', pointRadius: 4, order: 1
+                            },
+                            {
+                                type: 'bar',
+                                label: isHistoryBW ? 'Totale Reps' : 'Volume Tot. (Kg)',
+                                data: historicalData.map(d => d.volume),
+                                backgroundColor: 'rgba(52, 199, 89, 0.2)', borderColor: 'rgba(52, 199, 89, 0.5)',
+                                borderWidth: 1, borderRadius: 4, yAxisID: 'y1', order: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { position: 'top', labels: { color: '#8E8E93', boxWidth: 10, font: {size: 10} } }
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear', display: true, position: 'left',
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { color: '#0A84FF' },
+                                title: { display: true, text: 'Forza', color: '#0A84FF', font: {size: 9} }
+                            },
+                            y1: {
+                                type: 'linear', display: true, position: 'right',
+                                grid: { drawOnChartArea: false }, // Evita la griglia doppia
+                                ticks: { color: '#34C759' },
+                                title: { display: true, text: 'Volume', color: '#34C759', font: {size: 9} }
+                            },
+                            x: { grid: { display: false }, ticks: { color: '#8E8E93' } }
+                        }
+                    }
+                });
+            }
         }
+
         function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
         
         function exportData() { const dl = document.createElement('a'); dl.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage)); dl.download = "powerlog_backup.json"; dl.click(); }
