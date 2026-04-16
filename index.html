@@ -19,149 +19,50 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
-        :root { 
-            --apple-blue: #0A84FF; 
-            --apple-bg: #000000; 
-            --apple-card: #1C1C1E; 
-        }
-        
-        body { 
-            font-family: 'Inter', -apple-system, sans-serif; 
-            background-color: var(--apple-bg); 
-            color: white; 
-            -webkit-font-smoothing: antialiased; 
-            overscroll-behavior: none; 
-        }
-        
-        .glass { 
-            background: rgba(28, 28, 30, 0.75); 
-            backdrop-filter: blur(25px) saturate(180%); 
-            -webkit-backdrop-filter: blur(25px) saturate(180%); 
-        }
-        
-        .apple-card { 
-            background-color: var(--apple-card); 
-            border-radius: 28px; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            border: 1px solid rgba(255,255,255,0.05); 
-        }
-        
-        .btn-primary { 
-            background-color: var(--apple-blue); 
-            border-radius: 16px; 
-            font-weight: 800; 
-            transition: transform 0.1s, opacity 0.1s;
-        }
+        :root { --apple-blue: #0A84FF; --apple-bg: #000000; --apple-card: #1C1C1E; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--apple-bg); color: white; -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
+        .glass { background: rgba(28, 28, 30, 0.75); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); }
+        .apple-card { background-color: var(--apple-card); border-radius: 28px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
+        .btn-primary { background-color: var(--apple-blue); border-radius: 16px; font-weight: 800; transition: transform 0.1s, opacity 0.1s; }
         .btn-primary:active { transform: scale(0.96); opacity: 0.9; }
-        
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
         .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
-        
         .animate-slide { animation: slide 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slide { 
-            from { opacity: 0; transform: translateY(15px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        .modal-sheet { 
-            position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.8); 
-            backdrop-filter: blur(5px);
-            z-index: 200; display: none; align-items: flex-end; 
-        }
-        .sheet-content { 
-            background: #1C1C1E; width: 100%; 
-            border-top-left-radius: 36px; border-top-right-radius: 36px; 
-            padding: 24px; max-height: 90vh; overflow: hidden; 
-            display: flex; flex-direction: column; 
-            border-top: 1px solid rgba(255,255,255,0.1); 
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        @keyframes slide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 200; display: none; align-items: flex-end; }
+        .sheet-content { background: #1C1C1E; width: 100%; border-top-left-radius: 36px; border-top-right-radius: 36px; padding: 24px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; border-top: 1px solid rgba(255,255,255,0.1); box-shadow: 0 -10px 40px rgba(0,0,0,0.5); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .sheet-pill {
-            width: 40px; height: 5px; background: #3a3a3c; 
-            border-radius: 10px; margin: -10px auto 20px auto;
-        }
-
+        .sheet-pill { width: 40px; height: 5px; background: #3a3a3c; border-radius: 10px; margin: -10px auto 20px auto; }
         .scrollable-area { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; padding-bottom: 40px; }
-        
-        input[type="number"], input[type="text"], input[type="password"], select, textarea { 
-            background: #2C2C2E; border: 2px solid transparent; 
-            border-radius: 16px; color: white; padding: 16px; 
-            text-align: center; font-size: 16px; font-weight: 700; 
-            width: 100%; appearance: none; transition: border 0.2s;
-        }
+        input[type="number"], input[type="text"], input[type="password"], select, textarea { background: #2C2C2E; border: 2px solid transparent; border-radius: 16px; color: white; padding: 16px; text-align: center; font-size: 16px; font-weight: 700; width: 100%; appearance: none; transition: border 0.2s; }
         input:focus, textarea:focus { border-color: var(--apple-blue); outline: none; }
-        
-        label { 
-            color: #8E8E93; font-size: 10px; font-weight: 800; 
-            text-transform: uppercase; letter-spacing: 0.1em; 
-            margin-bottom: 6px; display: block; 
-        }
-        
-        .img-thumb { 
-            width: 64px !important; height: 64px !important; 
-            background: #2C2C2E; border-radius: 16px; overflow: hidden; 
-            flex-shrink: 0; display: flex; align-items: center; justify-content: center; 
-            position: relative; aspect-ratio: 1 / 1 !important; 
-        }
+        label { color: #8E8E93; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; display: block; }
+        .img-thumb { width: 64px !important; height: 64px !important; background: #2C2C2E; border-radius: 16px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; aspect-ratio: 1 / 1 !important; }
         .img-thumb img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
-        
-        .superset-connector { 
-            width: 4px; height: 40px; 
-            background: linear-gradient(to bottom, #AF52DE, rgba(175, 82, 222, 0.1)); 
-            margin: -20px auto; position: relative; z-index: 1; border-radius: 4px; 
-        }
-        
+        .superset-connector { width: 4px; height: 40px; background: linear-gradient(to bottom, #AF52DE, rgba(175, 82, 222, 0.1)); margin: -20px auto; position: relative; z-index: 1; border-radius: 4px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .horizontal-scroll { display: flex; overflow-x: auto; gap: 16px; padding: 10px 0 20px 0; scroll-snap-type: x mandatory; }
         .scroll-item { flex: 0 0 140px; scroll-snap-align: start; }
-        
-        #message-box { 
-            position: fixed; top: env(safe-area-inset-top, 20px); left: 50%; transform: translateX(-50%); 
-            z-index: 1000; padding: 14px 28px; border-radius: 100px; 
-            background: var(--apple-blue); color: white; font-weight: 800; font-size: 14px; 
-            text-align: center; display: none; width: max-content; box-shadow: 0 10px 30px rgba(0, 122, 255, 0.4);
-            animation: popDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        #message-box { position: fixed; top: env(safe-area-inset-top, 20px); left: 50%; transform: translateX(-50%); z-index: 1000; padding: 14px 28px; border-radius: 100px; background: var(--apple-blue); color: white; font-weight: 800; font-size: 14px; text-align: center; display: none; width: max-content; box-shadow: 0 10px 30px rgba(0, 122, 255, 0.4); animation: popDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes popDown { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-        
-        .calendar-day { 
-            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            border-radius: 14px; font-size: 15px; font-weight: 700; position: relative; color: #8E8E93; cursor: pointer;
-            transition: all 0.2s;
-        }
+        .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 14px; font-size: 15px; font-weight: 700; position: relative; color: #8E8E93; cursor: pointer; transition: all 0.2s; }
         .calendar-day:active { transform: scale(0.9); }
         .calendar-day.today { border: 2px solid var(--apple-blue); color: var(--apple-blue); }
         .calendar-day.workout { background-color: rgba(52, 199, 89, 0.1); color: white; }
-        .calendar-day.workout::after { 
-            content: ''; width: 5px; height: 5px; background: #34C759; 
-            border-radius: 50%; position: absolute; bottom: 6px; 
-        }
-        
+        .calendar-day.workout::after { content: ''; width: 5px; height: 5px; background: #34C759; border-radius: 50%; position: absolute; bottom: 6px; }
         #chart-modal { z-index: 300; }
-        
-        .glass-nav {
-            background: rgba(28, 28, 30, 0.85);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
+        .glass-nav { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%); border: 1px solid rgba(255,255,255,0.1); }
         .vshape-gradient { background: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(10,132,255,0.1) 100%); }
-
         .drag-handle { touch-action: none; cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
         .sortable-ghost { opacity: 0.3; background: #2C2C2E; }
         .sortable-drag { cursor: grabbing !important; }
-        
         .color-dot { width: 36px; height: 36px; border-radius: 50%; border: 3px solid transparent; transition: all 0.2s; cursor: pointer; }
         .color-dot.selected { border-color: white; transform: scale(1.1); }
-        
         .ai-glow { animation: pulseGlow 2s infinite; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(175, 82, 222, 0.3); } 50% { box-shadow: 0 0 25px rgba(175, 82, 222, 0.8); } 100% { box-shadow: 0 0 10px rgba(175, 82, 222, 0.3); } }
+        .ds-btn { transition: all 0.2s; }
+        .ds-btn.active { background-color: rgba(255, 59, 48, 0.15); color: #FF3B30; border-color: rgba(255, 59, 48, 0.4); }
     </style>
 </head>
 <body class="pt-safe">
@@ -568,79 +469,79 @@
 
     <script>
         const exerciseData = {
-            'corsa': { name: 'Corsa / Tapis Roulant', sets: '1', reps: '30m', rest: 0, img: 'img/corsa.png', category: 'aerobica' },
-            'spin_bike': { name: 'Spin Bike / Cyclette', sets: '1', reps: '30m', rest: 0, img: 'img/spin_bike.png', category: 'aerobica' },
-            'ellittica': { name: 'Ellittica', sets: '1', reps: '30m', rest: 0, img: 'img/ellittica.png', category: 'aerobica' },
-            'vogatore': { name: 'Vogatore', sets: '1', reps: '20m', rest: 0, img: 'img/vogatore.png', category: 'aerobica' },
-            'step': { name: 'Stair Climber (Step)', sets: '1', reps: '20m', rest: 0, img: 'img/step.png', category: 'aerobica' },
-            'alzate_90': { name: 'Alzate a 90°', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_90.png', category: 'spalle' },
-            'alzate_cavi': { name: 'Alzate Laterali ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_cavi.png', category: 'spalle' },
-            'alzate_cavi_dietro': { name: 'Alzate Posteriori ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_cavi_dietro.png', category: 'spalle' },
-            'alzate_inclinata': { name: 'Alzate su Panca Inclinata', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_inclinata.png', category: 'spalle' },
-            'alzate_lat': { name: 'Alzate Laterali Manubri', sets: '4', reps: '12-15', rest: 60, img: 'img/alzate_lat.png', category: 'spalle' },
-            'alzate_lat1': { name: 'Alzate Laterali (Variante)', sets: '4', reps: '12-15', rest: 60, img: 'img/alzate_lat1.png', category: 'spalle' },
-            'alzate_lean_away': { name: 'Lean Away Lateral Raises', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_lean_away.png', category: 'spalle' },
-            'alzate_seduto': { name: 'Alzate Laterali Seduto', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_seduto.png', category: 'spalle' },
-            'arnold_press': { name: 'Arnold Press', sets: '3', reps: '10-12', rest: 90, img: 'img/arnold_press.png', category: 'spalle' },
-            'landmine_press': { name: 'Landmine Press', sets: '3', reps: '8-10', rest: 90, img: 'img/landmine_press.png', category: 'spalle' },
-            'lento_avanti': { name: 'Lento Avanti Bilanciere', sets: '4', reps: '6-8', rest: 120, img: 'img/lento_avanti.png', category: 'spalle' },
-            'lento_manubri': { name: 'Lento Avanti Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/lento_manubri.png', category: 'spalle' },
-            'lu_raises': { name: 'Lu Raises', sets: '3', reps: '10-12', rest: 60, img: 'img/lu_raises.png', category: 'spalle' },
-            'shrugs': { name: 'Shrugs (Scrollate)', sets: '4', reps: '12-15', rest: 60, img: 'img/shrugs.png', category: 'spalle' },
-            'tirate_mento': { name: 'Tirate al Mento', sets: '3', reps: '10-12', rest: 90, img: 'img/tirate_mento.png', category: 'spalle' },
-            'belt_squat': { name: 'Belt Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/belt_squat.png', category: 'gambe' },
-            'bulgarian_split': { name: 'Bulgarian Split Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/bulgarian_split.png', category: 'gambe' },
-            'hack_squat': { name: 'Hack Squat', sets: '4', reps: '10-12', rest: 120, img: 'img/hack_squat.png', category: 'gambe' },
-            'hip_thrust': { name: 'Hip Thrust', sets: '4', reps: '10-12', rest: 90, img: 'img/hip_thrust.png', category: 'gambe' },
-            'leg_ext': { name: 'Leg Extension', sets: '3', reps: '15-20', rest: 60, img: 'img/leg_ext.png', category: 'gambe' },
-            'leg_press': { name: 'Leg Press 45°', sets: '4', reps: '10-12', rest: 120, img: 'img/leg_press.png', category: 'gambe' },
-            'leg_curl': { name: 'Leg Curl', sets: '3', reps: '12-15', rest: 60, img: 'img/leg_curl.png', category: 'gambe' },
-            'polpacci': { name: 'Calf Seduto/In Piedi', sets: '4', reps: '15-20', rest: 45, img: 'img/polpacci.png', category: 'gambe' },
-            'squat': { name: 'Squat Bilanciere', sets: '4', reps: '6-8', rest: 150, img: 'img/squat.png', category: 'gambe' },
-            'step_up': { name: 'Step-up', sets: '3', reps: '10-12', rest: 90, img: 'img/step_up.png', category: 'gambe' },
-            'cable_crunch': { name: 'Cable Crunch', sets: '3', reps: '15-20', rest: 60, img: 'img/cable_crunch.png', category: 'core' },
-            'decline_crunch': { name: 'Crunch Panca Declinata', sets: '3', reps: '15-20', rest: 60, img: 'img/decline_crunch.png', category: 'core' },
-            'hanging_leg': { name: 'Hanging Leg Raises', sets: '3', reps: '15', rest: 60, img: 'img/hanging_leg.png', category: 'core' },
-            'plank': { name: 'Plank', sets: '3', reps: '60s', rest: 60, img: 'img/plank.png', category: 'core' },
-            'rope_crunch': { name: 'Rope Crunch', sets: '3', reps: '15-20', rest: 60, img: 'img/rope_crunch.png', category: 'core' },
-            'russian_twist': { name: 'Russian Twist', sets: '3', reps: '20', rest: 60, img: 'img/russian_twist.png', category: 'core' },
-            'situp': { name: 'Sit-up', sets: '3', reps: '15-20', rest: 60, img: 'img/situp.png', category: 'core' },
-            'chest_press': { name: 'Chest Press', sets: '3', reps: '10-12', rest: 90, img: 'img/chest_press.png', category: 'petto' },
-            'chest_press_g1': { name: 'Inclined Chest Press', sets: '3', reps: '10-12', rest: 90, img: 'img/chest_press_g1.png', category: 'petto' },
-            'croci_cavi_bassi': { name: 'Croci Cavi Bassi', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_cavi_bassi.png', category: 'petto' },
-            'croci_inc': { name: 'Croci Panca Inclinata', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_inc.png', category: 'petto' },
-            'crossover': { name: 'Crossover ai Cavi', sets: '3', reps: '15-20', rest: 60, img: 'img/crossover.png', category: 'petto' },
-            'dips_petto': { name: 'Dip Parallele (Petto)', sets: '4', reps: '8-10', rest: 90, img: 'img/dips_petto.png', category: 'petto' },
-            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5', reps: '5-8', rest: 120, img: 'img/panca_piana.png', category: 'petto' },
-            'pectoral': { name: 'Pectoral Machine', sets: '4', reps: '12-15', rest: 60, img: 'img/pectoral.png', category: 'petto' },
-            'spinte_inc': { name: 'Spinte Inclinata Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/spinte_inc.png', category: 'petto' },
-            'curl_cavi': { name: 'Curl ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/curl_cavi.png', category: 'bicipiti' },
-            'curl_concentrazione': { name: 'Curl Concentrazione', sets: '3', reps: '10-12', rest: 60, img: 'img/curl_concentrazione.png', category: 'bicipiti' },
-            'curl_ez': { name: 'Curl Bilanciere EZ', sets: '4', reps: '8-10', rest: 90, img: 'img/curl_ez.png', category: 'bicipiti' },
-            'hammer_curl': { name: 'Hammer Curl Manubri', sets: '3', reps: '10-12', rest: 60, img: 'img/hammer_curl.png', category: 'bicipiti' },
-            'hammer_curl_cavi': { name: 'Hammer Curl Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/hammer_curl_cavi.png', category: 'bicipiti' },
-            'incline_curl': { name: 'Incline Dumbbell Curl', sets: '3', reps: '10-12', rest: 60, img: 'img/incline_curl.png', category: 'bicipiti' },
-            'preacher_curl': { name: 'Preacher Curl (Panca Scott)', sets: '3', reps: '10-12', rest: 90, img: 'img/preacher_curl.png', category: 'bicipiti' },
-            'dips_tricipiti': { name: 'Dip Parallele (Tricipiti)', sets: '3', reps: '10-12', rest: 90, img: 'img/dips_tricipiti.png', category: 'tricipiti' },
-            'estensioni_testa': { name: 'Estensioni Dietro Nuca', sets: '3', reps: '12-15', rest: 60, img: 'img/estensioni_testa.png', category: 'tricipiti' },
-            'french_press': { name: 'French Press', sets: '3', reps: '8-10', rest: 90, img: 'img/french_press.png', category: 'tricipiti' },
-            'kickback': { name: 'Kickback Manubri', sets: '3', reps: '12-15', rest: 60, img: 'img/kickback.png', category: 'tricipiti' },
-            'pushdown': { name: 'Push Down Cavi', sets: '4', reps: '10-12', rest: 60, img: 'img/pushdown.png', category: 'tricipiti' },
-            'pushdown_corda': { name: 'Pushdown Corda', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_corda.png', category: 'tricipiti' },
-            'pushdown_fune': { name: 'Pushdown Fune', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_fune.png', category: 'tricipiti' },
-            'skull_crusher': { name: 'Skull Crusher', sets: '3', reps: '10-12', rest: 90, img: 'img/skull_crusher.png', category: 'tricipiti' },
-            'lat_larga': { name: 'Lat Machine Presa Larga', sets: '4', reps: '12-15', rest: 90, img: 'img/lat_larga.png', category: 'dorso' },
-            'lat_neutra': { name: 'Lat Machine Presa Neutra', sets: '4', reps: '10-12', rest: 90, img: 'img/lat_neutra.png', category: 'dorso' },
-            'meadows_row': { name: 'Meadows Row', sets: '3', reps: '10-12', rest: 90, img: 'img/meadows_row.png', category: 'dorso' },
-            'pullover_cavi': { name: 'Pullover ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/pullover_cavi.png', category: 'dorso' },
-            'pullover_manubrio': { name: 'Pullover Manubrio', sets: '3', reps: '12-15', rest: 60, img: 'img/pullover_manubrio.png', category: 'dorso' },
-            'rematore_manubrio': { name: 'Rematore Manubrio', sets: '3', reps: '10-12', rest: 90, img: 'img/rematore_manubrio.png', category: 'dorso' },
-            'rematore_pendlay': { name: 'Pendlay Row', sets: '4', reps: '6-8', rest: 120, img: 'img/rematore_pendlay.png', category: 'dorso' },
-            'tbar_row': { name: 'T-Bar Row', sets: '4', reps: '8-10', rest: 120, img: 'img/tbar_row.png', category: 'dorso' },
-            'scapular_pullups': { name: 'Scapular Pullups', sets: '3', reps: '10-12', rest: 60, img: 'img/scapular_pullups.png', category: 'dorso' },
-            'seal_row': { name: 'Seal Row', sets: '3', reps: '10-12', rest: 90, img: 'img/seal_row.png', category: 'dorso' },
-            'trazioni': { name: 'Trazioni alla Sbarra', sets: '4', reps: '6-8', rest: 120, img: 'img/trazioni.png', category: 'dorso' },
-            'trazioni_supine': { name: 'Trazioni Supine (Chin-ups)', sets: '4', reps: '8-10', rest: 90, img: 'img/trazioni_supine.png', category: 'dorso' }
+            'corsa': { name: 'Corsa / Tapis Roulant', sets: '1', reps: '30m', rest: 0, img: 'img/corsa.png', category: 'aerobica', coach: { esecuzione: "Mantieni una postura eretta, sguardo dritto. Non aggrapparti ai corrimano del tapis roulant.", target: "Sistema cardiovascolare, resistenza e consumo calorico.", tempo: "Andatura costante o interval training (HIIT)" } },
+            'spin_bike': { name: 'Spin Bike / Cyclette', sets: '1', reps: '30m', rest: 0, img: 'img/spin_bike.png', category: 'aerobica', coach: { esecuzione: "Regola il sellino ad altezza anca. Mantieni una pedalata fluida e rotonda, spingendo e 'tirando' i pedali.", target: "Flessori dell'anca, quadricipiti e sistema cardiovascolare. Ottimo a basso impatto articolare.", tempo: "RPM costante tra 70 e 90" } },
+            'ellittica': { name: 'Ellittica', sets: '1', reps: '30m', rest: 0, img: 'img/ellittica.png', category: 'aerobica', coach: { esecuzione: "Usa braccia e gambe in sincronia. Mantieni il tallone appoggiato il più a lungo possibile sul pedale.", target: "Lavoro total body a bassissimo impatto per le ginocchia.", tempo: "Movimento continuo e ritmato" } },
+            'vogatore': { name: 'Vogatore', sets: '1', reps: '20m', rest: 0, img: 'img/vogatore.png', category: 'aerobica', coach: { esecuzione: "Fase 1: Spingi forte con le gambe. Fase 2: Apri il busto leggermente indietro. Fase 3: Tira con le braccia allo sterno.", target: "Straordinario lavoro cardiovascolare che recluta attivamente dorso e core.", tempo: "Spinta esplosiva indietro, ritorno lento e controllato" } },
+            'step': { name: 'Stair Climber (Step)', sets: '1', reps: '20m', rest: 0, img: 'img/step.png', category: 'aerobica', coach: { esecuzione: "Appoggia tutto il piede sul gradino e spingi dal tallone. Mantieni il busto dritto, non afflosciarti sulle maniglie.", target: "Glutei, polpacci e quadricipiti sotto estremo sforzo metabolico.", tempo: "Passo costante e profondo" } },
+            'alzate_90': { name: 'Alzate a 90°', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_90.png', category: 'spalle', coach: { esecuzione: "Fletti il busto in avanti quasi parallelo al pavimento. Mantieni la schiena dritta e solleva i manubri lateralmente strizzando le scapole.", target: "Focus sul deltoide posteriore. Pensa ad allontanare i manubri, non solo ad alzarli.", tempo: "1s salita, 1s picco, 3s discesa" } },
+            'alzate_cavi': { name: 'Alzate Laterali ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_cavi.png', category: 'spalle', coach: { esecuzione: "Afferra il cavo basso incrociando davanti al corpo o passandolo dietro. Tieni il petto in fuori e solleva il braccio lateralmente.", target: "Tensione continua sul deltoide laterale grazie al cavo.", tempo: "1s salita, 2-3s discesa controllata" } },
+            'alzate_cavi_dietro': { name: 'Alzate Posteriori ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_cavi_dietro.png', category: 'spalle', coach: { esecuzione: "Incrocia i cavi alti davanti a te. Tira i cavi all'indietro e verso l'esterno, aprendo le braccia come per un abbraccio inverso.", target: "Deltoide posteriore e romboidi. Non incassare il collo.", tempo: "1s salita, 1s picco, 2s discesa" } },
+            'alzate_inclinata': { name: 'Alzate su Panca Inclinata', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_inclinata.png', category: 'spalle', coach: { esecuzione: "Sdraiati di lato su panca inclinata (30-45°). Solleva il manubrio mantenendo il braccio teso ma non bloccato.", target: "Isolamento estremo del deltoide laterale eliminando lo slancio delle gambe.", tempo: "1s salita, 3s discesa lentissima" } },
+            'alzate_lat': { name: 'Alzate Laterali Manubri', sets: '4', reps: '12-15', rest: 60, img: 'img/alzate_lat.png', category: 'spalle', coach: { esecuzione: "In piedi, ginocchia sbloccate. Solleva i manubri lateralmente guidando il movimento con i gomiti (come se versassi dell'acqua da una caraffa).", target: "Allargamento del V-Shape. Evita di usare il trapezio spingendo in giù le spalle.", tempo: "1s salita, 2s discesa" } },
+            'alzate_lat1': { name: 'Alzate Laterali (Variante)', sets: '4', reps: '12-15', rest: 60, img: 'img/alzate_lat1.png', category: 'spalle', coach: { esecuzione: "Movimento laterale con traiettoria leggermente spostata in avanti (piano scapolare a 30°).", target: "Maggiore sicurezza articolare per le spalle rispetto alle alzate puramente laterali.", tempo: "1s salita, 2s discesa" } },
+            'alzate_lean_away': { name: 'Lean Away Lateral Raises', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_lean_away.png', category: 'spalle', coach: { esecuzione: "Aggrappati a un supporto solido con una mano e inclinati verso l'esterno. Esegui l'alzata laterale con l'altro braccio.", target: "Modifica la curva di resistenza, sovraccaricando la fase iniziale del movimento.", tempo: "1s salita, 2s discesa" } },
+            'alzate_seduto': { name: 'Alzate Laterali Seduto', sets: '3', reps: '12-15', rest: 60, img: 'img/alzate_seduto.png', category: 'spalle', coach: { esecuzione: "Seduto su una panca per evitare cheating col corpo. Solleva i manubri ai lati del corpo.", target: "Strict isolation per i deltoidi laterali. Impossibile usare lo slancio (cheating).", tempo: "1s salita, 1s picco, 2s discesa" } },
+            'arnold_press': { name: 'Arnold Press', sets: '3', reps: '10-12', rest: 90, img: 'img/arnold_press.png', category: 'spalle', coach: { esecuzione: "Inizia con i palmi rivolti verso di te. Mentre spingi in alto, ruota i polsi finché i palmi guardano in avanti a fine corsa.", target: "Coinvolge contemporaneamente deltoide anteriore e laterale.", tempo: "1.5s salita con rotazione, 2s discesa" } },
+            'landmine_press': { name: 'Landmine Press', sets: '3', reps: '8-10', rest: 90, img: 'img/landmine_press.png', category: 'spalle', coach: { esecuzione: "In piedi o in ginocchio, spingi il bilanciere incastrato a terra (landmine) in diagonale verso l'alto e l'avanti.", target: "Ottimo per spalle e pettorale alto, stress ridotto sull'articolazione della spalla.", tempo: "1s esplosiva, 2s discesa" } },
+            'lento_avanti': { name: 'Lento Avanti Bilanciere', sets: '4', reps: '6-8', rest: 120, img: 'img/lento_avanti.png', category: 'spalle', coach: { esecuzione: "Petto in alto, core compatto. Spingi il bilanciere dal petto/clavicole fin sopra la testa, incastrando la testa sotto il bilanciere in cima.", target: "Costruttore di massa per eccellenza per le spalle (Focus anteriore).", tempo: "1s spinta, 2s discesa controllata" } },
+            'lento_manubri': { name: 'Lento Avanti Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/lento_manubri.png', category: 'spalle', coach: { esecuzione: "Seduto con schienale a 75-85°. Spingi i manubri verso l'alto convergendo leggermente al centro senza farli sbattere.", target: "Più libertà articolare e range di movimento rispetto al bilanciere.", tempo: "1s spinta, 2s discesa" } },
+            'lu_raises': { name: 'Lu Raises', sets: '3', reps: '10-12', rest: 60, img: 'img/lu_raises.png', category: 'spalle', coach: { esecuzione: "Alzate laterali complete: parti dai fianchi e porta i manubri (o dischi) fin sopra la testa, ruotando i palmi in alto.", target: "Straordinaria mobilità e coinvolgimento totale del deltoide e trapezio superiore.", tempo: "2s salita, 2s discesa" } },
+            'shrugs': { name: 'Shrugs (Scrollate)', sets: '4', reps: '12-15', rest: 60, img: 'img/shrugs.png', category: 'spalle', coach: { esecuzione: "Manubri o bilanciere pesanti. 'Scrolla' le spalle verso le orecchie in linea retta. Non ruotare le spalle avanti o indietro.", target: "Trapezio superiore. Spalla forte e collo massiccio.", tempo: "1s salita, 1-2s pausa in cima, 2s discesa" } },
+            'tirate_mento': { name: 'Tirate al Mento', sets: '3', reps: '10-12', rest: 90, img: 'img/tirate_mento.png', category: 'spalle', coach: { esecuzione: "Presa media. Tira il bilanciere o i manubri verso lo sterno/mento, tenendo i gomiti sempre più alti delle mani.", target: "Deltoide laterale e trapezio. Se senti fastidio alle spalle, allarga la presa o usa i manubri.", tempo: "1s salita, 2s discesa" } },
+            'belt_squat': { name: 'Belt Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/belt_squat.png', category: 'gambe', coach: { esecuzione: "Aggancia la cintura al sovraccarico. Accosciati spingendo le ginocchia in fuori e tenendo il petto alto.", target: "Quadricipiti e glutei con carico zero sulla colonna vertebrale (no back pain).", tempo: "1s salita, 3s discesa" } },
+            'bulgarian_split': { name: 'Bulgarian Split Squat', sets: '3', reps: '10-12', rest: 90, img: 'img/bulgarian_split.png', category: 'gambe', coach: { esecuzione: "Piede posteriore in appoggio su panca. Scendi verticalmente finché la coscia anteriore non è parallela a terra. Petto in fuori.", target: "Esercizio unilaterale brutale per quadricipiti e glutei. Ottimo per colmare asimmetrie.", tempo: "1s spinta, 3s discesa lenta" } },
+            'hack_squat': { name: 'Hack Squat', sets: '4', reps: '10-12', rest: 120, img: 'img/hack_squat.png', category: 'gambe', coach: { esecuzione: "Piedi sulla pedana, schiena incollata allo schienale. Scendi in accosciata profonda e spingi da tutto il piede (non solo dalle punte).", target: "Isolamento massiccio dei quadricipiti in totale sicurezza per la schiena.", tempo: "1s salita, 3s discesa profonda" } },
+            'hip_thrust': { name: 'Hip Thrust', sets: '4', reps: '10-12', rest: 90, img: 'img/hip_thrust.png', category: 'gambe', coach: { esecuzione: "Dorso su panca, bilanciere sull'anca. Spingi sui talloni e porta in estensione l'anca contraendo a fondo. Mento chiuso verso lo sterno.", target: "Sviluppo puro del Gluteo Massimo.", tempo: "1s spinta, 1-2s di contrazione fortissima in cima, 2s discesa" } },
+            'leg_ext': { name: 'Leg Extension', sets: '3', reps: '15-20', rest: 60, img: 'img/leg_ext.png', category: 'gambe', coach: { esecuzione: "Siediti ben saldo col sedere incollato al sedile. Estendi le tibie cercando il blocco articolare in cima.", target: "Isolamento Quadricipite (soprattutto retto femorale).", tempo: "1s estensione, 1s fermo in cima, 3s discesa" } },
+            'leg_press': { name: 'Leg Press 45°', sets: '4', reps: '10-12', rest: 120, img: 'img/leg_press.png', category: 'gambe', coach: { esecuzione: "Piedi a larghezza spalle. Scendi lentamente finché le ginocchia arrivano vicine al petto, ma senza staccare mai il sedere o la zona lombare dal pad.", target: "Massa generale per quadricipiti, femorali e glutei.", tempo: "1s spinta potente, 3s discesa frenata" } },
+            'leg_curl': { name: 'Leg Curl', sets: '3', reps: '12-15', rest: 60, img: 'img/leg_curl.png', category: 'gambe', coach: { esecuzione: "Sdraiato o seduto. Fletti le ginocchia portando il pad verso i glutei. Punta i piedi verso il corpo (dorsiflessione) per maggior focus.", target: "Isolamento Femorali (Ischiocrurali).", tempo: "1s flessione, 1s contrazione di picco, 3s discesa lenta" } },
+            'polpacci': { name: 'Calf Seduto/In Piedi', sets: '4', reps: '15-20', rest: 45, img: 'img/polpacci.png', category: 'gambe', coach: { esecuzione: "Punte sui rialzi. Scendi in massimo allungamento finché tiri tutto. Poi spingi fin sulla punta massima dell'alluce.", target: "Polpacci (Gastrocnemio in piedi, Soleo seduto). L'allungamento in basso è la fase più importante.", tempo: "1s spinta, 1s in punta, 3s discesa, 1s fermo in basso" } },
+            'squat': { name: 'Squat Bilanciere', sets: '4', reps: '6-8', rest: 150, img: 'img/squat.png', category: 'gambe', coach: { esecuzione: "Bilanciere sui trapezi. Prendi aria, contrai l'addome. Scendi spingendo le ginocchia in fuori finché il bacino rompe il parallelo. Torna su mantenendo il core di marmo.", target: "Il Re degli esercizi per la massa totale di gambe e glutei.", tempo: "1-2s spinta, 3s discesa controllata" } },
+            'step_up': { name: 'Step-up', sets: '3', reps: '10-12', rest: 90, img: 'img/step_up.png', category: 'gambe', coach: { esecuzione: "Piede saldamente appoggiato sul box. Spingi dal tallone e sali senza darti slancio con il piede a terra. Controlla la discesa come se fosse uno squat a una gamba.", target: "Gluteo e Quadricipite unilaterale. Ottimo per stabilità e bilanciamento.", tempo: "1s salita esplosiva, 3-4s discesa molto lenta" } },
+            'cable_crunch': { name: 'Cable Crunch', sets: '3', reps: '15-20', rest: 60, img: 'img/cable_crunch.png', category: 'core', coach: { esecuzione: "In ginocchio davanti alla polifunzionale. Fune dietro il collo. Non muovere i fianchi: arrotola la colonna vertebrale (il petto va verso il bacino).", target: "Retto dell'addome in sovraccarico.", tempo: "1s contrazione (arrotolamento), 2-3s rilascio" } },
+            'decline_crunch': { name: 'Crunch Panca Declinata', sets: '3', reps: '15-20', rest: 60, img: 'img/decline_crunch.png', category: 'core', coach: { esecuzione: "Piedi bloccati. Sali staccando bene le spalle e 'schiacciando' l'ombelico verso il basso. Non salire fino a sederti del tutto per mantenere la tensione.", target: "Attivazione globale del retto addominale.", tempo: "1s salita, 2s discesa frenata" } },
+            'hanging_leg': { name: 'Hanging Leg Raises', sets: '3', reps: '15', rest: 60, img: 'img/hanging_leg.png', category: 'core', coach: { esecuzione: "Appeso alla sbarra. Fletti leggermente il bacino verso l'alto mentre alzi le gambe (tese o piegate). Non usare l'oscillazione del corpo.", target: "Porzione bassa dell'addome e flessori dell'anca.", tempo: "1s salita, 2s discesa rigorosa" } },
+            'plank': { name: 'Plank', sets: '3', reps: '60s', rest: 60, img: 'img/plank.png', category: 'core', coach: { esecuzione: "Appoggio su gomiti e punte dei piedi. Ruota il bacino in dentro (retroversione), stringi i glutei e 'tira' idealmente i gomiti verso i piedi per massimizzare la tensione.", target: "Core stability, trasverso dell'addome.", tempo: "Tenuta statica massima, respira regolarmente" } },
+            'rope_crunch': { name: 'Rope Crunch', sets: '3', reps: '15-20', rest: 60, img: 'img/rope_crunch.png', category: 'core', coach: { esecuzione: "Simile al cable crunch. Concentrati sull'espirare violentemente l'aria in fase di chiusura per far contrarre di più l'addome profondo.", target: "Ipertrofia degli addominali (la 'tartaruga').", tempo: "1s contrazione, 2s ritorno al centro" } },
+            'russian_twist': { name: 'Russian Twist', sets: '3', reps: '20', rest: 60, img: 'img/russian_twist.png', category: 'core', coach: { esecuzione: "Seduto, piedi leggermente staccati o poggiati a terra, busto indietro di 45°. Ruota le spalle (non solo le braccia) a destra e sinistra.", target: "Obliqui e rotazione del core.", tempo: "Movimento controllato e ritmico" } },
+            'situp': { name: 'Sit-up', sets: '3', reps: '15-20', rest: 60, img: 'img/situp.png', category: 'core', coach: { esecuzione: "Dalla posizione supina sali fino a sederti, portando il petto verso le ginocchia. Non tirare il collo con le mani.", target: "Flessori dell'anca e intero distretto addominale.", tempo: "1s salita, 2s discesa appoggiando vertebra per vertebra" } },
+            'chest_press': { name: 'Chest Press', sets: '3', reps: '10-12', rest: 90, img: 'img/chest_press.png', category: 'petto', coach: { esecuzione: "Regola l'altezza in modo che le maniglie siano a livello del medio-basso petto. Petto in fuori, scapole depresse (giù e indietro). Spingi estendendo le braccia.", target: "Massa per i pettorali senza lo stress stabilizzatorio dei pesi liberi.", tempo: "1s spinta, 2s discesa controllata" } },
+            'chest_press_g1': { name: 'Inclined Chest Press', sets: '3', reps: '10-12', rest: 90, img: 'img/chest_press_g1.png', category: 'petto', coach: { esecuzione: "Macchinario inclinato. Spingi tenendo i gomiti a 45 gradi rispetto al busto (non completamente larghi).", target: "Focus marcato sui fasci clavicolari (pettorale alto).", tempo: "1s spinta, 2-3s eccentrica profonda" } },
+            'croci_cavi_bassi': { name: 'Croci Cavi Bassi', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_cavi_bassi.png', category: 'petto', coach: { esecuzione: "Prendi i cavi dal basso. Tira incrociando/unendo le maniglie verso l'alto a livello del naso/occhi, mantenendo il petto gonfio.", target: "Isolamento del petto alto, ottima tensione in massimo accorciamento.", tempo: "1s salita, 1s strizzata in cima, 2s discesa" } },
+            'croci_inc': { name: 'Croci Panca Inclinata', sets: '3', reps: '12-15', rest: 60, img: 'img/croci_inc.png', category: 'petto', coach: { esecuzione: "Panca a 30°. Braccia tese ma sbloccate al gomito. Apri i manubri lateralmente finché senti tirare il petto, poi richiudi abbracciando una 'botte' immaginaria.", target: "Allungamento estremo per l'ipertrofia del pettorale alto.", tempo: "1s chiusura, 3-4s di apertura lentissima" } },
+            'crossover': { name: 'Crossover ai Cavi', sets: '3', reps: '15-20', rest: 60, img: 'img/crossover.png', category: 'petto', coach: { esecuzione: "Cavi alti. Piegati in avanti. Porta le mani a toccarsi o incrociarsi davanti alla zona addominale/inguine. Tieni le spalle indietro.", target: "Scolpisce la parte bassa e centrale del pettorale.", tempo: "1s chiusura, 1s strizzata, 2s ritorno controllato" } },
+            'dips_petto': { name: 'Dip Parallele (Petto)', sets: '4', reps: '8-10', rest: 90, img: 'img/dips_petto.png', category: 'petto', coach: { esecuzione: "Scendi piegando il busto molto in avanti (circa 45°) e allargando leggermente i gomiti. Scendi finché la spalla è sotto il gomito (se la mobilità lo permette).", target: "Costruttore formidabile per il petto basso e tricipiti.", tempo: "1s spinta in su, 3s discesa lenta" } },
+            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5', reps: '5-8', rest: 120, img: 'img/panca_piana.png', category: 'petto', coach: { esecuzione: "Piedi incollati a terra. Scapole chiuse. Porta il bilanciere allo sterno (capezzoli) controllando il peso, sfiora il petto e spingi su violentemente.", target: "Esercizio fondamentale di forza e ipertrofia per il petto e tutta la catena di spinta.", tempo: "Spinta esplosiva, 2-3s eccentrica" } },
+            'pectoral': { name: 'Pectoral Machine', sets: '4', reps: '12-15', rest: 60, img: 'img/pectoral.png', category: 'petto', coach: { esecuzione: "Gomiti o mani sui pad. Chiudi le braccia cercando di unire idealmente l'interno dei gomiti. Rilascia controllando.", target: "Pompaggio e isolamento totale per la separazione sternale del petto.", tempo: "1s chiusura, 1s pausa isometrica al centro, 2s apertura" } },
+            'spinte_inc': { name: 'Spinte Inclinata Manubri', sets: '4', reps: '8-10', rest: 90, img: 'img/spinte_inc.png', category: 'petto', coach: { esecuzione: "Panca 30-45°. Scendi con i manubri fino al lato del petto, gomiti a 45° rispetto al busto (non a 'T'). Spingi verso l'alto chiudendo l'arco.", target: "Sviluppo della parte alta della gabbia toracica e del petto.", tempo: "1s spinta, 2s discesa" } },
+            'curl_cavi': { name: 'Curl ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/curl_cavi.png', category: 'bicipiti', coach: { esecuzione: "Sbarra dritta o angolata ai cavi bassi. Tieni i gomiti bloccati ai lati del corpo. Tira su contraendo il bicipite. Usa il cavo per resistere in discesa.", target: "Tensione continua in ogni punto della rep, ottimo per il pump.", tempo: "1s contrazione, 2-3s discesa" } },
+            'curl_concentrazione': { name: 'Curl Concentrazione', sets: '3', reps: '10-12', rest: 60, img: 'img/curl_concentrazione.png', category: 'bicipiti', coach: { esecuzione: "Seduto, gomito incastrato all'interno della coscia. Esegui la flessione ruotando leggermente il polso verso l'esterno alla fine (supinazione).", target: "Costruisce il 'picco' e la massima rotondità del bicipite.", tempo: "1s contrazione, 1s pausa strizzando, 2s discesa" } },
+            'curl_ez': { name: 'Curl Bilanciere EZ', sets: '4', reps: '8-10', rest: 90, img: 'img/curl_ez.png', category: 'bicipiti', coach: { esecuzione: "Presa sulla curva per salvare i polsi. Solleva pesi importanti evitando di dondolare eccessivamente col busto. Gomiti fissi.", target: "Costruttore primario di massa globale per i flessori del braccio.", tempo: "1s flessione, 2s eccentrica controllata" } },
+            'hammer_curl': { name: 'Hammer Curl Manubri', sets: '3', reps: '10-12', rest: 60, img: 'img/hammer_curl.png', category: 'bicipiti', coach: { esecuzione: "Impugnatura neutra (a martello). Solleva i manubri alternati o insieme portandoli verso la spalla. Tieni sempre il polso dritto.", target: "Focus su muscolo brachiale e brachioradiale. Fa apparire il braccio più largo frontalmente.", tempo: "1s salita, 2s discesa" } },
+            'hammer_curl_cavi': { name: 'Hammer Curl Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/hammer_curl_cavi.png', category: 'bicipiti', coach: { esecuzione: "Cavo basso con corda. Afferra la fune mantenendo le mani parallele. Separa la corda al vertice della salita per extra stimolo.", target: "Tensione brutale per avambracci e brachiale in tutto l'arco di movimento.", tempo: "1s tirata, 1s apertura in cima, 2s ritorno" } },
+            'incline_curl': { name: 'Incline Dumbbell Curl', sets: '3', reps: '10-12', rest: 60, img: 'img/incline_curl.png', category: 'bicipiti', coach: { esecuzione: "Seduto su panca inclinata a 45°. Lascia cadere le braccia perpendicolari al pavimento. Fletti i manubri supinando il polso.", target: "Lavora il bicipite in massimo allungamento, reclutando il capo lungo.", tempo: "1s flessione, 3s discesa lentissima (stretching attivo)" } },
+            'preacher_curl': { name: 'Preacher Curl (Panca Scott)', sets: '3', reps: '10-12', rest: 90, img: 'img/preacher_curl.png', category: 'bicipiti', coach: { esecuzione: "Incastra ascelle e tricipiti sulla panca. Fletti il bilanciere. Attenzione nella discesa: non estendere il braccio fino a bloccare il gomito sotto carico.", target: "Focus brutale sul capo corto. Impossibile usare slanci.", tempo: "1s salita, 2-3s discesa (non iper-estendere in basso)" } },
+            'dips_tricipiti': { name: 'Dip Parallele (Tricipiti)', sets: '3', reps: '10-12', rest: 90, img: 'img/dips_tricipiti.png', category: 'tricipiti', coach: { esecuzione: "Busto dritto e verticale (non chinato in avanti come nel petto), gomiti strettissimi rasenti i fianchi. Scendi a 90 gradi, poi spingi fino a bloccare i gomiti.", target: "Il miglior costruttore di massa 'pesante' per i tricipiti.", tempo: "1s spinta, 2s discesa frenata" } },
+            'estensioni_testa': { name: 'Estensioni Dietro Nuca', sets: '3', reps: '12-15', rest: 60, img: 'img/estensioni_testa.png', category: 'tricipiti', coach: { esecuzione: "Un manubrio pesante a due mani o singolo. Tieni le braccia vicino alla testa. Scendi col peso dietro la nuca allungando al massimo, poi estendi in alto.", target: "Colpisce intensamente il capo lungo del tricipite in massimo allungamento.", tempo: "1s estensione in alto, 2s discesa profonda" } },
+            'french_press': { name: 'French Press', sets: '3', reps: '8-10', rest: 90, img: 'img/french_press.png', category: 'tricipiti', coach: { esecuzione: "Sdraiato su panca, bilanciere EZ. Le braccia non sono perfettamente a 90° ma leggermente inclinate all'indietro. Porta il peso dietro o alla sommità della fronte.", target: "Spessore generale del tricipite. La leggera inclinazione all'indietro mantiene tensione costante.", tempo: "1s estensione, 2-3s discesa controllata" } },
+            'kickback': { name: 'Kickback Manubri', sets: '3', reps: '12-15', rest: 60, img: 'img/kickback.png', category: 'tricipiti', coach: { esecuzione: "Busto piegato a 90°. Gomiti fissi alti sui fianchi. Estendi solo l'avambraccio all'indietro finché il braccio non è parallelo a terra.", target: "Isolamento di picco. L'obiettivo è contrarre fortissimo a fine corsa, non usare pesi enormi.", tempo: "1s spinta, 1s pausa (strizzata isometrica), 2s ritorno" } },
+            'pushdown': { name: 'Push Down Cavi', sets: '4', reps: '10-12', rest: 60, img: 'img/pushdown.png', category: 'tricipiti', coach: { esecuzione: "Sbarra dritta o a V. Gomiti incollati al busto o leggermente davanti. Spingi in basso fino a bloccare l'articolazione, apri il petto.", target: "Riscaldamento eccellente e isolamento isolato per il capo laterale.", tempo: "1s spinta in basso, 2s ritorno controllando il cavo" } },
+            'pushdown_corda': { name: 'Pushdown Corda', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_corda.png', category: 'tricipiti', coach: { esecuzione: "Come il pushdown classico, ma alla fine del movimento 'strappa' e allarga la corda all'esterno, ruotando i palmi verso il basso.", target: "Extra reclutamento e 'strizzata' del capo laterale a fine arco di movimento.", tempo: "1s spinta e apertura in basso, 2s risalita" } },
+            'pushdown_fune': { name: 'Pushdown Fune', sets: '3', reps: '12-15', rest: 60, img: 'img/pushdown_fune.png', category: 'tricipiti', coach: { esecuzione: "Presa neutra con fune singola o doppia lunga. Stesso principio ma con focus su estensione pulita.", target: "Più ergonomico sui polsi, focus sul pump del tricipite.", tempo: "1s spinta in basso, 2s risalita" } },
+            'skull_crusher': { name: 'Skull Crusher', sets: '3', reps: '10-12', rest: 90, img: 'img/skull_crusher.png', category: 'tricipiti', coach: { esecuzione: "Versione cruda della French Press. Gomiti puntati dritti a soffitto. Porta il bilanciere fino alla fronte (o sfiorando il naso) ed estendi verticalmente.", target: "Esercizio fondamentale di forza e ipertrofia. Attenzione ai gomiti: usa carichi gestibili.", tempo: "1s spinta esplosiva, 3s discesa rallentata" } },
+            'lat_larga': { name: 'Lat Machine Presa Larga', sets: '4', reps: '12-15', rest: 90, img: 'img/lat_larga.png', category: 'dorso', coach: { esecuzione: "Presa prona ben oltre le spalle. Deprimi le scapole e tira la sbarra verso l'alto petto espandendo il torace. Immagina di tirare con i gomiti in basso e indietro.", target: "Sviluppa l'ampiezza dorsale, donando la classica forma a V.", tempo: "1s tirata, 1s pausa toccando il petto, 2s ritorno" } },
+            'lat_neutra': { name: 'Lat Machine Presa Neutra', sets: '4', reps: '10-12', rest: 90, img: 'img/lat_neutra.png', category: 'dorso', coach: { esecuzione: "Utilizza la maniglia a V (trazione stretta neutra). Tira verso lo sterno, i gomiti scivolano vicini al corpo.", target: "Coinvolge di più i dorsali medi/bassi e dà maggiore spessore alla schiena. Usa più carico rispetto alla presa larga.", tempo: "1s tirata esplosiva, 2s ritorno controllato" } },
+            'meadows_row': { name: 'Meadows Row', sets: '3', reps: '10-12', rest: 90, img: 'img/meadows_row.png', category: 'dorso', coach: { esecuzione: "Posizione perpendicolare a un landmine. Impugna la punta del bilanciere e tira su verso i fianchi, portando il gomito ben in alto allargandolo un po'.", target: "Spessore devastante per la parte alta del dorso e deltoidi posteriori.", tempo: "1s tirata esplosiva, 3s di discesa controllando il peso" } },
+            'pullover_cavi': { name: 'Pullover ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/pullover_cavi.png', category: 'dorso', coach: { esecuzione: "In piedi o leggermente piegato in avanti. Braccia quasi tese. Tira la sbarra o la fune dall'alto fin verso le cosce, pensando di spingere le mani in basso.", target: "Isolamento puro del gran dorsale. Ottimo per pre-affaticamento o pump finale.", tempo: "1s tirata, 1s contrazione sulle cosce, 3s allungamento in salita" } },
+            'pullover_manubrio': { name: 'Pullover Manubrio', sets: '3', reps: '12-15', rest: 60, img: 'img/pullover_manubrio.png', category: 'dorso', coach: { esecuzione: "Di traverso su panca appoggiando solo il dorso. Bacino basso. Abbassa il manubrio dietro la testa a braccia sbloccate finché senti stirare il petto e i dorsali.", target: "Allarga la cassa toracica, recluta forte dorsale basso e dentato.", tempo: "1s tirata su, 3s discesa lentissima per lo stretching" } },
+            'rematore_manubrio': { name: 'Rematore Manubrio', sets: '3', reps: '10-12', rest: 90, img: 'img/rematore_manubrio.png', category: 'dorso', coach: { esecuzione: "Ginocchio e mano in appoggio su panca. Lascia 'cadere' la spalla a terra per il massimo allungamento, poi tira il gomito verso l'anca o l'ombelico (non verso il petto).", target: "Costruttore unilaterale per massa e spessore, bilancia le asimmetrie.", tempo: "1s tirata decisa, 2-3s discesa focalizzandosi sull'allungamento in basso" } },
+            'rematore_pendlay': { name: 'Pendlay Row', sets: '4', reps: '6-8', rest: 120, img: 'img/rematore_pendlay.png', category: 'dorso', coach: { esecuzione: "Busto rigidamente parallelo al suolo (90°). Il bilanciere poggia a terra a ogni rep. Tirata esplosiva verso lo sterno.", target: "Pura forza esplosiva per lo spessore del dorso (trapezi e romboidi medi).", tempo: "Spinta brutale in su, lascia cadere controllato, pausa netta a terra" } },
+            'tbar_row': { name: 'T-Bar Row', sets: '4', reps: '8-10', rest: 120, img: 'img/tbar_row.png', category: 'dorso', coach: { esecuzione: "In piedi, bilanciere in mezzo alle gambe (landmine con maniglia a V). Piegati in avanti a 45°. Tira i dischi al petto strizzando forte le scapole.", target: "Forse il miglior esercizio per il blocco centrale e lo spessore del dorso.", tempo: "1s tirata potente, 1s pausa contratta, 2s ritorno al centro" } },
+            'scapular_pullups': { name: 'Scapular Pullups', sets: '3', reps: '10-12', rest: 60, img: 'img/scapular_pullups.png', category: 'dorso', coach: { esecuzione: "Appeso alla sbarra (hang passivo). Le braccia rimangono tese per tutto l'esercizio. Sollevati 'incassando' le scapole verso il basso e il petto in alto (hang attivo).", target: "Rinforza e sensibilizza i muscoli di controllo scapolare per prepararti alle trazioni.", tempo: "1s contrazione (su), 1s fermo, 2s ritorno" } },
+            'seal_row': { name: 'Seal Row', sets: '3', reps: '10-12', rest: 90, img: 'img/seal_row.png', category: 'dorso', coach: { esecuzione: "Sdraiato a pancia in giù su una panca alta. Tira il bilanciere o i manubri da terra fino a far toccare la panca.", target: "Lavoro durissimo sui dorsali e romboidi azzerando completamente lo stress su glutei e lombari.", tempo: "1s tirata decisa, 1s pausa isometrica sulla panca, 2s discesa" } },
+            'trazioni': { name: 'Trazioni alla Sbarra', sets: '4', reps: '6-8', rest: 120, img: 'img/trazioni.png', category: 'dorso', coach: { esecuzione: "Presa prona larga. Parti a braccia tese. Inizia incassando le scapole in giù, poi tira il mento oltre la sbarra cercando di toccare quest'ultima col petto alto.", target: "Esercizio maestro a corpo libero per l'ampiezza estrema della schiena.", tempo: "Tirata potente e fluida, 2s discesa controllata fino a blocco braccia" } },
+            'trazioni_supine': { name: 'Trazioni Supine (Chin-ups)', sets: '4', reps: '8-10', rest: 90, img: 'img/trazioni_supine.png', category: 'dorso', coach: { esecuzione: "Presa inversa (palmi verso di te) a larghezza spalle. Tira finché il mento oltrepassa la sbarra. Tieni i gomiti vicini.", target: "Doppio beneficio: spessore impressionante per i dorsali inferiori e costruzione incredibile dei bicipiti.", tempo: "1s salita completa, 2-3s discesa lenta resistendo al carico" } }
         };
 
         const defaultPlan = {
@@ -664,7 +565,16 @@
         let currentWorkoutId = null; let currentLoggingExId = null; let swappingIndex = null; let editingIdx = null; let editingProgramId = null;
         let selectedProgColor = '#0A84FF'; let tempDropSet = false; let tempSuperset = false; let calendarDate = new Date();
         let sessionChart = null; let historyChart = null;
-        let audioCtx = null; // Per il suono del timer
+        
+        let audioCtx = null;
+
+        function unlockAudio() {
+            if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            gain.gain.value = 0; osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.01);
+        }
 
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
@@ -675,7 +585,7 @@
         async function askGemini(promptText, isJson = false) {
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) throw new Error("API Key mancante");
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
             const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
             if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
@@ -761,6 +671,13 @@
             closeCardioModal(); renderWorkout(currentWorkoutId);
         }
 
+        function toggleRowDS(i) {
+            const btn = document.getElementById(`log-ds-${i}`);
+            btn.classList.toggle('active');
+            if(btn.classList.contains('active')) { btn.classList.remove('text-gray-500'); } 
+            else { btn.classList.add('text-gray-500'); }
+        }
+
         function openLogModal(exId, expectedSets, expectedReps) {
             const isCardio = exerciseData[exId].category === 'aerobica';
             if (isCardio) { openCardioModal(exId); return; }
@@ -784,21 +701,24 @@
                 }
             }
 
-            html += `<div class="grid grid-cols-[30px_1fr_1fr] gap-4 px-2 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2"><div class="text-center">Set</div><div class="text-center">Kg</div><div class="text-center">Reps</div></div>`;
+            html += `<div class="grid grid-cols-[30px_1fr_1fr_40px] gap-2 px-2 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2"><div class="text-center">Set</div><div class="text-center">Kg</div><div class="text-center">Reps</div><div class="text-center"></div></div>`;
 
             let phReps = expectedReps.split('-')[0]; 
 
             for (let i = 0; i < expectedSets; i++) {
                 let wVal = existingData[i] && existingData[i].w !== null ? existingData[i].w : '';
                 let rVal = existingData[i] && existingData[i].r !== null ? existingData[i].r : '';
+                let isDs = existingData[i] && existingData[i].isDrop ? true : false;
+
                 let wPh = lastSessionSet && lastSessionSet.w ? lastSessionSet.w : 'kg';
                 let rPh = lastSessionSet && lastSessionSet.r ? lastSessionSet.r : phReps;
                 
                 html += `
-                <div class="grid grid-cols-[30px_1fr_1fr] gap-4 items-center bg-[#2C2C2E] p-3 rounded-2xl mb-2">
+                <div class="grid grid-cols-[30px_1fr_1fr_40px] gap-3 items-center bg-[#2C2C2E] p-3 rounded-2xl mb-2">
                     <div class="text-center font-bold text-gray-500">${i + 1}</div>
                     <div><input type="number" step="0.5" id="log-w-${i}" value="${wVal}" placeholder="${wPh}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
                     <div><input type="number" id="log-r-${i}" value="${rVal}" placeholder="${rPh}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>
+                    <button id="log-ds-${i}" onclick="toggleRowDS(${i})" class="ds-btn h-full rounded-xl border border-white/10 text-[10px] font-black ${isDs ? 'active' : 'text-gray-500'}">DS</button>
                 </div>`;
             }
 
@@ -806,12 +726,36 @@
             document.getElementById('modal-log-sets').style.display = 'flex';
             lucide.createIcons();
         }
+
         function closeLogModal() { document.getElementById('modal-log-sets').style.display = 'none'; }
+        
         function confirmLogs() {
             const rowCount = document.querySelectorAll('input[id^="log-w-"]').length; let logs = []; let hasData = false;
-            for (let i = 0; i < rowCount; i++) { let wStr = document.getElementById(`log-w-${i}`).value; let rStr = document.getElementById(`log-r-${i}`).value; let w = wStr === '' ? 0 : parseFloat(wStr); let r = rStr === '' ? 0 : parseInt(rStr); if (w > 0 || r > 0) { logs.push({ w: w, r: r }); hasData = true; } else { logs.push({ w: null, r: null }); } }
-            if (hasData) { activeSession[currentLoggingExId] = logs; localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession)); const validLogs = logs.filter(l => l.r !== null && l.r > 0); if(validLogs.length > 0) { let bestSet = validLogs[0]; for (let l of validLogs) { if (l.w > bestSet.w) bestSet = l; else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l; } const h = JSON.parse(localStorage.getItem(`h_${currentLoggingExId}`)) || []; const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}); const filteredH = h.filter(entry => entry.d !== todayStr); filteredH.push({ d: todayStr, w: bestSet.w, r: bestSet.r }); localStorage.setItem(`h_${currentLoggingExId}`, JSON.stringify(filteredH.slice(-15))); } } 
-            else { delete activeSession[currentLoggingExId]; localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession)); }
+            for (let i = 0; i < rowCount; i++) { 
+                let wStr = document.getElementById(`log-w-${i}`).value; 
+                let rStr = document.getElementById(`log-r-${i}`).value; 
+                let isDs = document.getElementById(`log-ds-${i}`).classList.contains('active');
+                let w = wStr === '' ? 0 : parseFloat(wStr); let r = rStr === '' ? 0 : parseInt(rStr); 
+                if (w > 0 || r > 0) { logs.push({ w: w, r: r, isDrop: isDs }); hasData = true; } 
+                else { logs.push({ w: null, r: null, isDrop: false }); } 
+            }
+            
+            if (hasData) { 
+                activeSession[currentLoggingExId] = logs; 
+                localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession)); 
+                const validLogs = logs.filter(l => l.r !== null && l.r > 0 && !l.isDrop); 
+                if(validLogs.length > 0) { 
+                    let bestSet = validLogs[0]; 
+                    for (let l of validLogs) { if (l.w > bestSet.w) bestSet = l; else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l; } 
+                    const h = JSON.parse(localStorage.getItem(`h_${currentLoggingExId}`)) || []; 
+                    const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}); 
+                    const filteredH = h.filter(entry => entry.d !== todayStr); 
+                    filteredH.push({ d: todayStr, w: bestSet.w, r: bestSet.r }); 
+                    localStorage.setItem(`h_${currentLoggingExId}`, JSON.stringify(filteredH.slice(-15))); 
+                } 
+            } else { 
+                delete activeSession[currentLoggingExId]; localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession)); 
+            }
             closeLogModal(); renderWorkout(currentWorkoutId);
         }
 
@@ -955,7 +899,7 @@
             if (localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
-                    const prompt = `Agisci come uno strength coach severo e analitico. Il tuo cliente ha appena completato questa sessione in palestra: ${JSON.stringify(sessionDataForAI)}. Analizza questi dati. Trova un punto debole o un potenziale problema. Dammi un feedback TECNICO di 2-3 frasi dirette su cosa migliorare e come. Sii freddo, spietato, costruttivo. Nessun complimento inutile.`;
+                    const prompt = `Agisci come uno strength coach severo e analitico. Il tuo cliente ha completato questa sessione: ${JSON.stringify(sessionDataForAI)}. Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTA BENE: Se "isDrop" è true, significa che è un Drop Set (serie a scalare per cedimento), quindi un calo di peso/reps in quelle serie è CORRETTO e VOLUTO, non è un errore. Analizza i dati. Trova un punto debole o un problema (es. troppo volume, poco carico). Dammi un feedback TECNICO di 2-3 frasi dirette su cosa migliorare. Sii spietato, costruttivo.`;
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
                     document.getElementById('ai-feedback-text').innerText = feedback; document.getElementById('modal-ai-feedback').style.display = 'flex';
@@ -1068,7 +1012,6 @@
                 homeCharts[cat] = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: pts.map((_,i)=>i), datasets: [{ data: pts, borderColor: '#0A84FF', borderWidth: 2.5, pointRadius: 0, tension: 0.4, spanGaps: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } } });
             });
 
-            // NUOVO: GRAFICO RADAR SIMMETRIA
             const radarCanvas = document.getElementById('chart-radar');
             if (!radarCanvas) return;
             if (radarChart) radarChart.destroy();
@@ -1085,23 +1028,7 @@
                 }
             });
 
-            radarChart = new Chart(radarCanvas.getContext('2d'), {
-                type: 'radar',
-                data: {
-                    labels: ['Petto', 'Dorso', 'Gambe', 'Spalle', 'Bicipiti', 'Tricipiti'],
-                    datasets: [{
-                        label: 'Volume (Kg)',
-                        data: [radarData.petto, radarData.dorso, radarData.gambe, radarData.spalle, radarData.bicipiti, radarData.tricipiti],
-                        backgroundColor: 'rgba(10, 132, 255, 0.2)', borderColor: '#0A84FF',
-                        pointBackgroundColor: '#0A84FF', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#0A84FF'
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { r: { angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: '#8E8E93', font: {family: 'Inter', size: 10, weight: 'bold'} }, ticks: { display: false } } },
-                    plugins: { legend: { display: false } }
-                }
-            });
+            radarChart = new Chart(radarCanvas.getContext('2d'), { type: 'radar', data: { labels: ['Petto', 'Dorso', 'Gambe', 'Spalle', 'Bicipiti', 'Tricipiti'], datasets: [{ label: 'Volume (Kg)', data: [radarData.petto, radarData.dorso, radarData.gambe, radarData.spalle, radarData.bicipiti, radarData.tricipiti], backgroundColor: 'rgba(10, 132, 255, 0.2)', borderColor: '#0A84FF', pointBackgroundColor: '#0A84FF', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#0A84FF' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: '#8E8E93', font: {family: 'Inter', size: 10, weight: 'bold'} }, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
         }
 
         function saveBiometrics() {
@@ -1153,45 +1080,18 @@
             bodyChart = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: labels, datasets: [ { label: 'Spalle', data: dataShoulders, borderColor: '#0A84FF', backgroundColor: '#0A84FF', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Petto', data: dataChest, borderColor: '#AF52DE', backgroundColor: '#AF52DE', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Vita', data: dataWaist, borderColor: '#34C759', backgroundColor: '#34C759', tension: 0.3, spanGaps: true, borderWidth: 3 } ] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'bottom', labels: { color: '#8E8E93', boxWidth: 10, font: {family: 'Inter', weight:'bold'} } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } } } } });
         }
 
-        // --- GESTIONE TIMER E AUDIO ---
         function toggleTimer(id, sec) {
+            unlockAudio();
             const btn = document.getElementById(`timer-${id}`);
-            
-            // Inizializza l'audio al primo tocco per sbloccare le restrizioni iOS
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            if (activeTimers[id]) { 
-                clearInterval(activeTimers[id].int); delete activeTimers[id]; 
-                btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; 
-                btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; 
-                lucide.createIcons(); return; 
-            }
-            
+            if (activeTimers[id]) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); return; }
             const endTime = Date.now() + (sec * 1000);
             btn.className = "bg-orange-500/20 text-orange-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 border border-orange-500/20";
-            
             activeTimers[id] = { int: setInterval(() => { 
                 const rem = Math.ceil((endTime - Date.now()) / 1000);
                 if (rem <= 0) { 
-                    clearInterval(activeTimers[id].int); delete activeTimers[id]; 
-                    btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; 
-                    btn.className = "bg-green-500 text-black text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(52,199,89,0.4)]"; 
-                    
-                    // Vibrazione e BEEP
+                    clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; btn.className = "bg-green-500 text-black text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(52,199,89,0.4)]"; 
                     if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); 
-                    if (audioCtx) {
-                        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                        osc.connect(gain); gain.connect(audioCtx.destination);
-                        osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Nota A5
-                        gain.gain.setValueAtTime(1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-                        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-                    }
-
+                    if (audioCtx) { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.setValueAtTime(1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); osc.start(); osc.stop(audioCtx.currentTime + 0.5); }
                     setTimeout(() => { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); }, 5000); 
                 } 
                 else { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; lucide.createIcons(); }
@@ -1227,7 +1127,7 @@
                     const sets = entry.exercises[id].filter(s => s.r !== null && s.r > 0);
                     if (sets.length > 0) {
                         if (isCardio) { historicalData.push({ date: date.split('-').reverse().join('/').substring(0, 5), dist: parseFloat(sets[0].w) || 0, time: parseInt(sets[0].r) || 0 }); } 
-                        else { let vol = 0; let top1RM = 0; sets.forEach(s => { const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0; vol += (w * r); const est1RM = w > 0 ? w * (1 + r/30) : r; if (est1RM > top1RM) top1RM = est1RM; }); historicalData.push({ date: date.split('-').reverse().join('/').substring(0, 5), volume: vol, top1RM: Math.round(top1RM), isBW: sets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0) }); }
+                        else { let vol = 0; let top1RM = 0; sets.forEach(s => { if(!s.isDrop) { const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0; vol += (w * r); const est1RM = w > 0 ? w * (1 + r/30) : r; if (est1RM > top1RM) top1RM = est1RM; } }); historicalData.push({ date: date.split('-').reverse().join('/').substring(0, 5), volume: vol, top1RM: Math.round(top1RM), isBW: sets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0) }); }
                         lastSessionSets = sets;
                     }
                 }
@@ -1237,7 +1137,7 @@
             if (activeSets.length > 0) {
                 lastSessionSets = activeSets;
                 if (isCardio) { historicalData.push({ date: 'Oggi', dist: parseFloat(activeSets[0].w) || 0, time: parseInt(activeSets[0].r) || 0 }); } 
-                else { let vol = 0; let top1RM = 0; activeSets.forEach(s => { const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0; vol += (w * r); const est1RM = w > 0 ? w * (1 + r/30) : r; if (est1RM > top1RM) top1RM = est1RM; }); historicalData.push({ date: 'Oggi', volume: vol, top1RM: Math.round(top1RM), isBW: activeSets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0) }); }
+                else { let vol = 0; let top1RM = 0; activeSets.forEach(s => { if(!s.isDrop) { const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0; vol += (w * r); const est1RM = w > 0 ? w * (1 + r/30) : r; if (est1RM > top1RM) top1RM = est1RM; } }); historicalData.push({ date: 'Oggi', volume: vol, top1RM: Math.round(top1RM), isBW: activeSets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0) }); }
             }
 
             if (isCardio) { document.getElementById('chart-container-session').style.display = 'none'; } 
@@ -1259,25 +1159,11 @@
         }
         function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
         
-        // --- NUOVO: ESPORTAZIONE NATIVA iCLOUD/DRIVE VIA SHARE SHEET ---
         async function exportData() { 
-            const dataStr = JSON.stringify(localStorage);
-            const blob = new Blob([dataStr], {type: "application/json"});
-            const file = new File([blob], "powerlog_backup.json", {type: "application/json"});
-            
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file], title: 'Backup PowerLog', text: 'Ecco il backup dei miei allenamenti.'
-                    });
-                } catch (e) {
-                    console.log("Condivisione annullata o fallita.", e);
-                }
-            } else {
-                const dl = document.createElement('a'); dl.href = URL.createObjectURL(blob); dl.download = "powerlog_backup.json"; dl.click(); 
-            }
+            const dataStr = JSON.stringify(localStorage); const blob = new Blob([dataStr], {type: "application/json"}); const file = new File([blob], "powerlog_backup.json", {type: "application/json"});
+            if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Backup PowerLog', text: 'Ecco il backup dei miei allenamenti.' }); } catch (e) { console.log("Condivisione annullata o fallita.", e); } } 
+            else { const dl = document.createElement('a'); dl.href = URL.createObjectURL(blob); dl.download = "powerlog_backup.json"; dl.click(); }
         }
-
         function importData(e) { const r = new FileReader(); r.onload = (ev) => { const d = JSON.parse(ev.target.result); Object.entries(d).forEach(([k,v]) => localStorage.setItem(k, v)); location.reload(); }; r.readAsText(e.target.files[0]); }
         function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
 
