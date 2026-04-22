@@ -565,6 +565,7 @@
             'cross_curl': { name: 'Cross Body Curl Manubri', sets: '3', reps: '10-12', rest: 60, img: 'img/cross_curl.png', category: 'bicipiti', coach: { esecuzione: "In piedi, solleva il manubrio in diagonale (verso la spalla opposta) mantenendo la presa a martello.", target: "Muscolo brachiale e brachioradiale per aumentare lo spessore visivo del braccio.", tempo: "1s salita, 2s discesa" } },
             'bayesian_curl': { name: 'Bayesian Curl ai Cavi', sets: '3', reps: '12-15', rest: 60, img: 'img/bayesian_curl.png', category: 'bicipiti', coach: { esecuzione: "Dai le spalle al cavo basso. Fai un passo avanti in modo che il braccio sia teso all'indietro. Fletti in avanti senza muovere il gomito.", target: "Capo lungo del bicipite sotto sforzo massimo in fase di allungamento.", tempo: "1s flessione, 3s allungamento lentissimo" } },
             'tri_ext_single': { name: 'Estensione Tricep Singola Sopra Testa', sets: '3', reps: '12-15', rest: 60, img: 'img/tri_ext_single.png', category: 'tricipiti', coach: { esecuzione: "Cavo posizionato in basso o medio. Afferra la maniglia, portala dietro la nuca e distendi il braccio verso l'alto.", target: "Isolamento estremo del capo lungo del tricipite. Corregge asimmetrie.", tempo: "1s estensione, 2s discesa profonda" } },
+
         };
 
         const defaultPlan = {
@@ -1037,4 +1038,175 @@
                 const canvas = document.getElementById(`chart-${cat}`); if (!canvas) return;
                 if (homeCharts[cat]) homeCharts[cat].destroy();
                 let pts = entries.map(e => {
-                    if (cat === 'volume') return
+                    if (cat === 'volume') return e[1].volume || 0;
+                    let sum = 0; Object.entries(e[1].exercises || {}).forEach(([id, logs]) => { if (exerciseData[id]?.category === cat) { logs.forEach(l => sum += ((l.w||0) * l.r)); } });
+                    return sum;
+                });
+                if (pts.length < 5) while(pts.length < 5) pts.unshift(0);
+                homeCharts[cat] = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: pts.map((_,i)=>i), datasets: [{ data: pts, borderColor: '#0A84FF', borderWidth: 2.5, pointRadius: 0, tension: 0.4, spanGaps: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } } });
+            });
+
+            const radarCanvas = document.getElementById('chart-radar');
+            if (!radarCanvas) return;
+            if (radarChart) radarChart.destroy();
+            
+            const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            let radarData = { petto: 0, dorso: 0, gambe: 0, spalle: 0, bicipiti: 0, tricipiti: 0 };
+            
+            Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).forEach(([dateStr, entry]) => {
+                if (new Date(dateStr) >= thirtyDaysAgo) {
+                    Object.entries(entry.exercises || {}).forEach(([exId, logs]) => {
+                        const c = exerciseData[exId]?.category;
+                        if (radarData[c] !== undefined) { logs.forEach(l => radarData[c] += ((l.w||0) * l.r)); }
+                    });
+                }
+            });
+
+            radarChart = new Chart(radarCanvas.getContext('2d'), { type: 'radar', data: { labels: ['Petto', 'Dorso', 'Gambe', 'Spalle', 'Bicipiti', 'Tricipiti'], datasets: [{ label: 'Volume (Kg)', data: [radarData.petto, radarData.dorso, radarData.gambe, radarData.spalle, radarData.bicipiti, radarData.tricipiti], backgroundColor: 'rgba(10, 132, 255, 0.2)', borderColor: '#0A84FF', pointBackgroundColor: '#0A84FF', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#0A84FF' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: '#8E8E93', font: {family: 'Inter', size: 10, weight: 'bold'} }, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
+        }
+
+        function saveBiometrics() {
+            const data = {
+                date: new Date().toISOString().split('T')[0],
+                height: parseFloat(document.getElementById('bio-height').value) || null, weight: parseFloat(document.getElementById('bio-weight').value) || null,
+                lean: parseFloat(document.getElementById('bio-lean').value) || null, fat: parseFloat(document.getElementById('bio-fat').value) || null,
+                shoulders: parseFloat(document.getElementById('bio-shoulders').value) || null, chest: parseFloat(document.getElementById('bio-chest').value) || null,
+                waist: parseFloat(document.getElementById('bio-waist').value) || null, 
+                arm_sx: parseFloat(document.getElementById('bio-arm-sx').value) || null, arm_dx: parseFloat(document.getElementById('bio-arm-dx').value) || null,
+                leg_sx: parseFloat(document.getElementById('bio-leg-sx').value) || null, leg_dx: parseFloat(document.getElementById('bio-leg-dx').value) || null,
+                calf_sx: parseFloat(document.getElementById('bio-calf-sx').value) || null, calf_dx: parseFloat(document.getElementById('bio-calf-dx').value) || null
+            };
+            if(!data.weight && !data.waist && !data.arm_sx) { showMessage("Inserisci almeno un dato."); return; }
+            const existingIndex = biometricsHistory.findIndex(b => b.date === data.date);
+            if (existingIndex !== -1) { biometricsHistory[existingIndex] = { ...biometricsHistory[existingIndex], ...Object.fromEntries(Object.entries(data).filter(([_, v]) => v != null)) }; } 
+            else { biometricsHistory.push(data); }
+            biometricsHistory.sort((a,b) => new Date(a.date) - new Date(b.date));
+            localStorage.setItem('biometrics_history', JSON.stringify(biometricsHistory));
+            document.querySelectorAll('#view-body input').forEach(i => i.value = '');
+            showMessage("Misurazioni Salvate!"); renderBodyStats();
+        }
+
+        function renderBodyStats() {
+            if (biometricsHistory.length === 0) return;
+            const latest = biometricsHistory[biometricsHistory.length - 1]; const previous = biometricsHistory.length > 1 ? biometricsHistory[biometricsHistory.length - 2] : null;
+            const getRatio = (entry) => { if (!entry || !entry.waist) return null; const upper = entry.shoulders || entry.chest; return upper ? (upper / entry.waist) : null; };
+            let currentRatio = getRatio(latest); let previousRatio = getRatio(previous);
+
+            const statusEl = document.getElementById('vshape-status'); const subtextEl = document.getElementById('vshape-subtext');
+            const iconEl = document.getElementById('vshape-icon'); const iconContainer = document.getElementById('vshape-icon-container');
+
+            if (currentRatio) {
+                let statusText = "In Costruzione"; let iconName = "activity"; let colorClass = "text-blue-500"; let bgClass = "bg-blue-500/20 border-blue-500/30";
+                if (currentRatio >= 1.6) { statusText = "V-Shape Eccellente"; iconName = "triangle"; colorClass = "text-yellow-400"; bgClass = "bg-yellow-400/20 border-yellow-400/30"; iconEl.classList.add("rotate-180"); } 
+                else if (currentRatio >= 1.4) { statusText = "Ottimo V-Shape"; iconName = "trending-up"; colorClass = "text-emerald-400"; bgClass = "bg-emerald-400/20 border-emerald-400/30"; iconEl.classList.remove("rotate-180"); }
+                let subText = `Rapporto Upper/Vita: ${currentRatio.toFixed(2)}`;
+                if (previousRatio) { if (currentRatio > previousRatio) subText += " (In Crescita )"; else if (currentRatio < previousRatio) subText += " (In Calo )"; }
+                statusEl.innerText = statusText; subtextEl.innerText = subText;
+                iconEl.setAttribute('data-lucide', iconName); iconEl.className = `w-7 h-7 ${colorClass}`; iconContainer.className = `w-14 h-14 rounded-full flex items-center justify-center border ${bgClass}`;
+            } else { statusEl.innerText = "Dati Insufficienti"; subtextEl.innerText = "Inserisci spalle/petto e vita per l'analisi"; }
+            lucide.createIcons();
+
+            const canvas = document.getElementById('chart-body-measurements');
+            if(bodyChart) bodyChart.destroy();
+            const labels = biometricsHistory.map(b => b.date.substring(5)); 
+            const dataShoulders = biometricsHistory.map(b => b.shoulders || null); const dataChest = biometricsHistory.map(b => b.chest || null); const dataWaist = biometricsHistory.map(b => b.waist || null);
+
+            bodyChart = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: labels, datasets: [ { label: 'Spalle', data: dataShoulders, borderColor: '#0A84FF', backgroundColor: '#0A84FF', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Petto', data: dataChest, borderColor: '#AF52DE', backgroundColor: '#AF52DE', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Vita', data: dataWaist, borderColor: '#34C759', backgroundColor: '#34C759', tension: 0.3, spanGaps: true, borderWidth: 3 } ] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'bottom', labels: { color: '#8E8E93', boxWidth: 10, font: {family: 'Inter', weight:'bold'} } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } } } } });
+        }
+
+        function toggleTimer(id, sec) {
+            unlockAudio();
+            const btn = document.getElementById(`timer-${id}`);
+            if (activeTimers[id]) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); return; }
+            const endTime = Date.now() + (sec * 1000);
+            btn.className = "bg-orange-500/20 text-orange-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 border border-orange-500/20";
+            activeTimers[id] = { int: setInterval(() => { 
+                const rem = Math.ceil((endTime - Date.now()) / 1000);
+                if (rem <= 0) { 
+                    clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; btn.className = "bg-green-500 text-black text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(52,199,89,0.4)]"; 
+                    if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); 
+                    if (audioCtx) { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.setValueAtTime(1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); osc.start(); osc.stop(audioCtx.currentTime + 0.5); }
+                    setTimeout(() => { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); }, 5000); 
+                } 
+                else { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; lucide.createIcons(); }
+            }, 1000) };
+        }
+
+        function openInfo(exId) {
+            const ex = exerciseData[exId]; if (!ex) return;
+            const modal = document.getElementById('modal-info'); const content = document.getElementById('info-content'); document.getElementById('info-title').innerText = ex.name;
+            const esecuzione = ex.coach?.esecuzione || "Mantieni la schiena dritta, il core contratto e controlla il peso in entrambe le fasi.";
+            const suggerimenti = ex.coach?.target || `Sviluppo del distretto: ${ex.category}.`;
+            const tempo = ex.coach?.tempo || "Costante o controllato.";
+            content.innerHTML = `<div class="space-y-4"><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> Distretto Muscolare</h4><p class="text-sm font-bold text-white uppercase">${ex.category}</p></div><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-emerald-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Esecuzione</h4><p class="text-sm leading-relaxed text-gray-300">${esecuzione}</p></div><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Suggerimenti e Tempo</h4><p class="text-sm leading-relaxed text-gray-300 mb-2">${suggerimenti}</p><p class="text-xs font-bold text-gray-400 mt-2"><i data-lucide="clock" class="w-3 h-3 inline"></i> ${tempo}</p></div></div>`;
+            modal.style.display = 'flex'; lucide.createIcons();
+        }
+
+        function closeInfo() { document.getElementById('modal-info').style.display = 'none'; }
+
+        function showChart(id, name) {
+            document.getElementById('chart-modal').style.display = 'flex'; document.getElementById('chart-title').innerText = name;
+            const isCardio = exerciseData[id].category === 'aerobica';
+            document.getElementById('chart-subtitle-session').innerHTML = `<i data-lucide="activity" class="w-3.5 h-3.5 text-orange-500"></i> ${isCardio ? 'Ultimo Allenamento' : 'Ultima Sessione (Fatica)'}`;
+            document.getElementById('chart-subtitle-history').innerHTML = `<i data-lucide="trending-up" class="w-3.5 h-3.5 text-blue-500"></i> ${isCardio ? 'Storico (Tempo e Distanza)' : 'Storico (Forza e Volume)'}`;
+            lucide.createIcons();
+            
+            if (sessionChart) sessionChart.destroy(); if (historyChart) historyChart.destroy();
+            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; const dates = Object.keys(journal).sort((a,b) => new Date(a) - new Date(b));
+            let historicalData = []; let lastSessionSets = [];
+
+            dates.forEach(date => {
+                const entry = journal[date];
+                if (entry.exercises && entry.exercises[id]) {
+                    const sets = entry.exercises[id].filter(s => s.r !== null && s.r > 0);
+                    if (sets.length > 0) {
+                        if (isCardio) { historicalData.push({ date: date.split('-').reverse().join('/').substring(0, 5), dist: parseFloat(sets[0].w) || 0, time: parseInt(sets[0].r) || 0 }); } 
+                        else { let vol = 0; let top1RM = 0; sets.forEach(s => { if(!s.isDrop) { const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0; vol += (w * r); const est1RM = w > 0 ? w * (1 + r/30) : r; if (est1RM > top1RM) top1RM = est1RM; } }); historicalData.push({ date: date.split('-').reverse().join('/').substring(0, 5), volume: vol, top1RM: Math.round(top1RM), isBW: sets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0) }); }
+                        lastSessionSets = sets;
+                    }
+                }
+            });
+
+            let activeSets = (activeSession[id] || []).filter(s => s.r !== null && s.r > 0);
+            if (activeSets.length > 0) {
+                lastSessionSets = activeSets;
+                if (isCardio) { historicalData.push({ date: 'Oggi', dist: parseFloat(activeSets[0].w) || 0, time: parseInt(activeSets[0].r) || 0 }); } 
+                else { let vol = 0; let top1RM = 0; activeSets.forEach(s => { if(!s.isDrop) { const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0; vol += (w * r); const est1RM = w > 0 ? w * (1 + r/30) : r; if (est1RM > top1RM) top1RM = est1RM; } }); historicalData.push({ date: 'Oggi', volume: vol, top1RM: Math.round(top1RM), isBW: activeSets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0) }); }
+            }
+
+            if (isCardio) { document.getElementById('chart-container-session').style.display = 'none'; } 
+            else {
+                document.getElementById('chart-container-session').style.display = 'block';
+                if (lastSessionSets.length > 0) {
+                    const isBW = lastSessionSets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0);
+                    const sData = lastSessionSets.map(s => isBW ? parseInt(s.r) : parseFloat(s.w)); const sReps = lastSessionSets.map(s => parseInt(s.r));
+                    sessionChart = new Chart(document.getElementById('sessionChart').getContext('2d'), { type: 'line', data: { labels: lastSessionSets.map((_, i) => `Set ${i+1}`), datasets: [{ label: isBW ? 'Reps' : 'Carico (Kg)', data: sData, borderColor: '#FF9500', backgroundColor: 'rgba(255, 149, 0, 0.1)', fill: true, tension: 0.3, pointBackgroundColor: '#FF9500', pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { afterLabel: (ctx) => isBW ? '' : `Ripetizioni: ${sReps[ctx.dataIndex]}` } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } } } });
+                }
+            }
+
+            if (historicalData.length > 0) {
+                let datasets = []; let y1Title = ''; let y2Title = '';
+                if (isCardio) { datasets = [ { type: 'line', label: 'Distanza / Livello', data: historicalData.map(d => d.dist), borderColor: '#0A84FF', tension: 0.3, yAxisID: 'y', pointRadius: 4 }, { type: 'bar', label: 'Tempo (Min)', data: historicalData.map(d => d.time), backgroundColor: 'rgba(255, 149, 0, 0.3)', borderRadius: 4, yAxisID: 'y1' } ]; y1Title = 'Km/Livello'; y2Title = 'Minuti'; } 
+                else { const isHistoryBW = historicalData.every(d => d.isBW); datasets = [ { type: 'line', label: isHistoryBW ? 'Max Reps' : 'Forza Max (1RM Stimato)', data: historicalData.map(d => d.top1RM), borderColor: '#0A84FF', tension: 0.3, yAxisID: 'y', pointRadius: 4 }, { type: 'bar', label: isHistoryBW ? 'Totale Reps' : 'Volume Tot. (Kg)', data: historicalData.map(d => d.volume), backgroundColor: 'rgba(52, 199, 89, 0.2)', borderRadius: 4, yAxisID: 'y1' } ]; y1Title = 'Forza'; y2Title = 'Volume'; }
+                historyChart = new Chart(document.getElementById('historyChart').getContext('2d'), { type: 'line', data: { labels: historicalData.map(d => d.date), datasets: datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', labels: { color: '#8E8E93', boxWidth: 10, font: {size: 10} } } }, scales: { y: { type: 'linear', display: true, position: 'left', grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#0A84FF' }, title: { display: true, text: y1Title, color: '#0A84FF', font: {size: 9} } }, y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: isCardio ? '#FF9500' : '#34C759' }, title: { display: true, text: y2Title, color: isCardio ? '#FF9500' : '#34C759', font: {size: 9} } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } } } });
+            }
+        }
+        function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
+        
+        async function exportData() { 
+            const dataStr = JSON.stringify(localStorage); const blob = new Blob([dataStr], {type: "application/json"}); const file = new File([blob], "powerlog_backup.json", {type: "application/json"});
+            if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Backup PowerLog', text: 'Ecco il backup dei miei allenamenti.' }); } catch (e) { console.log("Condivisione annullata o fallita.", e); } } 
+            else { const dl = document.createElement('a'); dl.href = URL.createObjectURL(blob); dl.download = "powerlog_backup.json"; dl.click(); }
+        }
+        function importData(e) { const r = new FileReader(); r.onload = (ev) => { const d = JSON.parse(ev.target.result); Object.entries(d).forEach(([k,v]) => localStorage.setItem(k, v)); location.reload(); }; r.readAsText(e.target.files[0]); }
+        function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
+
+        window.onload = () => {
+            const options = { weekday: 'long', day: 'numeric', month: 'long' }; const today = new Date(); const dateStr = today.toLocaleDateString('it-IT', options);
+            document.getElementById('date-label').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+            goHome(); lucide.createIcons();
+            if(localStorage.getItem('gemini_api_key')) document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key');
+        };
+    </script>
+</body>
+</html>
