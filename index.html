@@ -885,6 +885,39 @@
             lucide.createIcons();
         }
 
+		async function analyzePastWorkout(key) {
+            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+            const entry = journal[key];
+            if (!entry || !entry.exercises) return;
+
+            if (!localStorage.getItem('gemini_api_key')) {
+                showMessage("Inserisci l'API Key nelle Opzioni!");
+                return;
+            }
+
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
+            try {
+                let sessionDataForAI = {};
+                Object.keys(entry.exercises).forEach(exId => {
+                    const ex = exerciseData[exId];
+                    if(ex) sessionDataForAI[ex.name] = entry.exercises[exId];
+                });
+
+                let notesContext = entry.notes ? ` Il cliente ha anche lasciato questa nota sulla sessione: "${entry.notes}". Tienine conto nella tua analisi in modo empatico.` : '';
+
+                const prompt = `Agisci come uno strength coach severo e analitico. Rivedi questa sessione passata del tuo cliente: ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Se "isDrop" è true, è un Drop Set (calo peso/reps corretto). 2. I carichi (w) sono SEMPRE IL PESO TOTALE sollevato. Dammi un feedback TECNICO di 2-3 frasi dirette sulla performance. Sii spietato e costruttivo. Modello: gemini-3-flash-preview.`;
+
+                const feedback = await askGemini(prompt, false);
+                document.getElementById('ai-loading-overlay').style.display = 'none';
+                document.getElementById('ai-feedback-text').innerText = feedback;
+                document.getElementById('modal-ai-feedback').style.display = 'flex';
+            } catch (e) {
+                console.error(e);
+                document.getElementById('ai-loading-overlay').style.display = 'none';
+                showMessage("Errore di connessione con l'AI.");
+            }
+        }
+
         function finishWorkout() { document.getElementById('session-kcal').value = ''; document.getElementById('modal-finish').style.display = 'flex'; lucide.createIcons(); }
 
         function closeFinishModal() { document.getElementById('modal-finish').style.display = 'none'; }
