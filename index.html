@@ -1273,11 +1273,12 @@
             const feedback = document.getElementById('ai-feedback-text').innerText;
             const validIds = Object.keys(exerciseData).join(', ');
             
-            // Istruzioni per Gemini-3-flash-preview per creare una scheda correttiva
+            // Istruzioni per Gemini-3-flash-preview per creare una scheda correttiva con pesi
             const prompt = `Sei uno strength coach elitario. Hai appena analizzato l'allenamento del tuo cliente e gli hai dato questo feedback: "${feedback}". 
-            Crea la sua PROSSIMA scheda di allenamento "Correttiva" (circa 45-60 minuti) strutturata appositamente per correggere questi punti deboli, riequilibrare il volume o aggiustare la selezione degli esercizi in base al tuo feedback. Sii specifico e logico, indicando sempre per tutti gli esercizi suggeriti: numero di serie, ripetizioni e carico. E' fondamentale che tu specifichi questi tre parametri, solo così può miglorare. Aiutalo.
+            Crea la sua PROSSIMA scheda di allenamento "Correttiva" (circa 45-60 minuti) strutturata appositamente per correggere questi punti deboli. Sii specifico e logico.
             Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID validi: [${validIds}]. 
-            Restituisci SOLO un oggetto JSON valido con questa esatta struttura: {"title": "Scheda Correttiva AI", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10", "rest": 90, "isDropSet": false}}}.`;
+            ATTENZIONE: Devi obbligatoriamente indicare i carichi (pesi) suggeriti per ogni esercizio. Poiché il sistema accetta solo determinati campi, inserisci il carico (in kg) o il livello di difficoltà direttamente dentro la stringa "reps" (es. "8-10 @ 50kg" oppure "15 @ Corpo Libero").
+            Restituisci SOLO un oggetto JSON valido con questa esatta struttura di esempio: {"title": "Scheda Correttiva AI", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "rest": 90, "isDropSet": false}}}.`;
             
             try {
                 const responseText = await askGemini(prompt, true); 
