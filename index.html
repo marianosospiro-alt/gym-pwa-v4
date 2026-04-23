@@ -1267,7 +1267,39 @@
         }
         function importData(e) { const r = new FileReader(); r.onload = (ev) => { const d = JSON.parse(ev.target.result); Object.entries(d).forEach(([k,v]) => localStorage.setItem(k, v)); location.reload(); }; r.readAsText(e.target.files[0]); }
         function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
-
+		async function generateCorrectiveWorkout() {
+            closeAIFeedback();
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
+            
+            // Recupera il "cazziatone" appena ricevuto
+            const feedback = document.getElementById('ai-feedback-text').innerText;
+            const validIds = Object.keys(exerciseData).join(', ');
+            
+            // Istruzioni per Gemini-3-flash-preview per creare una scheda correttiva
+            const prompt = `Sei uno strength coach elitario. Hai appena analizzato l'allenamento del tuo cliente e gli hai dato questo feedback: "${feedback}". 
+            Crea la sua PROSSIMA scheda di allenamento "Correttiva" (circa 45-60 minuti) strutturata appositamente per correggere questi punti deboli, riequilibrare il volume o aggiustare la selezione degli esercizi in base al tuo feedback. Sii specifico (indica numero di serie ripetizioni e peso) e logico.
+            Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID validi: [${validIds}]. 
+            Restituisci SOLO un oggetto JSON valido con questa esatta struttura: {"title": "Scheda Correttiva AI", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10", "rest": 90, "isDropSet": false}}}.`;
+            
+            try {
+                const responseText = await askGemini(prompt, true); 
+                const generatedPlan = JSON.parse(responseText);
+                // Crea un ID univoco per la scheda correttiva
+                const newId = 'AI_CORR_' + Date.now().toString(); 
+                userPlan[newId] = generatedPlan; 
+                localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
+                
+                document.getElementById('ai-loading-overlay').style.display = 'none'; 
+                showMessage("Scheda Correttiva Pronta!"); 
+                goHome(); 
+                // Apre automaticamente la nuova scheda appena creata
+                setTimeout(() => openWorkout(newId), 500);
+            } catch (err) { 
+                console.error(err); 
+                document.getElementById('ai-loading-overlay').style.display = 'none'; 
+                showMessage("Errore AI. Riprova."); 
+            }
+        }
         window.onload = () => {
             const options = { weekday: 'long', day: 'numeric', month: 'long' }; const today = new Date(); const dateStr = today.toLocaleDateString('it-IT', options);
             document.getElementById('date-label').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
