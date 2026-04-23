@@ -911,7 +911,13 @@
             if (localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
-                    const prompt = `Agisci come uno strength coach severo e analitico. Il tuo cliente ha completato questa sessione: ${JSON.stringify(sessionDataForAI)}. Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Se "isDrop" è true, è un Drop Set (calo peso/reps corretto e voluto). 2. Negli esercizi con bilanciere l'utente inserisce il peso PER LATO, valuta il progresso e non il valore assoluto. Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato e costruttivo.`;
+                    // PROMPT CORRETTO CON LA REGOLA DEL PESO TOTALE
+                    const prompt = `Agisci come uno strength coach severo e analitico. Il tuo cliente ha completato questa sessione: ${JSON.stringify(sessionDataForAI)}. Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. 
+                    NOTE IMPORTANTI: 
+                    1. Se "isDrop" è true, è un Drop Set (quindi un calo di peso/reps è corretto e voluto per sfinimento muscolare). 
+                    2. I carichi indicati (w) sono SEMPRE IL PESO TOTALE sollevato (incluso il peso dell'eventuale bilanciere o del macchinario). Valuta i volumi in modo realistico.
+                    Trova un punto debole o un problema nella progressione. Dammi un feedback TECNICO di 2-3 frasi dirette su cosa migliorare. Sii spietato e costruttivo.`;
+                    
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
                     document.getElementById('ai-feedback-text').innerText = feedback; document.getElementById('modal-ai-feedback').style.display = 'flex';
