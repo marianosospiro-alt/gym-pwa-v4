@@ -585,7 +585,7 @@
         let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || [];
         let selectedDateStr = new Date().toISOString().split('T')[0];
         
-        let activeTimers = {}; let homeCharts = {}; let bodyChart = null; let chartKcalTrend = null; let workoutSortable = null; let radarChart = null;
+        let homeCharts = {}; let bodyChart = null; let chartKcalTrend = null; let workoutSortable = null; let radarChart = null;
         let currentWorkoutId = null; let currentLoggingExId = null; let swappingIndex = null; let editingIdx = null; let editingProgramId = null;
         let selectedProgColor = '#0A84FF'; let tempDropSet = false; let tempSuperset = false; let calendarDate = new Date();
         let sessionChart = null; let historyChart = null;
@@ -616,11 +616,37 @@
             if(!time || !focus) { showMessage("Compila tutti i campi!"); return; }
             closeAIGenerator(); document.getElementById('ai-loading-overlay').style.display = 'flex';
             const validIds = Object.keys(exerciseData).join(', ');
-            const prompt = `Sei un personal trainer elitario. Crea un allenamento intenso e scientifico di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID validi: [${validIds}]. Restituisci SOLO un oggetto JSON valido con questa esatta struttura: {"title": "Nome creativo", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10", "rest": 90, "isDropSet": false}}}`;
+            
+            const prompt = `Sei un personal trainer elitario. Crea un allenamento intenso e scientifico di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID validi: [${validIds}]. Restituisci SOLO un oggetto JSON valido. NESSUN MARKDOWN. Struttura: {"title": "Nome creativo", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "rest": 90, "isDropSet": false}}}`;
+            
             try {
-                const responseText = await askGemini(prompt, true); const generatedPlan = JSON.parse(responseText);
+                const responseText = await askGemini(prompt, true); 
+                // FIX: Rimuove i blocchi markdown che mandavano in tilt il JSON parser
+                const cleanText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const generatedPlan = JSON.parse(cleanText);
+                
                 const newId = 'AI_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
                 document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Scheda Magica Creata!"); goHome(); setTimeout(() => openWorkout(newId), 500);
+            } catch (err) { console.error(err); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore AI. Riprova."); }
+        }
+
+        async function generateCorrectiveWorkout() {
+            closeAIFeedback();
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
+            const feedback = document.getElementById('ai-feedback-text').innerText;
+            const validIds = Object.keys(exerciseData).join(', ');
+            
+            const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" (45-60 min) per correggere i punti deboli. Scegli GLI ESERCIZI SOLO da: [${validIds}]. Indica i carichi dentro la stringa "reps" (es. "8-10 @ 50kg"). Restituisci SOLO un oggetto JSON valido, NESSUN MARKDOWN. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "rest": 90, "isDropSet": false}}}`;
+            
+            try {
+                const responseText = await askGemini(prompt, true); 
+                // FIX: Pulizia markdown anche qui
+                const cleanText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const generatedPlan = JSON.parse(cleanText);
+                
+                const newId = 'AI_CORR_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
+                
+                document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Scheda Correttiva Pronta!"); goHome(); setTimeout(() => openWorkout(newId), 500);
             } catch (err) { console.error(err); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore AI. Riprova."); }
         }
 
@@ -773,7 +799,7 @@
             closeLogModal(); renderWorkout(currentWorkoutId);
         }
 
-        function renderWorkout(id, isHistory = false, hist = null) {
+       function renderWorkout(id, isHistory = false, hist = null) {
             const container = document.getElementById('exercise-list'); const items = userPlan[id].items || []; const overrides = userPlan[id].overrides || {};
             const finishBtn = document.getElementById('finish-btn'); if (finishBtn) finishBtn.style.display = isHistory ? 'none' : 'block';
             if (document.getElementById('notes-area')) document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
@@ -822,7 +848,7 @@
                                     <span class="text-[11px] font-black ${isCardio ? 'text-orange-400' : 'text-blue-400'} uppercase tracking-widest">${isCardio ? 'CARDIO' : `${sets} <span class="text-white/40">x</span> ${reps}`}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    ${(!isHistory && !isSuper && !isCardio) ? `<button id="timer-${exId}" onclick="toggleTimer('${exId}', ${rest})" class="bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"><i data-lucide="timer" class="w-4 h-4"></i> ${rest}s</button>` : ''}
+                                    ${(!isHistory && !isSuper && !isCardio) ? `<div class="bg-[#2C2C2E] text-gray-500 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i> ${rest}s</div>` : ''}
                                     ${isSuper ? `<div class="bg-purple-500/20 text-purple-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 border border-purple-500/20"><i data-lucide="link" class="w-4 h-4"></i> Superset</div>` : ''}
                                     ${(!isHistory && !isCardio) ? `<button onclick="openEditParams(${idx})" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl text-gray-400 active:text-white active:scale-90 transition-transform"><i data-lucide="settings-2" class="w-5 h-5"></i></button>` : ''}
                                 </div>
@@ -864,7 +890,6 @@
                 });
             }
         }
-
         function updateNav(active) { ['home', 'calendar', 'body', 'settings'].forEach(n => { const btn = document.getElementById(`nav-${n}`); if (btn) { btn.classList.toggle('text-blue-500', active === n); btn.classList.toggle('text-gray-500', active !== n); } }); }
         function switchView(viewId) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(`view-${viewId}`).classList.remove('hidden'); updateNav(viewId); }
         function goHome() { switchView('home'); renderHomeCards(); }
@@ -1179,23 +1204,6 @@
             bodyChart = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: labels, datasets: [ { label: 'Spalle', data: dataShoulders, borderColor: '#0A84FF', backgroundColor: '#0A84FF', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Petto', data: dataChest, borderColor: '#AF52DE', backgroundColor: '#AF52DE', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Vita', data: dataWaist, borderColor: '#34C759', backgroundColor: '#34C759', tension: 0.3, spanGaps: true, borderWidth: 3 } ] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'bottom', labels: { color: '#8E8E93', boxWidth: 10, font: {family: 'Inter', weight:'bold'} } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } } } } });
         }
 
-        function toggleTimer(id, sec) {
-            unlockAudio();
-            const btn = document.getElementById(`timer-${id}`);
-            if (activeTimers[id]) { clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); return; }
-            const endTime = Date.now() + (sec * 1000);
-            btn.className = "bg-orange-500/20 text-orange-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 border border-orange-500/20";
-            activeTimers[id] = { int: setInterval(() => { 
-                const rem = Math.ceil((endTime - Date.now()) / 1000);
-                if (rem <= 0) { 
-                    clearInterval(activeTimers[id].int); delete activeTimers[id]; btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> GO!`; btn.className = "bg-green-500 text-black text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(52,199,89,0.4)]"; 
-                    if (window.navigator.vibrate) window.navigator.vibrate([200, 100, 200]); 
-                    if (audioCtx) { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); gain.gain.setValueAtTime(1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); osc.start(); osc.stop(audioCtx.currentTime + 0.5); }
-                    setTimeout(() => { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${sec}s`; btn.className = "bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 active:scale-95 transition-all"; lucide.createIcons(); }, 5000); 
-                } 
-                else { btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; lucide.createIcons(); }
-            }, 1000) };
-        }
 
         function openInfo(exId) {
             const ex = exerciseData[exId]; if (!ex) return;
