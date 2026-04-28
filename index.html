@@ -73,7 +73,7 @@
             <i data-lucide="sparkles" class="w-10 h-10 text-purple-400 animate-pulse"></i>
         </div>
         <h2 class="text-2xl font-black text-white tracking-tight mb-2">Coach AI in elaborazione</h2>
-        <p class="text-sm text-gray-400 font-medium">Analisi dei dati in corso...</p>
+        <p class="text-sm text-gray-400 font-medium">Questa operazione richiede qualche secondo...</p>
     </div>
 
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden text-white">
@@ -307,6 +307,21 @@
             </div>
         </div>
 
+        <div id="modal-ai-gen" class="modal-sheet" onclick="closeAIGenerator()">
+            <div class="sheet-content" onclick="event.stopPropagation()">
+                <div class="sheet-pill"></div>
+                <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4">
+                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-2"><i data-lucide="sparkles" class="w-6 h-6 text-purple-500"></i> AI Generator</h3>
+                    <button onclick="closeAIGenerator()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="space-y-6 mb-8">
+                    <div><label>Minuti a disposizione</label><input type="number" id="ai-time" placeholder="es. 45" class="!text-2xl !py-4"></div>
+                    <div><label>Focus e Obiettivo</label><textarea id="ai-focus" rows="3" placeholder="es. Gambe e Glutei, focus ipertrofia." class="!text-sm"></textarea></div>
+                </div>
+                <button onclick="generateWorkoutAI()" class="w-full bg-purple-600 hover:bg-purple-500 py-4 rounded-2xl font-black text-white uppercase tracking-widest text-[12px] transition-colors shadow-[0_10px_20px_rgba(175,82,222,0.3)]">GENERA SCHEDA MAGICA</button>
+            </div>
+        </div>
+
         <div id="modal-ai-feedback" class="modal-sheet" onclick="closeAIFeedback()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="sheet-pill"></div>
@@ -327,21 +342,6 @@
                         Ricevuto. Torna alla Home
                     </button>
                 </div>
-            </div>
-        </div>
-        <div id="modal-ai-feedback" class="modal-sheet" onclick="closeAIFeedback()">
-            <div class="sheet-content" onclick="event.stopPropagation()">
-                <div class="sheet-pill"></div>
-                <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4">
-                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-2"><i data-lucide="crosshair" class="w-6 h-6 text-red-500"></i> Analisi Tecnica</h3>
-                    <button onclick="closeAIFeedback()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-                </div>
-                <div class="scrollable-area">
-                    <div class="bg-red-500/10 border border-red-500/20 p-5 rounded-2xl mb-4">
-                        <p id="ai-feedback-text" class="text-sm leading-relaxed text-gray-200 font-medium"></p>
-                    </div>
-                </div>
-                <button onclick="finishWorkoutFinal()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest mt-4">RICEVUTO. TORNA ALLA HOME</button>
             </div>
         </div>
 
@@ -384,11 +384,10 @@
                         <div><label>Serie</label><input type="number" id="edit-sets" placeholder="es. 4"></div>
                         <div><label>Reps / Sec</label><input type="text" id="edit-reps" placeholder="es. 10-12"></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-5">
-                        <div><label>Recupero (s)</label><input type="number" id="edit-rest" placeholder="90"></div>
-                        <div class="flex flex-col justify-end pb-0.5"><label>Intensità</label><button id="toggle-drop" onclick="toggleDropSetLocal()" class="w-full py-4 rounded-2xl border border-white/10 text-xs font-black tracking-widest transition-all">DROP SET: OFF</button></div>
+                    <div class="grid grid-cols-2 gap-5 mt-5">
+                        <div class="flex flex-col justify-end"><label>Intensità</label><button id="toggle-drop" onclick="toggleDropSetLocal()" class="w-full py-4 rounded-2xl border border-white/10 text-xs font-black tracking-widest transition-all">DROP SET: OFF</button></div>
+                        <div class="flex flex-col justify-end"><label>Tecnica</label><button id="toggle-superset" onclick="toggleSupersetLocal()" class="w-full py-4 rounded-2xl border border-white/10 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"><i data-lucide="link" class="w-4 h-4"></i> SUPER SET: OFF</button></div>
                     </div>
-                    <div class="pt-2"><label>Tecnica</label><button id="toggle-superset" onclick="toggleSupersetLocal()" class="w-full py-4 rounded-2xl border border-white/10 text-sm font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"><i data-lucide="link" class="w-5 h-5"></i> SUPER SET: OFF</button></div>
                     <button onclick="saveExerciseParams()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest mt-4">AGGIORNA</button>
                 </div>
             </div>
@@ -446,7 +445,7 @@
                 <div class="mb-8"><input type="number" id="session-kcal" placeholder="Kcal bruciate" class="!text-xl !py-5 bg-[#2C2C2E] border-2 focus:border-orange-500 transition-colors"></div>
                 <div class="flex flex-col gap-3">
                     <button onclick="preSaveWorkoutFinal(false)" class="w-full bg-orange-500 hover:bg-orange-400 py-4 rounded-2xl font-black text-black uppercase tracking-widest text-[11px] transition-colors shadow-lg shadow-orange-500/20">Salva Sessione</button>
-                    <button onclick="closeFinishModal()" class="w-full bg-transparent border border-white/10 hover:bg-white/5 py-4 rounded-2xl font-black text-gray-400 uppercase tracking-widest text-[11px] transition-colors">Annulla</button>
+                    <button onclick="closeFinishModal()" class="w-full bg-transparent border border-white/10 hover:bg-white/5 py-4 rounded-2xl font-black text-gray-400 uppercase tracking-widest text-[11px] transition-colors">Annulla / Modifica</button>
                 </div>
             </div>
         </div>
@@ -596,6 +595,18 @@
             else { localStorage.removeItem('gemini_api_key'); showMessage("API Key rimossa!"); }
         }
 
+        function parseAIResponse(text) {
+            try {
+                // Estrae solo il blocco JSON ignorando il markdown circostante
+                const match = text.match(/\{[\s\S]*\}/);
+                const clean = match ? match[0] : text;
+                return JSON.parse(clean);
+            } catch(e) {
+                console.error("JSON parse failed", text);
+                throw e;
+            }
+        }
+
         async function askGemini(promptText, isJson = false) {
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) throw new Error("API Key mancante");
@@ -617,13 +628,11 @@
             closeAIGenerator(); document.getElementById('ai-loading-overlay').style.display = 'flex';
             const validIds = Object.keys(exerciseData).join(', ');
             
-            const prompt = `Sei un personal trainer elitario. Crea un allenamento intenso e scientifico di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID validi: [${validIds}]. Restituisci SOLO un oggetto JSON valido. NESSUN MARKDOWN. Struttura: {"title": "Nome creativo", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "rest": 90, "isDropSet": false}}}`;
+            const prompt = `Sei un personal trainer elitario. Crea un allenamento intenso e scientifico di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID validi: [${validIds}]. Restituisci SOLO E SOLTANTO UN OGGETTO JSON VALIDO, senza altro testo. Indica i carichi dentro la stringa "reps" (es. "8-10 @ 50kg"). Struttura: {"title": "Nome creativo", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
             
             try {
                 const responseText = await askGemini(prompt, true); 
-                // FIX: Rimuove i blocchi markdown che mandavano in tilt il JSON parser
-                const cleanText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
-                const generatedPlan = JSON.parse(cleanText);
+                const generatedPlan = parseAIResponse(responseText);
                 
                 const newId = 'AI_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
                 document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Scheda Magica Creata!"); goHome(); setTimeout(() => openWorkout(newId), 500);
@@ -636,13 +645,11 @@
             const feedback = document.getElementById('ai-feedback-text').innerText;
             const validIds = Object.keys(exerciseData).join(', ');
             
-            const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" (45-60 min) per correggere i punti deboli. Scegli GLI ESERCIZI SOLO da: [${validIds}]. Indica i carichi dentro la stringa "reps" (es. "8-10 @ 50kg"). Restituisci SOLO un oggetto JSON valido, NESSUN MARKDOWN. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "rest": 90, "isDropSet": false}}}`;
+            const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" (45-60 min) per correggere i punti deboli. Scegli GLI ESERCIZI SOLO da: [${validIds}]. Indica i carichi dentro la stringa "reps" (es. "8-10 @ 50kg"). Restituisci SOLO E SOLTANTO UN OGGETTO JSON, senza testo aggiuntivo. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
             
             try {
                 const responseText = await askGemini(prompt, true); 
-                // FIX: Pulizia markdown anche qui
-                const cleanText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
-                const generatedPlan = JSON.parse(cleanText);
+                const generatedPlan = parseAIResponse(responseText);
                 
                 const newId = 'AI_CORR_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
                 
@@ -676,19 +683,19 @@
 
         function openEditParams(idx) {
             editingIdx = idx; const exId = userPlan[currentWorkoutId].items[idx]; const override = userPlan[currentWorkoutId].overrides[idx] || {};
-            document.getElementById('edit-sets').value = override.sets || exerciseData[exId].sets; document.getElementById('edit-reps').value = override.reps || exerciseData[exId].reps; document.getElementById('edit-rest').value = override.rest !== undefined ? override.rest : exerciseData[exId].rest;
+            document.getElementById('edit-sets').value = override.sets || exerciseData[exId].sets; document.getElementById('edit-reps').value = override.reps || exerciseData[exId].reps; 
             tempDropSet = override.isDropSet || false; tempSuperset = override.isSuperset || false;
             updateLocalToggleUI(); document.getElementById('modal-edit-params').style.display = 'flex';
         }
         function toggleDropSetLocal() { tempDropSet = !tempDropSet; updateLocalToggleUI(); }
-        function toggleSupersetLocal() { tempSuperset = !tempSuperset; if (tempSuperset) { document.getElementById('edit-rest').value = 0; } else { document.getElementById('edit-rest').value = exerciseData[userPlan[currentWorkoutId].items[editingIdx]].rest; } updateLocalToggleUI(); }
+        function toggleSupersetLocal() { tempSuperset = !tempSuperset; updateLocalToggleUI(); }
         function updateLocalToggleUI() {
             const btnDrop = document.getElementById('toggle-drop'); btnDrop.innerText = `DROP SET: ${tempDropSet ? 'ATTIVO' : 'OFF'}`; btnDrop.style.backgroundColor = tempDropSet ? 'rgba(255, 59, 48, 0.15)' : 'transparent'; btnDrop.style.borderColor = tempDropSet ? 'rgba(255, 59, 48, 0.3)' : 'rgba(255,255,255,0.1)'; btnDrop.style.color = tempDropSet ? '#FF3B30' : 'white';
-            const btnSuper = document.getElementById('toggle-superset'); btnSuper.innerHTML = `<i data-lucide="link" class="w-5 h-5"></i> SUPER SET: ${tempSuperset ? 'ATTIVO' : 'OFF'}`; btnSuper.style.backgroundColor = tempSuperset ? 'rgba(175, 82, 222, 0.15)' : 'transparent'; btnSuper.style.borderColor = tempSuperset ? 'rgba(175, 82, 222, 0.3)' : 'rgba(255,255,255,0.1)'; btnSuper.style.color = tempSuperset ? '#AF52DE' : 'white'; lucide.createIcons();
+            const btnSuper = document.getElementById('toggle-superset'); btnSuper.innerHTML = `<i data-lucide="link" class="w-4 h-4"></i> SUPER SET: ${tempSuperset ? 'ATTIVO' : 'OFF'}`; btnSuper.style.backgroundColor = tempSuperset ? 'rgba(175, 82, 222, 0.15)' : 'transparent'; btnSuper.style.borderColor = tempSuperset ? 'rgba(175, 82, 222, 0.3)' : 'rgba(255,255,255,0.1)'; btnSuper.style.color = tempSuperset ? '#AF52DE' : 'white'; lucide.createIcons();
         }
         function saveExerciseParams() {
             if (!userPlan[currentWorkoutId].overrides) userPlan[currentWorkoutId].overrides = {};
-            userPlan[currentWorkoutId].overrides[editingIdx] = { sets: document.getElementById('edit-sets').value, reps: document.getElementById('edit-reps').value, rest: parseInt(document.getElementById('edit-rest').value), isDropSet: tempDropSet, isSuperset: tempSuperset };
+            userPlan[currentWorkoutId].overrides[editingIdx] = { sets: document.getElementById('edit-sets').value, reps: document.getElementById('edit-reps').value, isDropSet: tempDropSet, isSuperset: tempSuperset };
             localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeEditParams(); renderWorkout(currentWorkoutId); showMessage("Parametri aggiornati.");
         }
         function closeEditParams() { document.getElementById('modal-edit-params').style.display = 'none'; }
@@ -799,18 +806,18 @@
             closeLogModal(); renderWorkout(currentWorkoutId);
         }
 
-       function renderWorkout(id, isHistory = false, hist = null) {
+        function renderWorkout(id, isHistory = false, hist = null) {
             const container = document.getElementById('exercise-list'); const items = userPlan[id].items || []; const overrides = userPlan[id].overrides || {};
             const finishBtn = document.getElementById('finish-btn'); if (finishBtn) finishBtn.style.display = isHistory ? 'none' : 'block';
             if (document.getElementById('notes-area')) document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
             if(items.length === 0) { container.innerHTML = `<div class="text-center p-10 text-gray-500 font-bold">Nessun esercizio presente. Clicca su + in basso per iniziare!</div>`; return; }
 
             container.innerHTML = items.map((exId, idx) => {
-                const ex = exerciseData[exId] || { name: exId, sets: '3', reps: '12', rest: 60, img: '', category: 'custom' }; const isCardio = ex.category === 'aerobica';
+                const ex = exerciseData[exId] || { name: exId, sets: '3', reps: '12', img: '', category: 'custom' }; const isCardio = ex.category === 'aerobica';
                 const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastEntry = h.length > 0 ? h[h.length-1] : null; let last = '--';
                 if (lastEntry) { if (isCardio) last = lastEntry.w > 0 ? `${lastEntry.w}km / ${lastEntry.r}m` : `${lastEntry.r} min`; else { if (lastEntry.w > 0) last = `${lastEntry.w}kg x${lastEntry.r}`; else if (lastEntry.r > 0) last = `${lastEntry.r} reps`; } }
                 
-                const ov = overrides[idx] || {}; const sets = ov.sets || ex.sets; const reps = ov.reps || ex.reps; const rest = ov.rest !== undefined ? ov.rest : ex.rest; const isDrop = ov.isDropSet || false; const isSuper = ov.isSuperset || false;
+                const ov = overrides[idx] || {}; const sets = ov.sets || ex.sets; const reps = ov.reps || ex.reps; const isDrop = ov.isDropSet || false; const isSuper = ov.isSuperset || false;
                 const logs = activeSession[exId] || []; const validLogs = logs.filter(l => l.r !== null && l.r > 0); const logCount = validLogs.length; let summaryHTML = '';
                 
                 if (logCount > 0 && !isHistory) {
@@ -848,7 +855,6 @@
                                     <span class="text-[11px] font-black ${isCardio ? 'text-orange-400' : 'text-blue-400'} uppercase tracking-widest">${isCardio ? 'CARDIO' : `${sets} <span class="text-white/40">x</span> ${reps}`}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    ${(!isHistory && !isSuper && !isCardio) ? `<div class="bg-[#2C2C2E] text-gray-500 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i> ${rest}s</div>` : ''}
                                     ${isSuper ? `<div class="bg-purple-500/20 text-purple-400 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 border border-purple-500/20"><i data-lucide="link" class="w-4 h-4"></i> Superset</div>` : ''}
                                     ${(!isHistory && !isCardio) ? `<button onclick="openEditParams(${idx})" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl text-gray-400 active:text-white active:scale-90 transition-transform"><i data-lucide="settings-2" class="w-5 h-5"></i></button>` : ''}
                                 </div>
@@ -890,10 +896,11 @@
                 });
             }
         }
+
         function updateNav(active) { ['home', 'calendar', 'body', 'settings'].forEach(n => { const btn = document.getElementById(`nav-${n}`); if (btn) { btn.classList.toggle('text-blue-500', active === n); btn.classList.toggle('text-gray-500', active !== n); } }); }
         function switchView(viewId) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(`view-${viewId}`).classList.remove('hidden'); updateNav(viewId); }
         function goHome() { switchView('home'); renderHomeCards(); }
-        function openCalendar() { switchView('calendar'); renderCalendar(); showDayDetails(new Date().toISOString().split('T')[0]); }
+        function openCalendar() { switchView('calendar'); renderCalendar(); showDayDetails(selectedDateStr); }
         function openSettings() { switchView('settings'); document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || ''; }
         function openWorkout(id) { currentWorkoutId = id; document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-workout').classList.remove('hidden'); document.getElementById('workout-title-text').innerText = userPlan[id].title; renderWorkout(id); }
 
@@ -915,44 +922,10 @@
             lucide.createIcons();
         }
 
-		async function analyzePastWorkout(key) {
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            const entry = journal[key];
-            if (!entry || !entry.exercises) return;
-
-            if (!localStorage.getItem('gemini_api_key')) {
-                showMessage("Inserisci l'API Key nelle Opzioni!");
-                return;
-            }
-
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-            try {
-                let sessionDataForAI = {};
-                Object.keys(entry.exercises).forEach(exId => {
-                    const ex = exerciseData[exId];
-                    if(ex) sessionDataForAI[ex.name] = entry.exercises[exId];
-                });
-
-                let notesContext = entry.notes ? ` Il cliente ha anche lasciato questa nota sulla sessione: "${entry.notes}". Tienine conto nella tua analisi in modo empatico.` : '';
-
-                const prompt = `Agisci come uno strength coach severo e analitico. Rivedi questa sessione passata del tuo cliente: ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Se "isDrop" è true, è un Drop Set (calo peso/reps corretto). 2. I carichi (w) sono SEMPRE IL PESO TOTALE sollevato. Dammi un feedback TECNICO di 2-3 frasi dirette sulla performance. Sii spietato e costruttivo. Modello: gemini-3-flash-preview.`;
-
-                const feedback = await askGemini(prompt, false);
-                document.getElementById('ai-loading-overlay').style.display = 'none';
-                document.getElementById('ai-feedback-text').innerText = feedback;
-                document.getElementById('modal-ai-feedback').style.display = 'flex';
-            } catch (e) {
-                console.error(e);
-                document.getElementById('ai-loading-overlay').style.display = 'none';
-                showMessage("Errore di connessione con l'AI.");
-            }
-        }
-
         function finishWorkout() { document.getElementById('session-kcal').value = ''; document.getElementById('modal-finish').style.display = 'flex'; lucide.createIcons(); }
-
         function closeFinishModal() { document.getElementById('modal-finish').style.display = 'none'; }
 
-       async function preSaveWorkoutFinal(skipKcal) {
+        async function preSaveWorkoutFinal(skipKcal) {
             document.getElementById('modal-finish').style.display = 'none';
             let totalVolume = 0; let sessionDataForAI = {};
 
@@ -974,15 +947,39 @@
             if (localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
-                    let notesContext = sessionNotes ? ` Il cliente ha anche lasciato questa nota sulla sessione: "${sessionNotes}". Tienine conto nella tua analisi in modo empatico.` : '';
-                    
-                    const prompt = `Agisci come uno strength coach severo e analitico. Il tuo cliente ha completato questa sessione: ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Se "isDrop" è true, è un Drop Set (calo peso/reps corretto e voluto). 2. I carichi (w) sono SEMPRE IL PESO TOTALE sollevato. Valuta i volumi in modo realistico. Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato e costruttivo. Modello: gemini-3-flash-preview.`;
+                    let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
+                    const prompt = `Agisci come uno strength coach severo. Analizza questa sessione: ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Se isDrop=true, è un Drop Set voluto. 2. I carichi (w) sono SEMPRE IL PESO TOTALE. Valuta i volumi in modo realistico. Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato e costruttivo. Modello: gemini-3-flash-preview.`;
                     
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
                     document.getElementById('ai-feedback-text').innerText = feedback; document.getElementById('modal-ai-feedback').style.display = 'flex';
                 } catch (e) { console.error(e); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Sessione Salvata!"); goHome(); }
             } else { showMessage("Sessione Salvata!"); goHome(); }
+        }
+
+        async function analyzePastWorkout(key) {
+            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+            const entry = journal[key];
+            if (!entry || !entry.exercises) return;
+
+            if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
+
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
+            try {
+                let sessionDataForAI = {};
+                Object.keys(entry.exercises).forEach(exId => {
+                    const ex = exerciseData[exId];
+                    if(ex) sessionDataForAI[ex.name] = entry.exercises[exId];
+                });
+
+                let notesContext = entry.notes ? ` Il cliente ha lasciato questa nota: "${entry.notes}". Tienine conto.` : '';
+                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata: ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Se isDrop=true, è un Drop Set corretto. 2. I carichi (w) sono IL PESO TOTALE. Dammi un feedback TECNICO di 2-3 frasi. Sii spietato. Modello: gemini-3-flash-preview.`;
+
+                const feedback = await askGemini(prompt, false);
+                document.getElementById('ai-loading-overlay').style.display = 'none';
+                document.getElementById('ai-feedback-text').innerText = feedback;
+                document.getElementById('modal-ai-feedback').style.display = 'flex';
+            } catch (e) { console.error(e); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore connessione AI."); }
         }
 
         function closeAIFeedback() { document.getElementById('modal-ai-feedback').style.display = 'none'; }
@@ -1005,216 +1002,15 @@
         function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
         function openAddMenu() { swappingIndex = null; renderLibrary('aerobica'); document.getElementById('modal-library').style.display = 'flex'; }
 
-        function renderCalendar() {
-            const container = document.getElementById('calendar-days'); const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; container.innerHTML = '';
-            const year = calendarDate.getFullYear(); const month = calendarDate.getMonth(); document.getElementById('calendar-month').innerText = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' }).format(calendarDate);
-            const firstDay = new Date(year, month, 1).getDay(); const offset = firstDay === 0 ? 6 : firstDay - 1;
-            const today = new Date().toISOString().split('T')[0];
-
-            for(let i=0; i<offset; i++) container.innerHTML += `<div></div>`;
-            for(let d=1; d<=new Date(year, month + 1, 0).getDate(); d++) { 
-                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; 
-                const isToday = today === key;
-                const isSelected = selectedDateStr === key;
-                const hasWorkout = journal[key] ? 'workout' : '';
-                container.innerHTML += `<div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasWorkout}" onclick="showDayDetails('${key}')">${d}</div>`; 
-            }
-            updateCalendarStats();
-        }
-        function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); renderCalendar(); }
-
-        function showDayDetails(key) {
-            selectedDateStr = key;
-            renderCalendar();
-            
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; const entry = journal[key]; const selContainer = document.getElementById('calendar-selection');
-            if (!entry) { selContainer.innerHTML = `<div class="bg-[#1C1C1E] p-6 rounded-3xl border border-white/5 text-center"><p class="text-sm text-gray-500">Nessun allenamento registrato il ${key.split('-').reverse().join('/')}.</p></div>`; return; }
-            
-            selContainer.innerHTML = `
-            <div class="apple-card p-6 border border-white/5 relative overflow-hidden shadow-lg animate-slide">
-                <button onclick="deleteValidatedWorkout('${key}')" class="absolute top-4 right-4 text-red-500/40 hover:text-red-500 transition-colors z-20"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                <div class="absolute -right-6 -top-6 opacity-[0.03]"><i data-lucide="dumbbell" class="w-40 h-40"></i></div>
-                <div class="relative z-10">
-                    <span class="text-blue-500 font-black text-[10px] uppercase tracking-widest block mb-1">${key.split('-').reverse().join('/')}</span>
-                    <h3 class="text-2xl font-black text-white mb-6 leading-tight">${entry.title}</h3>
-                    <div class="flex gap-4 mb-4">
-                        <div class="bg-[#2C2C2E] px-4 py-3 rounded-2xl flex-1 text-center border border-white/5">
-                            <span class="block text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1.5">Volume Pesi</span>
-                            <span class="text-lg font-black text-white">${entry.volume} <span class="text-[10px] text-gray-500">kg</span></span>
-                        </div>
-                        <div class="bg-orange-500/10 border border-orange-500/20 px-4 py-3 rounded-2xl flex-1 text-center">
-                            <span class="block text-[9px] text-orange-400 font-black uppercase tracking-widest mb-1.5">Calorie</span>
-                            <span class="text-lg font-black text-orange-500 flex items-center justify-center gap-1.5"><i data-lucide="flame" class="w-4 h-4"></i> ${entry.kcal || 0}</span>
-                        </div>
-                    </div>
-                    ${entry.notes ? `<div class="bg-[#2C2C2E] p-4 rounded-2xl border border-white/5 text-left mt-2"><span class="block text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1.5"><i data-lucide="file-text" class="w-3 h-3 inline"></i> Note</span><p class="text-sm text-gray-300 italic">"${entry.notes}"</p></div>` : ''}
-                    
-                    <button onclick="analyzePastWorkout('${key}')" class="w-full bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-4 flex items-center justify-center gap-2 transition-colors">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i> Richiedi Analisi AI
-                    </button>
-                </div>
-            </div>`;
-            lucide.createIcons();
-        }
-
-        function deleteValidatedWorkout(key) {
-            openConfirm("Elimina Allenamento", "Sei sicuro di voler rimuovere questa sessione dal diario?", () => {
-                const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-                delete journal[key];
-                localStorage.setItem('workout_journal', JSON.stringify(journal));
-                showDayDetails(key);
-                renderCalendar();
-                showMessage("Allenamento eliminato.");
-            });
-        }
-
-        function updateCalendarStats() {
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; let monthlyKcal = 0; let weeklyKcal = 0;
-            const year = calendarDate.getFullYear(); const month = calendarDate.getMonth(); const today = new Date(); today.setHours(23, 59, 59, 999);
-            const currentDayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - currentDayOfWeek); startOfWeek.setHours(0, 0, 0, 0);
-            const labels = []; const data = []; const daysInMonth = new Date(year, month + 1, 0).getDate();
-            for(let d=1; d<=daysInMonth; d++) { labels.push(d); const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const dailyKcal = journal[key]?.kcal || 0; data.push(dailyKcal); if (dailyKcal > 0) { monthlyKcal += dailyKcal; const entryDate = new Date(key); if (entryDate >= startOfWeek && entryDate <= today) { weeklyKcal += dailyKcal; } } }
-            document.getElementById('kcal-week').innerText = weeklyKcal; document.getElementById('kcal-month').innerText = monthlyKcal;
-            const canvas = document.getElementById('chart-kcal'); if(chartKcalTrend) chartKcalTrend.destroy();
-            chartKcalTrend = new Chart(canvas.getContext('2d'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Kcal', data: data, backgroundColor: '#FF9500', borderRadius: 4, barPercentage: 0.6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {size: 10, family: 'Inter'} } } } } });
-        }
-
-        function renderRecoveryHeatmap() {
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            const dates = Object.keys(journal).sort((a, b) => new Date(b) - new Date(a));
-            
-            const lastTrained = { petto: Infinity, dorso: Infinity, spalle: Infinity, gambe: Infinity, bicipiti: Infinity, tricipiti: Infinity, core: Infinity };
-            const today = new Date(); today.setHours(0, 0, 0, 0);
-
-            dates.forEach(dateStr => {
-                const entryDate = new Date(dateStr); entryDate.setHours(0, 0, 0, 0);
-                const diffTime = Math.abs(today - entryDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                const entry = journal[dateStr];
-                Object.keys(entry.exercises || {}).forEach(exId => {
-                    const cat = exerciseData[exId]?.category;
-                    if (cat && lastTrained[cat] !== undefined) { if (diffDays < lastTrained[cat]) lastTrained[cat] = diffDays; }
-                });
-            });
-
-            const container = document.getElementById('recovery-heatmap');
-            if(!container) return;
-
-            const categories = [
-                { id: 'petto', name: 'Petto', icon: 'square' }, { id: 'dorso', name: 'Dorso', icon: 'shield' },
-                { id: 'spalle', name: 'Spalle', icon: 'triangle' }, { id: 'gambe', name: 'Gambe', icon: 'circle' },
-                { id: 'bicipiti', name: 'Bicipiti', icon: 'activity' }, { id: 'tricipiti', name: 'Tricipiti', icon: 'activity' },
-                { id: 'core', name: 'Core', icon: 'disc' }
-            ];
-
-            container.innerHTML = categories.map(c => {
-                const days = lastTrained[c.id];
-                let status = "Rilassato"; let colorClass = "text-green-500"; let bgClass = "bg-green-500/10 border-green-500/20"; let dotClass = "bg-green-500";
-                
-                if (days <= 1) { status = "Affaticato"; colorClass = "text-red-500"; bgClass = "bg-red-500/10 border-red-500/20"; dotClass = "bg-red-500 shadow-[0_0_10px_rgba(255,59,48,0.8)]"; } 
-                else if (days <= 3) { status = "In Recupero"; colorClass = "text-orange-500"; bgClass = "bg-orange-500/10 border-orange-500/20"; dotClass = "bg-orange-500 shadow-[0_0_10px_rgba(255,149,0,0.8)]"; }
-
-                return `<div class="flex items-center justify-between p-3 rounded-2xl border ${bgClass}"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center bg-black/20"><i data-lucide="${c.icon}" class="w-4 h-4 ${colorClass}"></i></div><div><p class="text-sm font-bold text-white capitalize">${c.name}</p><p class="text-[10px] uppercase tracking-widest font-black ${colorClass}">${status}</p></div></div><div class="w-3 h-3 rounded-full ${dotClass}"></div></div>`;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        function openBody() { switchView('body'); renderRecoveryHeatmap(); renderDashboardCharts(); renderBodyStats(); }
-
-        function renderDashboardCharts() {
-            const cats = ['volume', 'petto', 'dorso', 'spalle', 'gambe', 'bicipiti', 'tricipiti'];
-            const entries = Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).sort((a,b) => new Date(a[0]) - new Date(b[0])).slice(-10);
-            cats.forEach(cat => {
-                const canvas = document.getElementById(`chart-${cat}`); if (!canvas) return;
-                if (homeCharts[cat]) homeCharts[cat].destroy();
-                let pts = entries.map(e => {
-                    if (cat === 'volume') return e[1].volume || 0;
-                    let sum = 0; Object.entries(e[1].exercises || {}).forEach(([id, logs]) => { if (exerciseData[id]?.category === cat) { logs.forEach(l => sum += ((l.w||0) * l.r)); } });
-                    return sum;
-                });
-                if (pts.length < 5) while(pts.length < 5) pts.unshift(0);
-                homeCharts[cat] = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: pts.map((_,i)=>i), datasets: [{ data: pts, borderColor: '#0A84FF', borderWidth: 2.5, pointRadius: 0, tension: 0.4, spanGaps: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } } });
-            });
-
-            const radarCanvas = document.getElementById('chart-radar');
-            if (!radarCanvas) return;
-            if (radarChart) radarChart.destroy();
-            
-            const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            let radarData = { petto: 0, dorso: 0, gambe: 0, spalle: 0, bicipiti: 0, tricipiti: 0 };
-            
-            Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).forEach(([dateStr, entry]) => {
-                if (new Date(dateStr) >= thirtyDaysAgo) {
-                    Object.entries(entry.exercises || {}).forEach(([exId, logs]) => {
-                        const c = exerciseData[exId]?.category;
-                        if (radarData[c] !== undefined) { logs.forEach(l => radarData[c] += ((l.w||0) * l.r)); }
-                    });
-                }
-            });
-
-            radarChart = new Chart(radarCanvas.getContext('2d'), { type: 'radar', data: { labels: ['Petto', 'Dorso', 'Gambe', 'Spalle', 'Bicipiti', 'Tricipiti'], datasets: [{ label: 'Volume (Kg)', data: [radarData.petto, radarData.dorso, radarData.gambe, radarData.spalle, radarData.bicipiti, radarData.tricipiti], backgroundColor: 'rgba(10, 132, 255, 0.2)', borderColor: '#0A84FF', pointBackgroundColor: '#0A84FF', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#0A84FF' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: '#8E8E93', font: {family: 'Inter', size: 10, weight: 'bold'} }, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
-        }
-
-        function saveBiometrics() {
-            const data = {
-                date: new Date().toISOString().split('T')[0],
-                height: parseFloat(document.getElementById('bio-height').value) || null, weight: parseFloat(document.getElementById('bio-weight').value) || null,
-                lean: parseFloat(document.getElementById('bio-lean').value) || null, fat: parseFloat(document.getElementById('bio-fat').value) || null,
-                shoulders: parseFloat(document.getElementById('bio-shoulders').value) || null, chest: parseFloat(document.getElementById('bio-chest').value) || null,
-                waist: parseFloat(document.getElementById('bio-waist').value) || null, 
-                arm_sx: parseFloat(document.getElementById('bio-arm-sx').value) || null, arm_dx: parseFloat(document.getElementById('bio-arm-dx').value) || null,
-                leg_sx: parseFloat(document.getElementById('bio-leg-sx').value) || null, leg_dx: parseFloat(document.getElementById('bio-leg-dx').value) || null,
-                calf_sx: parseFloat(document.getElementById('bio-calf-sx').value) || null, calf_dx: parseFloat(document.getElementById('bio-calf-dx').value) || null
-            };
-            if(!data.weight && !data.waist && !data.arm_sx) { showMessage("Inserisci almeno un dato."); return; }
-            const existingIndex = biometricsHistory.findIndex(b => b.date === data.date);
-            if (existingIndex !== -1) { biometricsHistory[existingIndex] = { ...biometricsHistory[existingIndex], ...Object.fromEntries(Object.entries(data).filter(([_, v]) => v != null)) }; } 
-            else { biometricsHistory.push(data); }
-            biometricsHistory.sort((a,b) => new Date(a.date) - new Date(b.date));
-            localStorage.setItem('biometrics_history', JSON.stringify(biometricsHistory));
-            document.querySelectorAll('#view-body input').forEach(i => i.value = '');
-            showMessage("Misurazioni Salvate!"); renderBodyStats();
-        }
-
-        function renderBodyStats() {
-            if (biometricsHistory.length === 0) return;
-            const latest = biometricsHistory[biometricsHistory.length - 1]; const previous = biometricsHistory.length > 1 ? biometricsHistory[biometricsHistory.length - 2] : null;
-            const getRatio = (entry) => { if (!entry || !entry.waist) return null; const upper = entry.shoulders || entry.chest; return upper ? (upper / entry.waist) : null; };
-            let currentRatio = getRatio(latest); let previousRatio = getRatio(previous);
-
-            const statusEl = document.getElementById('vshape-status'); const subtextEl = document.getElementById('vshape-subtext');
-            const iconEl = document.getElementById('vshape-icon'); const iconContainer = document.getElementById('vshape-icon-container');
-
-            if (currentRatio) {
-                let statusText = "In Costruzione"; let iconName = "activity"; let colorClass = "text-blue-500"; let bgClass = "bg-blue-500/20 border-blue-500/30";
-                if (currentRatio >= 1.6) { statusText = "V-Shape Eccellente"; iconName = "triangle"; colorClass = "text-yellow-400"; bgClass = "bg-yellow-400/20 border-yellow-400/30"; iconEl.classList.add("rotate-180"); } 
-                else if (currentRatio >= 1.4) { statusText = "Ottimo V-Shape"; iconName = "trending-up"; colorClass = "text-emerald-400"; bgClass = "bg-emerald-400/20 border-emerald-400/30"; iconEl.classList.remove("rotate-180"); }
-                let subText = `Rapporto Upper/Vita: ${currentRatio.toFixed(2)}`;
-                if (previousRatio) { if (currentRatio > previousRatio) subText += " (In Crescita )"; else if (currentRatio < previousRatio) subText += " (In Calo )"; }
-                statusEl.innerText = statusText; subtextEl.innerText = subText;
-                iconEl.setAttribute('data-lucide', iconName); iconEl.className = `w-7 h-7 ${colorClass}`; iconContainer.className = `w-14 h-14 rounded-full flex items-center justify-center border ${bgClass}`;
-            } else { statusEl.innerText = "Dati Insufficienti"; subtextEl.innerText = "Inserisci spalle/petto e vita per l'analisi"; }
-            lucide.createIcons();
-
-            const canvas = document.getElementById('chart-body-measurements');
-            if(bodyChart) bodyChart.destroy();
-            const labels = biometricsHistory.map(b => b.date.substring(5)); 
-            const dataShoulders = biometricsHistory.map(b => b.shoulders || null); const dataChest = biometricsHistory.map(b => b.chest || null); const dataWaist = biometricsHistory.map(b => b.waist || null);
-
-            bodyChart = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: labels, datasets: [ { label: 'Spalle', data: dataShoulders, borderColor: '#0A84FF', backgroundColor: '#0A84FF', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Petto', data: dataChest, borderColor: '#AF52DE', backgroundColor: '#AF52DE', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Vita', data: dataWaist, borderColor: '#34C759', backgroundColor: '#34C759', tension: 0.3, spanGaps: true, borderWidth: 3 } ] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'bottom', labels: { color: '#8E8E93', boxWidth: 10, font: {family: 'Inter', weight:'bold'} } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } } } } });
-        }
-
-
         function openInfo(exId) {
             const ex = exerciseData[exId]; if (!ex) return;
             const modal = document.getElementById('modal-info'); const content = document.getElementById('info-content'); document.getElementById('info-title').innerText = ex.name;
-            const esecuzione = ex.coach?.esecuzione || "Mantieni la schiena dritta, il core contratto e controlla il peso in entrambe le fasi.";
+            const esecuzione = ex.coach?.esecuzione || "Mantieni la schiena dritta, il core contratto e controlla il peso.";
             const suggerimenti = ex.coach?.target || `Sviluppo del distretto: ${ex.category}.`;
             const tempo = ex.coach?.tempo || "Costante o controllato.";
             content.innerHTML = `<div class="space-y-4"><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> Distretto Muscolare</h4><p class="text-sm font-bold text-white uppercase">${ex.category}</p></div><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-emerald-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Esecuzione</h4><p class="text-sm leading-relaxed text-gray-300">${esecuzione}</p></div><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Suggerimenti e Tempo</h4><p class="text-sm leading-relaxed text-gray-300 mb-2">${suggerimenti}</p><p class="text-xs font-bold text-gray-400 mt-2"><i data-lucide="clock" class="w-3 h-3 inline"></i> ${tempo}</p></div></div>`;
             modal.style.display = 'flex'; lucide.createIcons();
         }
-
         function closeInfo() { document.getElementById('modal-info').style.display = 'none'; }
 
         function showChart(id, name) {
@@ -1273,40 +1069,7 @@
         }
         function importData(e) { const r = new FileReader(); r.onload = (ev) => { const d = JSON.parse(ev.target.result); Object.entries(d).forEach(([k,v]) => localStorage.setItem(k, v)); location.reload(); }; r.readAsText(e.target.files[0]); }
         function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
-		async function generateCorrectiveWorkout() {
-            closeAIFeedback();
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-            
-            // Recupera il "cazziatone" appena ricevuto
-            const feedback = document.getElementById('ai-feedback-text').innerText;
-            const validIds = Object.keys(exerciseData).join(', ');
-            
-            // Istruzioni per Gemini-3-flash-preview per creare una scheda correttiva con pesi
-            const prompt = `Sei uno strength coach elitario. Hai appena analizzato l'allenamento del tuo cliente e gli hai dato questo feedback: "${feedback}". 
-            Crea la sua PROSSIMA scheda di allenamento "Correttiva" (circa 45-60 minuti) strutturata appositamente per correggere questi punti deboli. Sii specifico e logico.
-            Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID validi: [${validIds}]. 
-            ATTENZIONE: Devi obbligatoriamente indicare i carichi (pesi) suggeriti per ogni esercizio. Poiché il sistema accetta solo determinati campi, inserisci il carico (in kg) o il livello di difficoltà direttamente dentro la stringa "reps" (es. "8-10 @ 50kg" oppure "15 @ Corpo Libero").
-            Restituisci SOLO un oggetto JSON valido con questa esatta struttura di esempio: {"title": "Scheda Correttiva AI", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "rest": 90, "isDropSet": false}}}.`;
-            
-            try {
-                const responseText = await askGemini(prompt, true); 
-                const generatedPlan = JSON.parse(responseText);
-                // Crea un ID univoco per la scheda correttiva
-                const newId = 'AI_CORR_' + Date.now().toString(); 
-                userPlan[newId] = generatedPlan; 
-                localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
-                
-                document.getElementById('ai-loading-overlay').style.display = 'none'; 
-                showMessage("Scheda Correttiva Pronta!"); 
-                goHome(); 
-                // Apre automaticamente la nuova scheda appena creata
-                setTimeout(() => openWorkout(newId), 500);
-            } catch (err) { 
-                console.error(err); 
-                document.getElementById('ai-loading-overlay').style.display = 'none'; 
-                showMessage("Errore AI. Riprova."); 
-            }
-        }
+
         window.onload = () => {
             const options = { weekday: 'long', day: 'numeric', month: 'long' }; const today = new Date(); const dateStr = today.toLocaleDateString('it-IT', options);
             document.getElementById('date-label').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
