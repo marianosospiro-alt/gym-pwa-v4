@@ -179,8 +179,8 @@
             <div id="recovery-heatmap" class="grid grid-cols-2 gap-3 mb-8"></div>
 
             <div class="apple-card p-6 mb-8 relative">
-                <h3 class="font-bold text-white mb-1">Simmetria Muscolare</h3>
-                <p class="text-xs text-gray-500 mb-4">Distribuzione volumi (ultimi 30gg)</p>
+                <h3 class="font-bold text-white mb-1">Distribuzione Volumi (%)</h3>
+                <p class="text-xs text-gray-500 mb-4">Focus muscolare degli ultimi 30 giorni</p>
                 <div class="w-full h-64">
                     <canvas id="chart-radar"></canvas>
                 </div>
@@ -211,7 +211,7 @@
                 </div>
             </div>
             
-            <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1 mt-10">Andamento Volumi (Kg)</h2>
+            <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1 mt-10">Andamento Volumi (Kg/Reps)</h2>
             <div class="horizontal-scroll no-scrollbar -mx-6 px-6 mb-8">
                 <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Volume Tot.</p><div class="h-16"><canvas id="chart-volume"></canvas></div></div>
                 <div class="scroll-item apple-card p-5"><p class="text-[10px] font-black text-gray-400 uppercase text-center mb-3 tracking-widest">Petto</p><div class="h-16"><canvas id="chart-petto"></canvas></div></div>
@@ -382,7 +382,7 @@
                 <div class="scrollable-area space-y-6">
                     <div class="grid grid-cols-2 gap-5">
                         <div><label>Serie</label><input type="number" id="edit-sets" placeholder="es. 4"></div>
-                        <div><label>Reps / Sec</label><input type="text" id="edit-reps" placeholder="es. 10-12"></div>
+                        <div><label>Reps / Carico</label><input type="text" id="edit-reps" placeholder="es. 10 @ 50kg"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-5 mt-5">
                         <div class="flex flex-col justify-end"><label>Intensità</label><button id="toggle-drop" onclick="toggleDropSetLocal()" class="w-full py-4 rounded-2xl border border-white/10 text-xs font-black tracking-widest transition-all">DROP SET: OFF</button></div>
@@ -472,7 +472,7 @@
 
     <script>
         const exerciseData = {
-            // AEROBICA
+            '// AEROBICA
             'corsa': { name: 'Corsa / Tapis Roulant', sets: '1', reps: '30m', rest: 0, img: 'img/corsa.png', category: 'aerobica', coach: { esecuzione: "Mantieni una postura eretta, sguardo dritto. Non aggrapparti ai corrimano del tapis roulant.", target: "Sistema cardiovascolare, resistenza e consumo calorico.", tempo: "Andatura costante o interval training (HIIT)" } },
             'spin_bike': { name: 'Spin Bike / Cyclette', sets: '1', reps: '30m', rest: 0, img: 'img/spin_bike.png', category: 'aerobica', coach: { esecuzione: "Regola il sellino ad altezza anca. Mantieni una pedalata fluida e rotonda, spingendo e 'tirando' i pedali.", target: "Flessori dell'anca, quadricipiti e sistema cardiovascolare. Ottimo a basso impatto articolare.", tempo: "RPM costante tra 70 e 90" } },
             'ellittica': { name: 'Ellittica', sets: '1', reps: '30m', rest: 0, img: 'img/ellittica.png', category: 'aerobica', coach: { esecuzione: "Usa braccia e gambe in sincronia. Mantieni il tallone appoggiato il più a lungo possibile sul pedale.", target: "Lavoro total body a bassissimo impatto per le ginocchia.", tempo: "Movimento continuo e ritmato" } },
@@ -571,7 +571,6 @@
 			'pec_deck': { name: 'Pec Deck (Fly Machine)', sets: '3', reps: '12-15', rest: 60, img: 'img/pec_deck.png', category: 'petto', coach: { esecuzione: "Braccia distese, gomiti leggermente flessi. Chiudi senza stringere le mani sui pad, pensa a spingere con i bicipiti uno contro l'altro.", target: "Isolamento e tensione continua al centro del petto.", tempo: "1s chiusura, 1s strizzata forte, 3s apertura lenta" } },
 
         };
-
         const defaultPlan = {
             1: { title: 'PUSH (Forza)', color: '#007AFF', items: ['panca_piana', 'lento_avanti', 'chest_press_g1', 'alzate_lat', 'french_press', 'pushdown'], overrides: { 3: { isDropSet: true } } },
             2: { title: 'PULL (Forza)', color: '#AF52DE', items: ['trazioni_supine', 'tbar_row', 'pullover_cavi', 'alzate_90', 'curl_ez', 'hammer_curl', 'hanging_leg'], overrides: { 3: { isDropSet: true } } },
@@ -579,9 +578,12 @@
             4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', items: ['chest_press_g1', 'pectoral', 'lat_larga', 'crossover', 'alzate_cavi', 'curl_cavi', 'pushdown_corda'], overrides: { 4: { isDropSet: true } } }
         };
 
+        // --- RIMOSSO ARRAY DATI ESEMPIO BIOMETRICI ---
+        const defaultBiometrics = [];
+
         let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v5')) || defaultPlan;
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v5')) || {};
-        let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || [];
+        let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || defaultBiometrics;
         let selectedDateStr = new Date().toISOString().split('T')[0];
         
         let homeCharts = {}; let bodyChart = null; let chartKcalTrend = null; let workoutSortable = null; let radarChart = null;
@@ -597,14 +599,10 @@
 
         function parseAIResponse(text) {
             try {
-                // Estrae solo il blocco JSON ignorando il markdown circostante
                 const match = text.match(/\{[\s\S]*\}/);
                 const clean = match ? match[0] : text;
                 return JSON.parse(clean);
-            } catch(e) {
-                console.error("JSON parse failed", text);
-                throw e;
-            }
+            } catch(e) { console.error("JSON parse failed", text); throw e; }
         }
 
         async function askGemini(promptText, isJson = false) {
@@ -614,9 +612,8 @@
             const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
             if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
-            if (!response.ok) throw new Error("Errore chiamata API Gemini");
-            const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
+            if (!response.ok) throw new Error("Errore API Gemini");
+            const data = await response.json(); return data.candidates[0].content.parts[0].text;
         }
 
         function openAIGenerator() { if(!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; } document.getElementById('modal-ai-gen').style.display = 'flex'; }
@@ -627,34 +624,23 @@
             if(!time || !focus) { showMessage("Compila tutti i campi!"); return; }
             closeAIGenerator(); document.getElementById('ai-loading-overlay').style.display = 'flex';
             const validIds = Object.keys(exerciseData).join(', ');
-            
-            const prompt = `Sei un personal trainer elitario. Crea un allenamento intenso e scientifico di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID validi: [${validIds}]. Restituisci SOLO E SOLTANTO UN OGGETTO JSON VALIDO, senza altro testo. Indica i carichi dentro la stringa "reps" (es. "8-10 @ 50kg"). Struttura: {"title": "Nome creativo", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
-            
+            const prompt = `Sei un personal trainer elitario. Crea un allenamento di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID: [${validIds}]. Restituisci SOLO E SOLTANTO UN OGGETTO JSON. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Struttura: {"title": "Nome", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
             try {
-                const responseText = await askGemini(prompt, true); 
-                const generatedPlan = parseAIResponse(responseText);
-                
+                const responseText = await askGemini(prompt, true); const generatedPlan = parseAIResponse(responseText);
                 const newId = 'AI_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
                 document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Scheda Magica Creata!"); goHome(); setTimeout(() => openWorkout(newId), 500);
-            } catch (err) { console.error(err); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore AI. Riprova."); }
+            } catch (err) { console.error(err); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore AI."); }
         }
 
         async function generateCorrectiveWorkout() {
-            closeAIFeedback();
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-            const feedback = document.getElementById('ai-feedback-text').innerText;
-            const validIds = Object.keys(exerciseData).join(', ');
-            
-            const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" (45-60 min) per correggere i punti deboli. Scegli GLI ESERCIZI SOLO da: [${validIds}]. Indica i carichi dentro la stringa "reps" (es. "8-10 @ 50kg"). Restituisci SOLO E SOLTANTO UN OGGETTO JSON, senza testo aggiuntivo. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
-            
+            closeAIFeedback(); document.getElementById('ai-loading-overlay').style.display = 'flex';
+            const feedback = document.getElementById('ai-feedback-text').innerText; const validIds = Object.keys(exerciseData).join(', ');
+            const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" per correggere i punti deboli. Scegli ESERCIZI SOLO da: [${validIds}]. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Restituisci SOLO JSON. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
             try {
-                const responseText = await askGemini(prompt, true); 
-                const generatedPlan = parseAIResponse(responseText);
-                
+                const responseText = await askGemini(prompt, true); const generatedPlan = parseAIResponse(responseText);
                 const newId = 'AI_CORR_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
-                
-                document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Scheda Correttiva Pronta!"); goHome(); setTimeout(() => openWorkout(newId), 500);
-            } catch (err) { console.error(err); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore AI. Riprova."); }
+                document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Scheda Pronta!"); goHome(); setTimeout(() => openWorkout(newId), 500);
+            } catch (err) { console.error(err); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore AI."); }
         }
 
         let confirmCallback = null;
@@ -719,24 +705,17 @@
         }
 
         function toggleRowDS(i) {
-            const btn = document.getElementById(`log-ds-${i}`);
-            btn.classList.toggle('active');
-            if(btn.classList.contains('active')) { btn.classList.remove('text-gray-500'); } 
-            else { btn.classList.add('text-gray-500'); }
+            const btn = document.getElementById(`log-ds-${i}`); btn.classList.toggle('active');
+            if(btn.classList.contains('active')) { btn.classList.remove('text-gray-500'); } else { btn.classList.add('text-gray-500'); }
         }
 
         function openLogModal(exId, expectedSets, expectedReps) {
             const isCardio = exerciseData[exId].category === 'aerobica';
             if (isCardio) { openCardioModal(exId); return; }
 
-            currentLoggingExId = exId;
-            document.getElementById('log-title').innerText = exerciseData[exId].name;
-
-            let existingData = activeSession[exId] || [];
-            let html = '';
-
-            const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || [];
-            const lastSessionSet = h.length > 0 ? h[h.length-1] : null;
+            currentLoggingExId = exId; document.getElementById('log-title').innerText = exerciseData[exId].name;
+            let existingData = activeSession[exId] || []; let html = '';
+            const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastSessionSet = h.length > 0 ? h[h.length-1] : null;
 
             if (lastSessionSet) {
                 if (lastSessionSet.w > 0) {
@@ -749,14 +728,12 @@
             }
 
             html += `<div class="grid grid-cols-[30px_1fr_1fr_40px] gap-2 px-2 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2"><div class="text-center">Set</div><div class="text-center">Kg</div><div class="text-center">Reps</div><div class="text-center"></div></div>`;
-
             let phReps = expectedReps.split('-')[0]; 
 
             for (let i = 0; i < expectedSets; i++) {
                 let wVal = existingData[i] && existingData[i].w !== null ? existingData[i].w : '';
                 let rVal = existingData[i] && existingData[i].r !== null ? existingData[i].r : '';
                 let isDs = existingData[i] && existingData[i].isDrop ? true : false;
-
                 let wPh = lastSessionSet && lastSessionSet.w ? lastSessionSet.w : 'kg';
                 let rPh = lastSessionSet && lastSessionSet.r ? lastSessionSet.r : phReps;
                 
@@ -768,10 +745,7 @@
                     <button id="log-ds-${i}" onclick="toggleRowDS(${i})" class="ds-btn h-full rounded-xl border border-white/10 text-[10px] font-black ${isDs ? 'active' : 'text-gray-500'}">DS</button>
                 </div>`;
             }
-
-            document.getElementById('log-rows-container').innerHTML = html;
-            document.getElementById('modal-log-sets').style.display = 'flex';
-            lucide.createIcons();
+            document.getElementById('log-rows-container').innerHTML = html; document.getElementById('modal-log-sets').style.display = 'flex'; lucide.createIcons();
         }
 
         function closeLogModal() { document.getElementById('modal-log-sets').style.display = 'none'; }
@@ -779,30 +753,21 @@
         function confirmLogs() {
             const rowCount = document.querySelectorAll('input[id^="log-w-"]').length; let logs = []; let hasData = false;
             for (let i = 0; i < rowCount; i++) { 
-                let wStr = document.getElementById(`log-w-${i}`).value; 
-                let rStr = document.getElementById(`log-r-${i}`).value; 
-                let isDs = document.getElementById(`log-ds-${i}`).classList.contains('active');
+                let wStr = document.getElementById(`log-w-${i}`).value; let rStr = document.getElementById(`log-r-${i}`).value; let isDs = document.getElementById(`log-ds-${i}`).classList.contains('active');
                 let w = wStr === '' ? 0 : parseFloat(wStr); let r = rStr === '' ? 0 : parseInt(rStr); 
-                if (w > 0 || r > 0) { logs.push({ w: w, r: r, isDrop: isDs }); hasData = true; } 
-                else { logs.push({ w: null, r: null, isDrop: false }); } 
+                if (w > 0 || r > 0) { logs.push({ w: w, r: r, isDrop: isDs }); hasData = true; } else { logs.push({ w: null, r: null, isDrop: false }); } 
             }
             
             if (hasData) { 
-                activeSession[currentLoggingExId] = logs; 
-                localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession)); 
+                activeSession[currentLoggingExId] = logs; localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession)); 
                 const validLogs = logs.filter(l => l.r !== null && l.r > 0 && !l.isDrop); 
                 if(validLogs.length > 0) { 
-                    let bestSet = validLogs[0]; 
-                    for (let l of validLogs) { if (l.w > bestSet.w) bestSet = l; else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l; } 
+                    let bestSet = validLogs[0]; for (let l of validLogs) { if (l.w > bestSet.w) bestSet = l; else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l; } 
                     const h = JSON.parse(localStorage.getItem(`h_${currentLoggingExId}`)) || []; 
-                    const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}); 
-                    const filteredH = h.filter(entry => entry.d !== todayStr); 
-                    filteredH.push({ d: todayStr, w: bestSet.w, r: bestSet.r }); 
+                    const todayStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}); const filteredH = h.filter(entry => entry.d !== todayStr); filteredH.push({ d: todayStr, w: bestSet.w, r: bestSet.r }); 
                     localStorage.setItem(`h_${currentLoggingExId}`, JSON.stringify(filteredH.slice(-15))); 
                 } 
-            } else { 
-                delete activeSession[currentLoggingExId]; localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession)); 
-            }
+            } else { delete activeSession[currentLoggingExId]; localStorage.setItem('active_session_buffer_v5', JSON.stringify(activeSession)); }
             closeLogModal(); renderWorkout(currentWorkoutId);
         }
 
@@ -1063,11 +1028,36 @@
         function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
         
         async function exportData() { 
-            const dataStr = JSON.stringify(localStorage); const blob = new Blob([dataStr], {type: "application/json"}); const file = new File([blob], "powerlog_backup.json", {type: "application/json"});
-            if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Backup PowerLog', text: 'Ecco il backup dei miei allenamenti.' }); } catch (e) { console.log("Condivisione annullata o fallita.", e); } } 
-            else { const dl = document.createElement('a'); dl.href = URL.createObjectURL(blob); dl.download = "powerlog_backup.json"; dl.click(); }
+            let dump = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                dump[key] = localStorage.getItem(key);
+            }
+            const dataStr = JSON.stringify(dump); 
+            const blob = new Blob([dataStr], {type: "application/json"}); 
+            const file = new File([blob], "powerlog_backup.json", {type: "application/json"});
+            if (navigator.canShare && navigator.canShare({ files: [file] })) { 
+                try { await navigator.share({ files: [file], title: 'Backup PowerLog', text: 'Backup.' }); } 
+                catch (e) { console.log("Condivisione annullata.", e); } 
+            } else { 
+                const dl = document.createElement('a'); dl.href = URL.createObjectURL(blob); dl.download = "powerlog_backup.json"; dl.click(); 
+            }
         }
-        function importData(e) { const r = new FileReader(); r.onload = (ev) => { const d = JSON.parse(ev.target.result); Object.entries(d).forEach(([k,v]) => localStorage.setItem(k, v)); location.reload(); }; r.readAsText(e.target.files[0]); }
+
+        function importData(e) { 
+            const r = new FileReader(); 
+            r.onload = (ev) => { 
+                try {
+                    const d = JSON.parse(ev.target.result); 
+                    Object.keys(d).forEach(k => localStorage.setItem(k, d[k])); 
+                    location.reload(); 
+                } catch(err) {
+                    alert("Il file non è valido o è corrotto.");
+                }
+            }; 
+            r.readAsText(e.target.files[0]); 
+        }
+
         function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
 
         window.onload = () => {
