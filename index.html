@@ -963,8 +963,16 @@
                 });
 
                 let notesContext = entry.notes ? ` Il cliente ha lasciato questa nota: "${entry.notes}". Tienine conto.` : '';
-                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata: ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Se isDrop=true, è un Drop Set corretto. 2. I carichi (w) sono IL PESO TOTALE. Dammi un feedback TECNICO di 2-3 frasi. Sii spietato. Modello: gemini-3-flash-preview.`;
-
+                let workoutTitle = entry.title;
+                
+                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} 
+                Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. 
+                NOTE IMPORTANTI: 
+                1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). (Forza = alti carichi, Ipertrofia = volume/cedimento).
+                2. Se isDrop=true, è un Drop Set corretto. 
+                3. I carichi (w) sono IL PESO TOTALE. 
+                Dammi un feedback TECNICO di 2-3 frasi con spunti di miglioramento su come eseguire serie e ripetizioni. Sii sincero senza offendere . Modello: gemini-3-flash-preview.`;
+                
                 const feedback = await askGemini(prompt, false);
                 document.getElementById('ai-loading-overlay').style.display = 'none';
                 document.getElementById('ai-feedback-text').innerText = feedback;
