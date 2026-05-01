@@ -476,8 +476,7 @@
         </nav>
     </div>
 
-    <!-- LOGICA JS -->
-    <script>
+// DataBase Esercizi RTF
         const exerciseData = {
             'corsa': { name: 'Corsa / Tapis Roulant', sets: '1', reps: '30m', img: 'img/corsa.png', category: 'aerobica', coach: { esecuzione: "Mantieni una postura eretta, sguardo dritto. Non aggrapparti ai corrimano del tapis roulant.", target: "Sistema cardiovascolare, resistenza e consumo calorico.", tempo: "Andatura costante o interval training (HIIT)" } },
             'spin_bike': { name: 'Spin Bike / Cyclette', sets: '1', reps: '30m', img: 'img/spin_bike.png', category: 'aerobica', coach: { esecuzione: "Regola il sellino ad altezza anca. Mantieni una pedalata fluida e rotonda, spingendo e 'tirando' i pedali.", target: "Flessori dell'anca, quadricipiti e sistema cardiovascolare. Ottimo a basso impatto articolare.", tempo: "RPM costante tra 70 e 90" } },
@@ -577,8 +576,8 @@
             'lat_single': { name: 'Lat Pulldown Unilaterale Cavi', sets: '3', reps: '12-15', img: 'img/lat_single.png', category: 'dorso', coach: { esecuzione: "In ginocchio davanti a un cavo alto. Tira una maniglia singola verso il basso, ruotando leggermente il busto verso il braccio che lavora.", target: "Allungamento estremo e correzione asimmetrie dorsali.", tempo: "1s tirata, 1s strizzata al fianco, 3s risalita lenta" } },
             'facepull': { name: 'Face Pulls ai Cavi', sets: '4', reps: '15-20', img: 'img/facepull.png', category: 'dorso', coach: { esecuzione: "Cavo altezza occhi con fune. Tira verso il viso separando le mani, cercando di portare i polsi dietro le orecchie.", target: "Salute delle spalle, cuffia dei rotatori e deltoide posteriore.", tempo: "1s tirata, 1s pausa in chiusura, 2s discesa" } },
             'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Seduto al pulley basso, barra dritta larga. Tira verso lo sterno alto allargando i gomiti a 90°.", target: "Spessore eccezionale per deltoidi posteriori e trapezi centrali.", tempo: "1s tirata, 1s pausa contratta, 2s ritorno controllato" } },
-          
-	 'pec_deck': { name: 'Pec Deck (Fly Machine)', sets: '3', reps: '12-15', img: 'img/pec_deck.png', category: 'petto', coach: { esecuzione: "Braccia distese, gomiti leggermente flessi. Chiudi senza stringere le mani sui pad, pensa a spingere con i bicipiti uno contro l'altro.", target: "Isolamento e tensione continua al centro del petto.", tempo: "1s chiusura, 1s strizzata forte, 3s apertura lenta" } },
+            
+            'pec_deck': { name: 'Pec Deck (Fly Machine)', sets: '3', reps: '12-15', img: 'img/pec_deck.png', category: 'petto', coach: { esecuzione: "Braccia distese, gomiti leggermente flessi. Chiudi senza stringere le mani sui pad, pensa a spingere con i bicipiti uno contro l'altro.", target: "Isolamento e tensione continua al centro del petto.", tempo: "1s chiusura, 1s strizzata forte, 3s apertura lenta" } },
             
             'spider_curl': { name: 'Spider Curl (Manubri)', sets: '3', reps: '10-12', img: 'img/spider_curl.png', category: 'bicipiti', coach: { esecuzione: "Pancia in giù su panca inclinata (45°). Lascia pendere le braccia verticali a terra. Fletti i bicipiti portando i manubri alle spalle.", target: "Picco del bicipite lavorato in massimo accorciamento. Elimina lo slancio.", tempo: "1s contrazione, 1s pausa stringendo il muscolo, 2s discesa" } },
             'cross_curl': { name: 'Cross Body Curl Manubri', sets: '3', reps: '10-12', img: 'img/cross_curl.png', category: 'bicipiti', coach: { esecuzione: "In piedi, solleva il manubrio in diagonale (verso la spalla opposta) mantenendo la presa a martello.", target: "Muscolo brachiale e brachioradiale per aumentare lo spessore visivo del braccio.", tempo: "1s salita, 2s discesa" } },
@@ -935,7 +934,7 @@
                 try {
                     let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
                     let workoutTitle = userPlan[currentWorkoutId].title;
-                    const prompt = `Agisci come uno strength coach severo. Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato. Modello: gemini-3-flash-preview.`;
+                    const prompt = `Agisci come uno strength coach severo. Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). Se è "Forza" esigi carichi alti, se "Ipertrofia" valuta volume e reps. 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato. Modello: gemini-3-flash-preview.`;
                     
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
