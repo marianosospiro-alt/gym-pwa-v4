@@ -930,7 +930,15 @@
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
                     let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
-                    const prompt = `Agisci come uno strength coach severo. Analizza questa sessione: ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Se isDrop=true, è un Drop Set voluto. 2. I carichi (w) sono SEMPRE IL PESO TOTALE. Valuta i volumi in modo realistico. Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato e costruttivo. Modello: gemini-3-flash-preview.`;
+                    let workoutTitle = userPlan[currentWorkoutId].title;
+                    
+                    const prompt = `Agisci come uno strength coach severo. Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} 
+                    Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. 
+                    NOTE IMPORTANTI: 
+                    1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). Se il nome suggerisce "Forza", esigi carichi alti e reps basse. Se suggerisce "Ipertrofia" o "Volume", accetta carichi inferiori ma valuta il cedimento e l'alto numero di reps.
+                    2. Se isDrop=true, è un Drop Set voluto. 
+                    3. I carichi (w) sono SEMPRE IL PESO TOTALE. 
+                    Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato e costruttivo. Modello: gemini-3-flash-preview.`;
                     
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
