@@ -78,6 +78,7 @@
 
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden text-white">
         
+        <!-- VISTA HOME -->
         <div id="view-home" class="view p-6 pb-40 animate-slide">
             <header class="mb-10 mt-2">
                 <p id="date-label" class="text-blue-500 font-bold text-[11px] uppercase tracking-widest mb-2"></p>
@@ -101,6 +102,7 @@
             </div>
         </div>
 
+        <!-- VISTA WORKOUT -->
         <div id="view-workout" class="view hidden pb-40">
             <header class="p-4 pt-safe glass flex justify-between items-center sticky top-0 z-50 border-b border-white/5">
                 <button onclick="goHome()" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-white active:scale-95 transition-transform">
@@ -132,6 +134,7 @@
             </div>
         </div>
 
+        <!-- VISTA DIARIO -->
         <div id="view-calendar" class="view hidden p-6 pb-40 animate-slide">
             <h1 class="text-4xl font-black text-white mb-8 mt-2 tracking-tight">Diario</h1>
             
@@ -172,6 +175,7 @@
             <div id="calendar-selection" class="space-y-4"></div>
         </div>
 
+        <!-- VISTA FISICO -->
         <div id="view-body" class="view hidden p-6 pb-40 animate-slide">
             <h1 class="text-4xl font-black text-white mb-8 mt-2 tracking-tight">Fisico</h1>
 
@@ -257,6 +261,7 @@
             </button>
         </div>
 
+        <!-- VISTA OPZIONI -->
         <div id="view-settings" class="view hidden p-6 pb-40 animate-slide">
             <h1 class="text-4xl font-black text-white mb-8 mt-2 tracking-tight">Opzioni</h1>
             <div class="apple-card p-6 mb-6 bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] border border-purple-500/20 shadow-[0_10px_30px_rgba(175,82,222,0.1)]">
@@ -281,6 +286,7 @@
             </div>
         </div>
 
+        <!-- MODALI -->
         <div id="modal-program" class="modal-sheet" onclick="closeProgramModal()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="sheet-pill"></div>
@@ -470,8 +476,8 @@
         </nav>
     </div>
 
+    <!-- LOGICA JS -->
     <script>
-        // DataBase Esercizi RTF
         const exerciseData = {
             'corsa': { name: 'Corsa / Tapis Roulant', sets: '1', reps: '30m', img: 'img/corsa.png', category: 'aerobica', coach: { esecuzione: "Mantieni una postura eretta, sguardo dritto. Non aggrapparti ai corrimano del tapis roulant.", target: "Sistema cardiovascolare, resistenza e consumo calorico.", tempo: "Andatura costante o interval training (HIIT)" } },
             'spin_bike': { name: 'Spin Bike / Cyclette', sets: '1', reps: '30m', img: 'img/spin_bike.png', category: 'aerobica', coach: { esecuzione: "Regola il sellino ad altezza anca. Mantieni una pedalata fluida e rotonda, spingendo e 'tirando' i pedali.", target: "Flessori dell'anca, quadricipiti e sistema cardiovascolare. Ottimo a basso impatto articolare.", tempo: "RPM costante tra 70 e 90" } },
@@ -556,18 +562,23 @@
             
             'leg_press_hor': { name: 'Leg Press Orizzontale', sets: '4', reps: '10-12', img: 'img/leg_press_hor.png', category: 'gambe', coach: { esecuzione: "Posizionati sulla seduta con la schiena ben in appoggio. Spingi la pedana controllando il movimento senza mai bloccare completamente le ginocchia.", target: "Quadricipiti e glutei con carico zero sulla zona lombare.", tempo: "1s spinta, 3s discesa fluida" } },
             'leg_press_mono': { name: 'Leg Press 45° Unilaterale', sets: '3', reps: '10-12', img: 'img/leg_press_mono.png', category: 'gambe', coach: { esecuzione: "Una gamba alla volta, posizionando il piede al centro della pedana. Controlla la discesa finché il ginocchio forma un angolo di 90°.", target: "Isolamento muscolare per colmare le asimmetrie delle gambe.", tempo: "1s spinta, 3s discesa lenta" } },
+            'rev_hack': { name: 'Reverse Hack Squat (Machine)', sets: '4', reps: '8-10', img: 'img/rev_hack.png', category: 'gambe', coach: { esecuzione: "Posizionati al contrario sulla macchina, con il viso rivolto allo schienale. Scendi spingendo i glutei indietro.", target: "Stimolo brutale su femorali e glutei, salvaguardando la colonna rispetto allo squat libero.", tempo: "1s salita, 2-3s discesa profonda" } },
+            'pendulum': { name: 'Pendulum Squat', sets: '3', reps: '10-12', img: 'img/pendulum.png', category: 'gambe', coach: { esecuzione: "Appoggia bene la schiena sul pad mobile. L'arco del macchinario accompagna il movimento naturale dell'anca.", target: "Massimo sviluppo dei quadricipiti grazie al supporto articolare avanzato.", tempo: "1s spinta, 2-3s discesa controllata" } },
+            'v_squat': { name: 'V-Squat Machine', sets: '4', reps: '10-12', img: 'img/v_squat.png', category: 'gambe', coach: { esecuzione: "Posizione a V sulla pedana. Spalle sotto i pad, scendi finché il bacino è parallelo alle ginocchia.", target: "Ottima alternativa allo squat tradizionale, scarica completamente la tensione lombare.", tempo: "1s salita potente, 3s discesa" } },
             'adductor': { name: 'Adductor Machine', sets: '3', reps: '15-20', img: 'img/adductor.png', category: 'gambe', coach: { esecuzione: "Siediti con la schiena dritta. Chiudi le gambe stringendo i cuscini, concentrati sulla contrazione all'interno coscia.", target: "Interno coscia (adduttori) per stabilità e massa globale della gamba.", tempo: "1s chiusura, 1s pausa, 2s apertura" } },
             'abductor': { name: 'Abductor Machine', sets: '3', reps: '15-20', img: 'img/abductor.png', category: 'gambe', coach: { esecuzione: "Siediti o fletti leggermente il busto in avanti. Apri le ginocchia spingendo contro i cuscini esterni.", target: "Gluteo medio e minimo. Fondamentale per la salute dell'anca.", tempo: "1s spinta, 1s contrazione in massima apertura, 2s ritorno" } },
+            'glute_mach': { name: 'Glute Drive (Machine)', sets: '4', reps: '10-12', img: 'img/glute_mach.png', category: 'gambe', coach: { esecuzione: "Fissa la cintura sopra le anche. Spingi dai talloni e stringi i glutei in cima al movimento.", target: "Alternativa all'hip thrust libero, ma molto più stabile e confortevole per l'addome.", tempo: "1s spinta, 1-2s pausa isometrica, 2s discesa" } },
             'leg_curl_standing': { name: 'Leg Curl in piedi', sets: '3', reps: '12-15', img: 'img/leg_curl_standing.png', category: 'gambe', coach: { esecuzione: "In piedi sulla macchina, stabilizza il core. Fletti il ginocchio portando il pad verso il gluteo.", target: "Isolamento unilaterale dei flessori della coscia.", tempo: "1s flessione, 1s contrazione al picco, 3s discesa lenta" } },
-          
-
+            'pull_through': { name: 'Cable Pull Through', sets: '3', reps: '12-15', img: 'img/pull_through.png', category: 'gambe', coach: { esecuzione: "Cavo basso con corda. Dai le spalle al macchinario. Fletti i fianchi mandando il bacino indietro a gambe quasi tese, poi contrai i glutei per tornare su.", target: "Attivazione pazzesca per glutei e femorali con tensione costante. Zero stress spinale.", tempo: "1s estensione anca, 3s stretching in basso" } },
+            
+            'lat_mag': { name: 'Lat Machine Presa Mag Grip', sets: '4', reps: '10-12', img: 'img/lat_mag.png', category: 'dorso', coach: { esecuzione: "Usa le maniglie sagomate (Mag Grip) neutre. Tira spingendo i gomiti dritti in basso, senza stringere troppo la presa con le dita.", target: "Toglie il lavoro all'avambraccio, isolando quasi al 100% il gran dorsale.", tempo: "1s tirata, 1s pausa, 2s ritorno" } },
             'row_high': { name: 'Row Machine Presa Alta', sets: '3', reps: '10-12', img: 'img/row_high.png', category: 'dorso', coach: { esecuzione: "Regola il sedile per avere le maniglie alte. Tira portando i gomiti all'indietro a 45 gradi.", target: "Spessore della parte alta della schiena (trapezi e romboidi medi).", tempo: "1s tirata, 1s contrazione delle scapole, 2s ritorno" } },
             'row_low': { name: 'Row Machine Presa Bassa', sets: '3', reps: '10-12', img: 'img/row_low.png', category: 'dorso', coach: { esecuzione: "Afferra le maniglie dal basso o in presa neutra. Tira tenendo i gomiti sfregati ai fianchi.", target: "Sviluppo del gran dorsale basso.", tempo: "1s tirata, 1s contrazione in accorciamento, 2s ritorno" } },
             'lat_single': { name: 'Lat Pulldown Unilaterale Cavi', sets: '3', reps: '12-15', img: 'img/lat_single.png', category: 'dorso', coach: { esecuzione: "In ginocchio davanti a un cavo alto. Tira una maniglia singola verso il basso, ruotando leggermente il busto verso il braccio che lavora.", target: "Allungamento estremo e correzione asimmetrie dorsali.", tempo: "1s tirata, 1s strizzata al fianco, 3s risalita lenta" } },
             'facepull': { name: 'Face Pulls ai Cavi', sets: '4', reps: '15-20', img: 'img/facepull.png', category: 'dorso', coach: { esecuzione: "Cavo altezza occhi con fune. Tira verso il viso separando le mani, cercando di portare i polsi dietro le orecchie.", target: "Salute delle spalle, cuffia dei rotatori e deltoide posteriore.", tempo: "1s tirata, 1s pausa in chiusura, 2s discesa" } },
             'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Seduto al pulley basso, barra dritta larga. Tira verso lo sterno alto allargando i gomiti a 90°.", target: "Spessore eccezionale per deltoidi posteriori e trapezi centrali.", tempo: "1s tirata, 1s pausa contratta, 2s ritorno controllato" } },
-            
-            'pec_deck': { name: 'Pec Deck (Fly Machine)', sets: '3', reps: '12-15', img: 'img/pec_deck.png', category: 'petto', coach: { esecuzione: "Braccia distese, gomiti leggermente flessi. Chiudi senza stringere le mani sui pad, pensa a spingere con i bicipiti uno contro l'altro.", target: "Isolamento e tensione continua al centro del petto.", tempo: "1s chiusura, 1s strizzata forte, 3s apertura lenta" } },
+          
+	 'pec_deck': { name: 'Pec Deck (Fly Machine)', sets: '3', reps: '12-15', img: 'img/pec_deck.png', category: 'petto', coach: { esecuzione: "Braccia distese, gomiti leggermente flessi. Chiudi senza stringere le mani sui pad, pensa a spingere con i bicipiti uno contro l'altro.", target: "Isolamento e tensione continua al centro del petto.", tempo: "1s chiusura, 1s strizzata forte, 3s apertura lenta" } },
             
             'spider_curl': { name: 'Spider Curl (Manubri)', sets: '3', reps: '10-12', img: 'img/spider_curl.png', category: 'bicipiti', coach: { esecuzione: "Pancia in giù su panca inclinata (45°). Lascia pendere le braccia verticali a terra. Fletti i bicipiti portando i manubri alle spalle.", target: "Picco del bicipite lavorato in massimo accorciamento. Elimina lo slancio.", tempo: "1s contrazione, 1s pausa stringendo il muscolo, 2s discesa" } },
             'cross_curl': { name: 'Cross Body Curl Manubri', sets: '3', reps: '10-12', img: 'img/cross_curl.png', category: 'bicipiti', coach: { esecuzione: "In piedi, solleva il manubrio in diagonale (verso la spalla opposta) mantenendo la presa a martello.", target: "Muscolo brachiale e brachioradiale per aumentare lo spessore visivo del braccio.", tempo: "1s salita, 2s discesa" } },
@@ -584,10 +595,18 @@
             4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', items: ['chest_press_g1', 'pec_deck', 'lat_larga', 'crossover', 'alzate_cavi', 'curl_cavi', 'pushdown_corda'], overrides: { 4: { isDropSet: true } } }
         };
 
+        function getLocalYYYYMMDD() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v5')) || defaultPlan;
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v5')) || {};
         let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || [];
-        let selectedDateStr = new Date().toISOString().split('T')[0];
+        let selectedDateStr = getLocalYYYYMMDD();
         
         let homeCharts = {}; let bodyChart = null; let chartKcalTrend = null; let workoutSortable = null; let radarChart = null;
         let currentWorkoutId = null; let currentLoggingExId = null; let swappingIndex = null; let editingIdx = null; let editingProgramId = null;
@@ -868,7 +887,6 @@
         function updateNav(active) { ['home', 'calendar', 'body', 'settings'].forEach(n => { const btn = document.getElementById(`nav-${n}`); if (btn) { btn.classList.toggle('text-blue-500', active === n); btn.classList.toggle('text-gray-500', active !== n); } }); }
         function switchView(viewId) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(`view-${viewId}`).classList.remove('hidden'); updateNav(viewId); }
         function goHome() { switchView('home'); renderHomeCards(); }
-        function openCalendar() { switchView('calendar'); renderCalendar(); showDayDetails(selectedDateStr); }
         function openSettings() { switchView('settings'); document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || ''; }
         function openWorkout(id) { currentWorkoutId = id; document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-workout').classList.remove('hidden'); document.getElementById('workout-title-text').innerText = userPlan[id].title; renderWorkout(id); }
 
@@ -907,7 +925,7 @@
             const sessionNotes = document.getElementById('session-note').value; 
 
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            const key = new Date().toISOString().split('T')[0];
+            const key = getLocalYYYYMMDD();
             journal[key] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, exercises: { ...activeSession }, volume: totalVolume, kcal: kcalValue, notes: sessionNotes };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
             activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); document.getElementById('session-note').value = ''; 
@@ -917,14 +935,7 @@
                 try {
                     let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
                     let workoutTitle = userPlan[currentWorkoutId].title;
-                    
-                    const prompt = `Agisci come uno strength coach severo. Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} 
-                    Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. 
-                    NOTE IMPORTANTI: 
-                    1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). Se il nome suggerisce "Forza", esigi carichi alti e reps basse. Se suggerisce "Ipertrofia" o "Volume", accetta carichi inferiori ma valuta il cedimento e l'alto numero di reps.
-                    2. Se isDrop=true, è un Drop Set voluto. 
-                    3. I carichi (w) sono SEMPRE IL PESO TOTALE. 
-                    Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato e costruttivo. Modello: gemini-3-flash-preview.`;
+                    const prompt = `Agisci come uno strength coach severo. Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato. Modello: gemini-3-flash-preview.`;
                     
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
@@ -950,15 +961,8 @@
 
                 let notesContext = entry.notes ? ` Il cliente ha lasciato questa nota: "${entry.notes}". Tienine conto.` : '';
                 let workoutTitle = entry.title;
-                
-                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} 
-                Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. 
-                NOTE IMPORTANTI: 
-                1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). (Forza = alti carichi, Ipertrofia = volume/cedimento).
-                2. Se isDrop=true, è un Drop Set corretto. 
-                3. I carichi (w) sono IL PESO TOTALE. 
-                Dammi un feedback TECNICO di 2-3 frasi con spunti di miglioramento su come eseguire serie e ripetizioni. Sii sincero senza offendere . Modello: gemini-3-flash-preview.`;
-                
+                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). 2. Se isDrop=true, è un Drop Set corretto. 3. I carichi (w) sono IL PESO TOTALE. Dammi un feedback TECNICO di 2-3 frasi. Sii spietato. Modello: gemini-3-flash-preview.`;
+
                 const feedback = await askGemini(prompt, false);
                 document.getElementById('ai-loading-overlay').style.display = 'none';
                 document.getElementById('ai-feedback-text').innerText = feedback;
@@ -1075,6 +1079,19 @@
             r.readAsText(e.target.files[0]); 
         }
 
+        function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
+
+        function openCalendar() { switchView('calendar'); renderCalendar(); showDayDetails(selectedDateStr); }
+        
+        function changeMonth(dir) {
+            calendarDate.setDate(1); 
+            calendarDate.setMonth(calendarDate.getMonth() + dir);
+            renderCalendar();
+            const y = calendarDate.getFullYear();
+            const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
+            showDayDetails(`${y}-${m}-01`);
+        }
+
         function renderDashboardCharts() {
             const cats = ['volume', 'petto', 'dorso', 'spalle', 'gambe', 'bicipiti', 'tricipiti'];
             const entries = Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).sort((a,b) => new Date(a[0]) - new Date(b[0])).slice(-10);
@@ -1119,7 +1136,7 @@
 
         function saveBiometrics() {
             const data = {
-                date: new Date().toISOString().split('T')[0],
+                date: getLocalYYYYMMDD(),
                 height: parseFloat(document.getElementById('bio-height').value) || null, weight: parseFloat(document.getElementById('bio-weight').value) || null,
                 lean: parseFloat(document.getElementById('bio-lean').value) || null, fat: parseFloat(document.getElementById('bio-fat').value) || null,
                 shoulders: parseFloat(document.getElementById('bio-shoulders').value) || null, chest: parseFloat(document.getElementById('bio-chest').value) || null,
@@ -1217,74 +1234,7 @@
             chartKcalTrend = new Chart(canvas.getContext('2d'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Kcal', data: data, backgroundColor: '#FF9500', borderRadius: 4, barPercentage: 0.6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {size: 10, family: 'Inter'} } } } } });
         }
 
-        function renderCalendar() {
-            const container = document.getElementById('calendar-days'); const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; container.innerHTML = '';
-            const year = calendarDate.getFullYear(); const month = calendarDate.getMonth(); document.getElementById('calendar-month').innerText = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' }).format(calendarDate);
-            const firstDay = new Date(year, month, 1).getDay(); const offset = firstDay === 0 ? 6 : firstDay - 1;
-            const today = new Date().toISOString().split('T')[0];
-
-            for(let i=0; i<offset; i++) container.innerHTML += `<div></div>`;
-            for(let d=1; d<=new Date(year, month + 1, 0).getDate(); d++) { 
-                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; 
-                const isToday = today === key;
-                const isSelected = selectedDateStr === key;
-                const hasWorkout = journal[key] ? 'workout' : '';
-                container.innerHTML += `<div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasWorkout}" onclick="showDayDetails('${key}')">${d}</div>`; 
-            }
-            updateCalendarStats();
-        }
-
-        function showDayDetails(key) {
-            selectedDateStr = key;
-            renderCalendar();
-            
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; const entry = journal[key]; const selContainer = document.getElementById('calendar-selection');
-            if (!entry) { selContainer.innerHTML = `<div class="bg-[#1C1C1E] p-6 rounded-3xl border border-white/5 text-center"><p class="text-sm text-gray-500">Nessun allenamento registrato il ${key.split('-').reverse().join('/')}.</p></div>`; return; }
-            
-            selContainer.innerHTML = `
-            <div class="apple-card p-6 border border-white/5 relative overflow-hidden shadow-lg animate-slide">
-                <button onclick="deleteValidatedWorkout('${key}')" class="absolute top-4 right-4 text-red-500/40 hover:text-red-500 transition-colors z-20"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                <div class="absolute -right-6 -top-6 opacity-[0.03]"><i data-lucide="dumbbell" class="w-40 h-40"></i></div>
-                <div class="relative z-10">
-                    <span class="text-blue-500 font-black text-[10px] uppercase tracking-widest block mb-1">${key.split('-').reverse().join('/')}</span>
-                    <h3 class="text-2xl font-black text-white mb-6 leading-tight">${entry.title}</h3>
-                    <div class="flex gap-4 mb-4">
-                        <div class="bg-[#2C2C2E] px-4 py-3 rounded-2xl flex-1 text-center border border-white/5">
-                            <span class="block text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1.5">Volume Pesi</span>
-                            <span class="text-lg font-black text-white">${entry.volume} <span class="text-[10px] text-gray-500">kg</span></span>
-                        </div>
-                        <div class="bg-orange-500/10 border border-orange-500/20 px-4 py-3 rounded-2xl flex-1 text-center">
-                            <span class="block text-[9px] text-orange-400 font-black uppercase tracking-widest mb-1.5">Calorie</span>
-                            <span class="text-lg font-black text-orange-500 flex items-center justify-center gap-1.5"><i data-lucide="flame" class="w-4 h-4"></i> ${entry.kcal || 0}</span>
-                        </div>
-                    </div>
-                    ${entry.notes ? `<div class="bg-[#2C2C2E] p-4 rounded-2xl border border-white/5 text-left mt-2"><span class="block text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1.5"><i data-lucide="file-text" class="w-3 h-3 inline"></i> Note</span><p class="text-sm text-gray-300 italic">"${entry.notes}"</p></div>` : ''}
-                    
-                    <button onclick="analyzePastWorkout('${key}')" class="w-full bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-4 flex items-center justify-center gap-2 transition-colors">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i> Richiedi Analisi AI
-                    </button>
-                </div>
-            </div>`;
-            lucide.createIcons();
-        }
-
-        function deleteValidatedWorkout(key) {
-            openConfirm("Elimina Allenamento", "Sei sicuro di voler rimuovere questa sessione dal diario?", () => {
-                const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-                delete journal[key];
-                localStorage.setItem('workout_journal', JSON.stringify(journal));
-                showDayDetails(key);
-                renderCalendar();
-                showMessage("Allenamento eliminato.");
-            });
-        }
-
-        function openBody() { 
-            switchView('body'); 
-            renderRecoveryHeatmap(); 
-            renderDashboardCharts(); 
-            renderBodyStats(); 
-        }
+        function openBody() { switchView('body'); renderRecoveryHeatmap(); renderDashboardCharts(); renderBodyStats(); }
 
         window.onload = () => {
             const options = { weekday: 'long', day: 'numeric', month: 'long' }; const today = new Date(); const dateStr = today.toLocaleDateString('it-IT', options);
