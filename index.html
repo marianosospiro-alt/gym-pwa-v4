@@ -911,24 +911,21 @@
         function finishWorkout() { document.getElementById('session-kcal').value = ''; document.getElementById('modal-finish').style.display = 'flex'; lucide.createIcons(); }
         function closeFinishModal() { document.getElementById('modal-finish').style.display = 'none'; }
 
-        async function preSaveWorkoutFinal(skipKcal) {
+        async function preSaveWorkoutFinal(skipKcal, requestAI) {
             document.getElementById('modal-finish').style.display = 'none';
             let totalVolume = 0; let sessionDataForAI = {};
             
-            // Capisce se la scheda l'ha creata l'AI controllando l'ID
             let isAIGenerated = currentWorkoutId.startsWith('AI_');
 
             Object.keys(activeSession).forEach(exId => {
                 const isCardio = exerciseData[exId]?.category === 'aerobica';
                 const exName = exerciseData[exId].name;
                 
-                // Recupera l'obiettivo previsto dalla scheda
                 const planIdx = userPlan[currentWorkoutId].items.indexOf(exId);
                 const override = userPlan[currentWorkoutId].overrides[planIdx] || {};
                 const targetSets = override.sets || exerciseData[exId].sets;
-                const targetReps = override.reps || exerciseData[exId].reps; // Ora contiene anche i Kg!
+                const targetReps = override.reps || exerciseData[exId].reps;
 
-                // Salva sia l'obiettivo che il risultato reale
                 sessionDataForAI[exName] = {
                     obiettivo: isCardio ? targetReps : `${targetSets} set x ${targetReps}`,
                     risultato_reale: activeSession[exId]
@@ -946,20 +943,30 @@
             localStorage.setItem('workout_journal', JSON.stringify(journal));
             activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); document.getElementById('session-note').value = ''; 
 
-            if (localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
+            // Se l'utente ha premuto il tasto AI E c'è l'API key configurata
+            if (requestAI && localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
                     let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
                     let workoutTitle = userPlan[currentWorkoutId].title;
                     let aiContext = isAIGenerated ? "NOTA: Questa scheda l'hai creata TU tramite il generatore AI. Verifica severamente se il cliente ha rispettato i carichi e i volumi che gli avevi prescritto." : "";
                     
-                    const prompt = `Agisci come uno strength coach severo. ${aiContext} Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato del risultato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale". 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Valuta i volumi in modo realistico in base allo scopo della scheda (Forza o Ipertrofia). Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato. Modello: gemini-3-flash-preview.`;
+                    const prompt = `Agisci come uno strength coach severo. ${aiContext} Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato del risultato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale". 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Valuta i volumi in modo realistico in base allo scopo della scheda. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato. Modello: gemini-3-flash-preview.`;
                     
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
                     document.getElementById('ai-feedback-text').innerText = feedback; document.getElementById('modal-ai-feedback').style.display = 'flex';
-                } catch (e) { console.error(e); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Sessione Salvata!"); goHome(); }
-            } else { showMessage("Sessione Salvata!"); goHome(); }
+                } catch (e) { 
+                    console.error(e); 
+                    document.getElementById('ai-loading-overlay').style.display = 'none'; 
+                    showMessage("Sessione Salvata (Errore AI)"); 
+                    goHome(); 
+                }
+            } else { 
+                // Se l'utente ha premuto "Salva nel Diario" (Niente AI)
+                showMessage("Sessione Salvata!"); 
+                goHome(); 
+            }
         }
         async function analyzePastWorkout(key) {
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
