@@ -970,14 +970,34 @@
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             try {
                 let sessionDataForAI = {};
+                const planId = entry.id; // Recupera l'ID del piano usato quel giorno
+                const isAIGenerated = entry.isAIGenerated || (planId && planId.startsWith('AI_'));
+
                 Object.keys(entry.exercises).forEach(exId => {
                     const ex = exerciseData[exId];
-                    if(ex) sessionDataForAI[ex.name] = entry.exercises[exId];
+                    if(ex) {
+                        let targetSets = ex.sets;
+                        let targetReps = ex.reps;
+                        // Tenta di recuperare i parametri originali se il piano esiste ancora
+                        if (planId && userPlan[planId]) {
+                            const planIdx = userPlan[planId].items.indexOf(exId);
+                            if (planIdx !== -1 && userPlan[planId].overrides[planIdx]) {
+                                targetSets = userPlan[planId].overrides[planIdx].sets || targetSets;
+                                targetReps = userPlan[planId].overrides[planIdx].reps || targetReps;
+                            }
+                        }
+                        sessionDataForAI[ex.name] = {
+                            obiettivo: `${targetSets} set x ${targetReps}`,
+                            risultato_reale: entry.exercises[exId]
+                        };
+                    }
                 });
 
                 let notesContext = entry.notes ? ` Il cliente ha lasciato questa nota: "${entry.notes}". Tienine conto.` : '';
                 let workoutTitle = entry.title;
-                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). 2. Se isDrop=true, è un Drop Set corretto. 3. I carichi (w) sono IL PESO TOTALE. Dammi un feedback TECNICO di 2-3 frasi. Sii spietato. Modello: gemini-3-flash-preview.`;
+                let aiContext = isAIGenerated ? "NOTA: Questa scheda l'hai creata TU tramite il generatore AI in passato. Controlla se il cliente aveva rispettato i TUOI parametri." : "";
+
+                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale" in base allo scopo della scheda. ${aiContext} 2. Se isDrop=true, è un Drop Set corretto. 3. I carichi (w) sono IL PESO TOTALE. Dammi un feedback TECNICO di 2-3 frasi. Sii spietato. Modello: gemini-3-flash-preview.`;
 
                 const feedback = await askGemini(prompt, false);
                 document.getElementById('ai-loading-overlay').style.display = 'none';
