@@ -913,10 +913,26 @@
         async function preSaveWorkoutFinal(skipKcal) {
             document.getElementById('modal-finish').style.display = 'none';
             let totalVolume = 0; let sessionDataForAI = {};
+            
+            // Capisce se la scheda l'ha creata l'AI controllando l'ID
+            let isAIGenerated = currentWorkoutId.startsWith('AI_');
 
             Object.keys(activeSession).forEach(exId => {
                 const isCardio = exerciseData[exId]?.category === 'aerobica';
-                sessionDataForAI[exerciseData[exId].name] = activeSession[exId];
+                const exName = exerciseData[exId].name;
+                
+                // Recupera l'obiettivo previsto dalla scheda
+                const planIdx = userPlan[currentWorkoutId].items.indexOf(exId);
+                const override = userPlan[currentWorkoutId].overrides[planIdx] || {};
+                const targetSets = override.sets || exerciseData[exId].sets;
+                const targetReps = override.reps || exerciseData[exId].reps; // Ora contiene anche i Kg!
+
+                // Salva sia l'obiettivo che il risultato reale
+                sessionDataForAI[exName] = {
+                    obiettivo: isCardio ? targetReps : `${targetSets} set x ${targetReps}`,
+                    risultato_reale: activeSession[exId]
+                };
+
                 if (!isCardio) { activeSession[exId].forEach(set => { if (set.w !== null && set.r !== null) totalVolume += ((set.w||0) * set.r); }); }
             });
 
@@ -925,7 +941,7 @@
 
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
             const key = getLocalYYYYMMDD();
-            journal[key] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, exercises: { ...activeSession }, volume: totalVolume, kcal: kcalValue, notes: sessionNotes };
+            journal[key] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, isAIGenerated: isAIGenerated, exercises: { ...activeSession }, volume: totalVolume, kcal: kcalValue, notes: sessionNotes };
             localStorage.setItem('workout_journal', JSON.stringify(journal));
             activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); document.getElementById('session-note').value = ''; 
 
@@ -934,7 +950,9 @@
                 try {
                     let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
                     let workoutTitle = userPlan[currentWorkoutId].title;
-                    const prompt = `Agisci come uno strength coach severo. Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Valuta i risultati IN BASE ALL'OBIETTIVO della scheda ("${workoutTitle}"). Se è "Forza" esigi carichi alti, se "Ipertrofia" valuta volume e reps. 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Trova un punto debole. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato. Modello: gemini-3-flash-preview.`;
+                    let aiContext = isAIGenerated ? "NOTA: Questa scheda l'hai creata TU tramite il generatore AI. Verifica severamente se il cliente ha rispettato i carichi e i volumi che gli avevi prescritto." : "";
+                    
+                    const prompt = `Agisci come uno strength coach severo. ${aiContext} Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato del risultato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale". 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Valuta i volumi in modo realistico in base allo scopo della scheda (Forza o Ipertrofia). Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato. Modello: gemini-3-flash-preview.`;
                     
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
@@ -942,7 +960,6 @@
                 } catch (e) { console.error(e); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Sessione Salvata!"); goHome(); }
             } else { showMessage("Sessione Salvata!"); goHome(); }
         }
-
         async function analyzePastWorkout(key) {
             const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
             const entry = journal[key];
