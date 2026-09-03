@@ -100,6 +100,14 @@
                     <i data-lucide="sparkles" class="w-6 h-6"></i> Genera con AI
                 </button>
             </div>
+
+            <!-- SEZIONE ARCHIVIO -->
+            <div id="archive-toggle-container" class="mt-8 text-center hidden">
+                <button onclick="toggleArchiveView()" id="btn-toggle-archive" class="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center justify-center gap-2 mx-auto bg-[#1C1C1E] px-4 py-2 rounded-full border border-white/5 transition-colors active:bg-white/5">
+                    <i data-lucide="archive" class="w-3 h-3"></i> Mostra Archivio
+                </button>
+            </div>
+            <section id="archived-cards-container" class="space-y-5 mt-4 hidden"></section>
         </div>
 
         <!-- VISTA WORKOUT -->
@@ -306,10 +314,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-3">
-                    <button id="btn-delete-prog" onclick="deleteProgram()" class="hidden bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl px-5 font-black text-sm transition-transform active:scale-95"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                    <button onclick="saveProgram()" class="btn-primary flex-1 py-4 text-white text-sm font-black uppercase tracking-widest">SALVA</button>
+                
+                <!-- Azioni della scheda -->
+                <div class="hidden gap-2 mb-4" id="prog-actions-row">
+                    <button id="btn-clone-prog" onclick="cloneProgram()" class="flex-1 bg-blue-500/10 text-blue-500 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1 transition-transform active:scale-95"><i data-lucide="copy" class="w-4 h-4"></i> Clona</button>
+                    <button id="btn-archive-prog" onclick="toggleArchiveProgram()" class="flex-1 bg-orange-500/10 text-orange-500 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1 transition-transform active:scale-95"><i data-lucide="archive" class="w-4 h-4"></i> Archivia</button>
+                    <button onclick="deleteProgram()" class="flex-1 bg-red-500/10 text-red-500 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1 transition-transform active:scale-95"><i data-lucide="trash-2" class="w-4 h-4"></i> Elimina</button>
                 </div>
+
+                <button onclick="saveProgram()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest">SALVA</button>
             </div>
         </div>
 
@@ -549,6 +562,7 @@
             'pushdown_corda': { name: 'Pushdown Corda', sets: '3', reps: '12-15', img: 'img/pushdown_corda.png', category: 'tricipiti', coach: { esecuzione: "Come il pushdown classico, ma alla fine del movimento 'strappa' e allarga la corda all'esterno, ruotando i palmi verso il basso.", target: "Extra reclutamento e 'strizzata' del capo laterale a fine arco di movimento.", tempo: "1s spinta e apertura in basso, 2s risalita" } },
             'pushdown_fune': { name: 'Pushdown Fune', sets: '3', reps: '12-15', img: 'img/pushdown_fune.png', category: 'tricipiti', coach: { esecuzione: "Presa neutra con fune singola o doppia lunga. Stesso principio ma con focus su estensione pulita.", target: "Più ergonomico sui polsi, focus sul pump del tricipite.", tempo: "1s spinta in basso, 2s risalita" } },
             'skull_crusher': { name: 'Skull Crusher', sets: '3', reps: '10-12', img: 'img/skull_crusher.png', category: 'tricipiti', coach: { esecuzione: "Versione cruda della French Press. Gomiti puntati dritti a soffitto. Porta il bilanciere fino alla fronte (o sfiorando il naso) ed estendi verticalmente.", target: "Esercizio fondamentale di forza e ipertrofia. Attenzione ai gomiti: usa carichi gestibili.", tempo: "1s spinta esplosiva, 3s discesa rallentata" } },
+            'estensioni_testa_cavi': { name: 'Estensioni Dietro Nuca Cavi', sets: '3', reps: '10-12', img: 'img/estensioni_testa_cavi.png', category: 'tricipiti', coach: { esecuzione: "Dai le spalle al cavo basso o medio. Afferra la corda dietro la testa con i gomiti puntati verso l'alto. Estendi le braccia verso l'alto e l'esterno, mantenendo la posizione dei gomiti ferma e stabile.", target: "Isolamento profondo del capo lungo del tricipite in posizione di massimo allungamento.", tempo: "1s estensione, 1s contrazione in cima, 3s discesa lenta" } },
             
             'lat_larga': { name: 'Lat Machine Presa Larga', sets: '4', reps: '12-15', img: 'img/lat_larga.png', category: 'dorso', coach: { esecuzione: "Presa prona ben oltre le spalle. Deprimi le scapole e tira la sbarra verso l'alto petto espandendo il torace. Immagina di tirare con i gomiti in basso e indietro.", target: "Sviluppa l'ampiezza dorsale, donando la classica forma a V.", tempo: "1s tirata, 1s pausa toccando il petto, 2s ritorno" } },
             'lat_neutra': { name: 'Lat Machine Presa Neutra', sets: '4', reps: '10-12', img: 'img/lat_neutra.png', category: 'dorso', coach: { esecuzione: "Utilizza la maniglia a V (trazione stretta neutra). Tira verso lo sterno, i gomiti scivolano vicini al corpo.", target: "Coinvolge di più i dorsali medi/bassi e dà maggiore spessore alla schiena. Usa più carico rispetto alla presa larga.", tempo: "1s tirata esplosiva, 2s ritorno controllato" } },
@@ -574,18 +588,7 @@
             'row_high': { name: 'Row Machine Presa Alta', sets: '3', reps: '10-12', img: 'img/row_high.png', category: 'dorso', coach: { esecuzione: "Regola il sedile per avere le maniglie alte. Tira portando i gomiti all'indietro a 45 gradi.", target: "Spessore della parte alta della schiena (trapezi e romboidi medi).", tempo: "1s tirata, 1s contrazione delle scapole, 2s ritorno" } },
             'row_low': { name: 'Row Machine Presa Bassa', sets: '3', reps: '10-12', img: 'img/row_low.png', category: 'dorso', coach: { esecuzione: "Afferra le maniglie dal basso o in presa neutra. Tira tenendo i gomiti sfregati ai fianchi.", target: "Sviluppo del gran dorsale basso.", tempo: "1s tirata, 1s contrazione in accorciamento, 2s ritorno" } },
             'lat_single': { name: 'Lat Pulldown Unilaterale Cavi', sets: '3', reps: '12-15', img: 'img/lat_single.png', category: 'dorso', coach: { esecuzione: "In ginocchio davanti a un cavo alto. Tira una maniglia singola verso il basso, ruotando leggermente il busto verso il braccio che lavora.", target: "Allungamento estremo e correzione asimmetrie dorsali.", tempo: "1s tirata, 1s strizzata al fianco, 3s risalita lenta" } },
-            'facepull': { name: 'Face Pulls ai Cavi', sets: '4', reps: '15-20', img: 'img/facepull.png', category: 'dorso', coach: { esecuzione: "Cavo altezza occhi con fune. Tira verso il viso separando le mani, cercando di portare i polsi dietro le orecchie.", target: "Salute delle spalle, cuffia dei rotatori e deltoide posteriore.", tempo: "1s tirata, 1s pausa in chiusura, 2s discesa" } },
-            'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Seduto al pulley basso, barra dritta larga. Tira verso lo sterno alto allargando i gomiti a 90°.", target: "Spessore eccezionale per deltoidi posteriori e trapezi centrali.", tempo: "1s tirata, 1s pausa contratta, 2s ritorno controllato" } },
-            
-            'pec_deck': { name: 'Pec Deck (Fly Machine)', sets: '3', reps: '12-15', img: 'img/pec_deck.png', category: 'petto', coach: { esecuzione: "Braccia distese, gomiti leggermente flessi. Chiudi senza stringere le mani sui pad, pensa a spingere con i bicipiti uno contro l'altro.", target: "Isolamento e tensione continua al centro del petto.", tempo: "1s chiusura, 1s strizzata forte, 3s apertura lenta" } },
-            
-            'spider_curl': { name: 'Spider Curl (Manubri)', sets: '3', reps: '10-12', img: 'img/spider_curl.png', category: 'bicipiti', coach: { esecuzione: "Pancia in giù su panca inclinata (45°). Lascia pendere le braccia verticali a terra. Fletti i bicipiti portando i manubri alle spalle.", target: "Picco del bicipite lavorato in massimo accorciamento. Elimina lo slancio.", tempo: "1s contrazione, 1s pausa stringendo il muscolo, 2s discesa" } },
-            'cross_curl': { name: 'Cross Body Curl Manubri', sets: '3', reps: '10-12', img: 'img/cross_curl.png', category: 'bicipiti', coach: { esecuzione: "In piedi, solleva il manubrio in diagonale (verso la spalla opposta) mantenendo la presa a martello.", target: "Muscolo brachiale e brachioradiale per aumentare lo spessore visivo del braccio.", tempo: "1s salita, 2s discesa" } },
-            'bayesian_curl': { name: 'Bayesian Curl ai Cavi', sets: '3', reps: '12-15', img: 'img/bayesian_curl.png', category: 'bicipiti', coach: { esecuzione: "Dai le spalle al cavo basso. Fai un passo avanti in modo che il braccio sia teso all'indietro. Fletti in avanti senza muovere il gomito.", target: "Capo lungo del bicipite sotto sforzo massimo in fase di allungamento.", tempo: "1s flessione, 3s allungamento lentissimo" } },
-            
-            'tri_ext_single': { name: 'Estensione Tricep Singola Sopra Testa', sets: '3', reps: '12-15', img: 'img/tri_ext_single.png', category: 'tricipiti', coach: { esecuzione: "Cavo posizionato in basso o medio. Afferra la maniglia, portala dietro la nuca e distendi il braccio verso l'alto.", target: "Isolamento estremo del capo lungo del tricipite. Corregge asimmetrie.", tempo: "1s estensione, 2s discesa profonda" } },
-            'kickback_cavi': { name: 'Kickback ai Cavi', sets: '3', reps: '12-15', img: 'img/kickback_cavi.png', category: 'tricipiti', coach: { esecuzione: "Piegato in avanti a 90°, puleggia ad altezza anca. Estendi all'indietro solo l'avambraccio, fermando il gomito sui fianchi.", target: "Picco del tricipite senza perdere tensione grazie al cavo.", tempo: "1s spinta indietro, 1s pausa di massima contrazione, 2s discesa" } }
-            'estensioni_testa_cavi': { name: 'Estensioni Dietro Nuca Cavi', sets: '3', reps: '10-12', img: 'img/estensioni_testa_cavi.png', category: 'tricipiti', coach: { esecuzione: "Dai le spalle al cavo basso o medio. Afferra la corda dietro la testa con i gomiti puntati verso l'alto. Estendi le braccia verso l'alto e l'esterno, mantenendo la posizione dei gomiti ferma e stabile.", target: "Isolamento profondo del capo lungo del tricipite in posizione di massimo allungamento.", tempo: "1s estensione, 1s contrazione in cima, 3s discesa lenta" } }
+            'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Seduto al pulley basso, barra dritta larga. Tira verso lo sterno alto allargando i gomiti a 90°.", target: "Spessore eccezionale per deltoidi posteriori e trapezi centrali.", tempo: "1s tirata, 1s pausa contratta, 2s ritorno controllato" } }
         };
 
         const defaultPlan = {
@@ -612,6 +615,7 @@
         let currentWorkoutId = null; let currentLoggingExId = null; let swappingIndex = null; let editingIdx = null; let editingProgramId = null;
         let selectedProgColor = '#0A84FF'; let tempDropSet = false; let tempSuperset = false; let calendarDate = new Date();
         let sessionChart = null; let historyChart = null;
+        let isArchiveViewOpen = false;
 
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
@@ -674,20 +678,65 @@
         function handleImgError(el) { el.style.display = 'none'; const placeholder = document.createElement('div'); placeholder.className = "absolute inset-0 flex items-center justify-center bg-[#2C2C2E]"; placeholder.innerHTML = '<i data-lucide="dumbbell" class="w-10 h-10 text-gray-600 opacity-40"></i>'; el.parentElement.appendChild(placeholder); lucide.createIcons(); }
 
         function openProgramModal(id = null) {
-            editingProgramId = id; document.getElementById('modal-program').style.display = 'flex'; const deleteBtn = document.getElementById('btn-delete-prog');
-            if (id) { document.getElementById('modal-prog-title').innerText = "Modifica Programma"; document.getElementById('prog-name').value = userPlan[id].title; selectedProgColor = userPlan[id].color; deleteBtn.style.display = 'block'; } 
-            else { document.getElementById('modal-prog-title').innerText = "Nuovo Programma"; document.getElementById('prog-name').value = ''; selectedProgColor = '#0A84FF'; deleteBtn.style.display = 'none'; }
+            editingProgramId = id; document.getElementById('modal-program').style.display = 'flex'; 
+            const actionRow = document.getElementById('prog-actions-row');
+            if (id) { 
+                document.getElementById('modal-prog-title').innerText = "Modifica Programma"; 
+                document.getElementById('prog-name').value = userPlan[id].title; 
+                selectedProgColor = userPlan[id].color; 
+                actionRow.style.display = 'flex'; 
+                const archiveBtn = document.getElementById('btn-archive-prog');
+                if (userPlan[id].archived) {
+                    archiveBtn.innerHTML = '<i data-lucide="package-open" class="w-4 h-4"></i> Ripristina';
+                    archiveBtn.className = 'flex-1 bg-emerald-500/10 text-emerald-500 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1 transition-transform active:scale-95';
+                } else {
+                    archiveBtn.innerHTML = '<i data-lucide="archive" class="w-4 h-4"></i> Archivia';
+                    archiveBtn.className = 'flex-1 bg-orange-500/10 text-orange-500 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1 transition-transform active:scale-95';
+                }
+            } else { 
+                document.getElementById('modal-prog-title').innerText = "Nuovo Programma"; 
+                document.getElementById('prog-name').value = ''; 
+                selectedProgColor = '#0A84FF'; 
+                actionRow.style.display = 'none'; 
+            }
             document.querySelectorAll('.color-dot').forEach(el => { if (el.getAttribute('data-color') === selectedProgColor) el.classList.add('selected'); else el.classList.remove('selected'); });
+            lucide.createIcons();
         }
         function closeProgramModal() { document.getElementById('modal-program').style.display = 'none'; }
         function selectColor(el) { document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); selectedProgColor = el.getAttribute('data-color'); }
+        
         function saveProgram() {
             const title = document.getElementById('prog-name').value.trim(); if (!title) { showMessage("Inserisci un nome!"); return; }
             if (editingProgramId) { userPlan[editingProgramId].title = title; userPlan[editingProgramId].color = selectedProgColor; document.getElementById('workout-title-text').innerText = title; } 
-            else { const newId = Date.now().toString(); userPlan[newId] = { title: title, color: selectedProgColor, items: [], overrides: {} }; }
+            else { const newId = Date.now().toString(); userPlan[newId] = { title: title, color: selectedProgColor, items: [], overrides: {}, archived: false }; }
             localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeProgramModal(); goHome(); showMessage("Programma salvato.");
         }
+        
         function deleteProgram() { openConfirm("Elimina", "Eliminare questa intera scheda?", () => { delete userPlan[editingProgramId]; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeProgramModal(); goHome(); }); }
+
+        function cloneProgram() {
+            if (!editingProgramId) return;
+            const source = userPlan[editingProgramId];
+            const newId = 'CLONE_' + Date.now().toString();
+            const clonedPlan = JSON.parse(JSON.stringify(source));
+            clonedPlan.title = clonedPlan.title + " (Copia)";
+            clonedPlan.archived = false;
+            userPlan[newId] = clonedPlan;
+            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
+            closeProgramModal();
+            goHome();
+            showMessage("Scheda clonata con successo!");
+        }
+
+        function toggleArchiveProgram() {
+            if (!editingProgramId) return;
+            const isArchived = userPlan[editingProgramId].archived || false;
+            userPlan[editingProgramId].archived = !isArchived;
+            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
+            closeProgramModal();
+            goHome();
+            showMessage(!isArchived ? "Scheda archiviata." : "Scheda ripristinata!");
+        }
 
         function openEditParams(idx) {
             editingIdx = idx; const exId = userPlan[currentWorkoutId].items[idx]; const override = userPlan[currentWorkoutId].overrides[idx] || {};
@@ -892,20 +941,67 @@
 
         function renderHomeCards() {
             const container = document.getElementById('workout-cards-container');
+            const archiveContainer = document.getElementById('archived-cards-container');
+            const archiveToggle = document.getElementById('archive-toggle-container');
+            
             const colorGradients = { '#007AFF': 'from-blue-600 to-blue-900', '#AF52DE': 'from-purple-600 to-purple-900', '#34C759': 'from-emerald-500 to-green-900', '#FF9500': 'from-orange-500 to-red-800', '#FF3B30': 'from-red-600 to-red-900' };
-            container.innerHTML = Object.entries(userPlan).map(([id, p]) => {
+            
+            let activeHtml = '';
+            let archivedHtml = '';
+            let hasArchived = false;
+
+            Object.entries(userPlan).forEach(([id, p]) => {
                 const grad = colorGradients[p.color] || 'from-gray-700 to-gray-900';
-                return `
-                <div onclick="openWorkout('${id}')" class="relative h-44 rounded-[32px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform cursor-pointer border border-white/10">
+                const isArchived = p.archived || false;
+                
+                const htmlStr = `
+                <div onclick="openWorkout('${id}')" class="relative h-44 rounded-[32px] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform cursor-pointer border border-white/10 ${isArchived ? 'opacity-50 grayscale' : ''}">
                     <div class="absolute inset-0 bg-gradient-to-br ${grad} opacity-95"></div>
                     <div class="absolute inset-0 p-7 flex flex-col justify-end">
-                        <span class="text-white/60 text-[11px] font-black uppercase tracking-widest mb-1.5">Programma</span>
+                        <span class="text-white/60 text-[11px] font-black uppercase tracking-widest mb-1.5">${isArchived ? 'Archiviata' : 'Programma'}</span>
                         <h3 class="text-3xl font-black text-white leading-none w-[80%]">${p.title}</h3>
                     </div>
-                    <div class="absolute top-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 shadow-lg"><i data-lucide="play" class="w-6 h-6 text-white ml-1"></i></div>
+                    <div class="absolute top-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 shadow-lg"><i data-lucide="${isArchived ? 'archive' : 'play'}" class="w-6 h-6 text-white ml-1"></i></div>
                 </div>`;
-            }).join('');
+
+                if (isArchived) { 
+                    archivedHtml += htmlStr; 
+                    hasArchived = true; 
+                } else { 
+                    activeHtml += htmlStr; 
+                }
+            });
+
+            container.innerHTML = activeHtml || `<p class="text-gray-500 text-sm font-bold text-center py-4">Nessuna scheda attiva.</p>`;
+            archiveContainer.innerHTML = archivedHtml;
+            
+            if (hasArchived) {
+                archiveToggle.style.display = 'block';
+            } else {
+                archiveToggle.style.display = 'none';
+                archiveContainer.classList.add('hidden');
+                isArchiveViewOpen = false;
+            }
+            
+            updateArchiveToggleBtn();
             lucide.createIcons();
+        }
+
+        function toggleArchiveView() {
+            isArchiveViewOpen = !isArchiveViewOpen;
+            const archiveContainer = document.getElementById('archived-cards-container');
+            if (isArchiveViewOpen) archiveContainer.classList.remove('hidden');
+            else archiveContainer.classList.add('hidden');
+            updateArchiveToggleBtn();
+        }
+        
+        function updateArchiveToggleBtn() {
+            const btn = document.getElementById('btn-toggle-archive');
+            if(btn) {
+                if(isArchiveViewOpen) btn.innerHTML = '<i data-lucide="chevron-up" class="w-3 h-3"></i> Nascondi Archivio';
+                else btn.innerHTML = '<i data-lucide="archive" class="w-3 h-3"></i> Mostra Archivio';
+                lucide.createIcons();
+            }
         }
 
         function finishWorkout() { document.getElementById('session-kcal').value = ''; document.getElementById('modal-finish').style.display = 'flex'; lucide.createIcons(); }
@@ -943,7 +1039,6 @@
             localStorage.setItem('workout_journal', JSON.stringify(journal));
             activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); document.getElementById('session-note').value = ''; 
 
-            // Se l'utente ha premuto il tasto AI E c'è l'API key configurata
             if (requestAI && localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
@@ -963,7 +1058,6 @@
                     goHome(); 
                 }
             } else { 
-                // Se l'utente ha premuto "Salva nel Diario" (Niente AI)
                 showMessage("Sessione Salvata!"); 
                 goHome(); 
             }
@@ -978,7 +1072,7 @@
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             try {
                 let sessionDataForAI = {};
-                const planId = entry.id; // Recupera l'ID del piano usato quel giorno
+                const planId = entry.id;
                 const isAIGenerated = entry.isAIGenerated || (planId && planId.startsWith('AI_'));
 
                 Object.keys(entry.exercises).forEach(exId => {
@@ -986,7 +1080,6 @@
                     if(ex) {
                         let targetSets = ex.sets;
                         let targetReps = ex.reps;
-                        // Tenta di recuperare i parametri originali se il piano esiste ancora
                         if (planId && userPlan[planId]) {
                             const planIdx = userPlan[planId].items.indexOf(exId);
                             if (planIdx !== -1 && userPlan[planId].overrides[planIdx]) {
@@ -1125,15 +1218,17 @@
 
         function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
 
-        function openCalendar() { switchView('calendar'); renderCalendar(); showDayDetails(selectedDateStr); }
+        function openCalendar() { switchView('calendar'); renderCalendarGrid(); updateCalendarStats(); showDayDetails(selectedDateStr, false); }
         
         function changeMonth(dir) {
             calendarDate.setDate(1); 
             calendarDate.setMonth(calendarDate.getMonth() + dir);
-            renderCalendar();
             const y = calendarDate.getFullYear();
             const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
-            showDayDetails(`${y}-${m}-01`);
+            selectedDateStr = `${y}-${m}-01`;
+            renderCalendarGrid();
+            updateCalendarStats();
+            showDayDetails(selectedDateStr, false); 
         }
 
         function renderDashboardCharts() {
@@ -1331,21 +1426,9 @@
             }
         }
 
-        function changeMonth(dir) {
-            calendarDate.setDate(1); 
-            calendarDate.setMonth(calendarDate.getMonth() + dir);
-            const y = calendarDate.getFullYear();
-            const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
-            selectedDateStr = `${y}-${m}-01`;
-            renderCalendarGrid();
-            updateCalendarStats();
-            showDayDetails(selectedDateStr, false); 
-        }
-
         function showDayDetails(key, updateGridUI = true) {
             selectedDateStr = key;
             
-            // Aggiorna solo visivamente il pallino blu senza ricaricare il grafico
             if (updateGridUI) {
                 document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
                 const activeDay = document.getElementById(`cal-day-${key}`);
@@ -1400,13 +1483,6 @@
             });
         }
 
-        function openCalendar() { 
-            switchView('calendar'); 
-            renderCalendarGrid(); 
-            updateCalendarStats(); 
-            showDayDetails(selectedDateStr, false); 
-        }
-    
         function openBody() { switchView('body'); renderRecoveryHeatmap(); renderDashboardCharts(); renderBodyStats(); }
 
         window.onload = () => {
