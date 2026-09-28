@@ -625,6 +625,9 @@
             'spider_curl': { name: 'Spider Curl (Manubri)', sets: '3', reps: '10-12', img: 'img/spider_curl.png', category: 'bicipiti', coach: { esecuzione: "Pancia in giù su panca inclinata (45°). Lascia pendere le braccia verticali a terra. Fletti i bicipiti portando i manubri alle spalle.", target: "Picco del bicipite lavorato in massimo accorciamento. Elimina lo slancio.", tempo: "1s contrazione, 1s pausa stringendo il muscolo, 2s discesa" } },
             'cross_curl': { name: 'Cross Body Curl Manubri', sets: '3', reps: '10-12', img: 'img/cross_curl.png', category: 'bicipiti', coach: { esecuzione: "In piedi, solleva il manubrio in diagonale (verso la spalla opposta) mantenendo la presa a martello.", target: "Muscolo brachiale e brachioradiale per aumentare lo spessore visivo del braccio.", tempo: "1s salita, 2s discesa" } }
         };  
+    // Carica e unisci gli esercizi personalizzati dell'utente
+        const customExDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+        Object.assign(exerciseData, customExDb);
 
         const defaultPlan = {
             1: { title: 'PUSH (Forza)', color: '#007AFF', items: ['panca_piana', 'lento_avanti', 'chest_press_g1', 'alzate_lat', 'french_press', 'pushdown'], overrides: { 3: { isDropSet: true } } },
