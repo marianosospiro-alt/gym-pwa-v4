@@ -1163,6 +1163,44 @@
         }
         function processSelection(newId) { if (!userPlan[currentWorkoutId].items) userPlan[currentWorkoutId].items = []; if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Esercizio già in scheda!"); return; } if (swappingIndex === null) userPlan[currentWorkoutId].items.push(newId); else { userPlan[currentWorkoutId].items[swappingIndex] = newId; if(userPlan[currentWorkoutId].overrides) delete userPlan[currentWorkoutId].overrides[swappingIndex]; } localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeLibrary(); renderWorkout(currentWorkoutId); }
         function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
+        function openCustomEx() { document.getElementById('modal-custom-ex').style.display = 'flex'; lucide.createIcons(); }
+        function closeCustomEx() { document.getElementById('modal-custom-ex').style.display = 'none'; }
+        
+        function saveCustomEx() {
+            const name = document.getElementById('custom-ex-name').value.trim();
+            const cat = document.getElementById('custom-ex-cat').value;
+            
+            if(!name) { showMessage("Inserisci il nome dell'esercizio!"); return; }
+            
+            // Crea un ID "pulito" (es: "Lat Machine" -> "custom_lat_machine")
+            const safeName = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            const newId = 'c_' + safeName;
+            
+            const newEx = {
+                name: name,
+                category: cat,
+                sets: '3', reps: '10',
+                img: `img/${newId}.png`,
+                coach: { 
+                    esecuzione: "Esercizio personalizzato creato da te.", 
+                    target: cat, 
+                    tempo: "Regolare" 
+                }
+            };
+            
+            // Salva permanentemente in memoria
+            const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+            customDb[newId] = newEx;
+            localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
+            
+            // Aggiungi al database attivo
+            exerciseData[newId] = newEx;
+            
+            document.getElementById('custom-ex-name').value = '';
+            closeCustomEx();
+            renderLibrary(cat); // Aggiorna la lista
+            showMessage(`Salvato! In futuro chiama l'immagine: ${newId}.png`);
+        }
         function openAddMenu() { swappingIndex = null; renderLibrary('aerobica'); document.getElementById('modal-library').style.display = 'flex'; }
 
         function openInfo(exId) {
