@@ -83,7 +83,7 @@
             <i data-lucide="sparkles" class="w-10 h-10 text-purple-400 animate-pulse"></i>
         </div>
         <h2 id="ai-loading-title" class="text-2xl font-black text-white tracking-tight mb-2">Coach AI in elaborazione</h2>
-        <p class="text-sm text-gray-400 font-medium">Questa operazione richiede qualche secondo...</p>
+        <p id="ai-loading-desc" class="text-sm text-gray-400 font-medium">Questa operazione richiede qualche secondo...</p>
     </div>
 
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden text-white">
@@ -458,7 +458,7 @@
                         </select>
                     </div>
                     <div>
-                        <label>Istruzioni / Dettagli per l'AI (Opzionale)</label>
+                        <label>Istruzioni / Dettagli per l'AI</label>
                         <textarea id="custom-ex-hint" rows="2" placeholder="es. Appoggio del petto/braccio sullo schienale della panca inclinata a 45°, non sul ginocchio." class="!text-xs text-left"></textarea>
                     </div>
                     <div class="flex items-center justify-between bg-[#2C2C2E] p-4 rounded-2xl border border-white/5">
@@ -716,6 +716,7 @@
         function compressImageBase64(base64Data, maxWidth = 350, maxHeight = 350, quality = 0.8) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
+                img.crossOrigin = "anonymous";
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
@@ -742,27 +743,23 @@
             });
         }
 
-        async function generateExerciseImage(promptText) {
-            const apiKey = localStorage.getItem('gemini_api_key');
-            if (!apiKey) throw new Error("API Key mancante!");
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
-            const reqBody = {
-                instances: [{ prompt: promptText }],
-                parameters: { sampleCount: 1, aspectRatio: "1:1" }
-            };
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reqBody)
+        async function generateExerciseImageFlux(promptText) {
+            const cleanPrompt = encodeURIComponent(promptText.trim());
+            const seed = Math.floor(Math.random() * 1000000);
+            const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=400&height=400&model=flux&nologo=true&seed=${seed}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Generatore foto occupato");
+            const blob = await response.blob();
+            
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    compressImageBase64(reader.result, 350, 350, 0.8).then(resolve).catch(reject);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
             });
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `HTTP ${response.status}`);
-            }
-            const data = await response.json();
-            const b64 = data.predictions?.[0]?.bytesBase64Encoded;
-            if (!b64) throw new Error("Nessun dato immagine");
-            return await compressImageBase64(b64, 350, 350, 0.8);
         }
 
         function openAIGenerator() { if(!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; } document.getElementById('modal-ai-gen').style.display = 'flex'; }
@@ -773,6 +770,7 @@
             if(!time || !focus) { showMessage("Compila tutti i campi!"); return; }
             closeAIGenerator(); 
             document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
+            document.getElementById('ai-loading-desc').innerText = "Questa operazione richiede qualche secondo...";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             const validIds = Object.keys(exerciseData).join(', ');
             const prompt = `Sei un personal trainer elitario. Crea un allenamento di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID: [${validIds}]. Restituisci SOLO E SOLTANTO UN OGGETTO JSON. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Struttura: {"title": "Nome", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
@@ -786,6 +784,7 @@
         async function generateCorrectiveWorkout() {
             closeAIFeedback(); 
             document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
+            document.getElementById('ai-loading-desc').innerText = "Questa operazione richiede qualche secondo...";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             const feedback = document.getElementById('ai-feedback-text').innerText; const validIds = Object.keys(exerciseData).join(', ');
             const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" per correggere i punti deboli. Scegli ESERCIZI SOLO da: [${validIds}]. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Restituisci SOLO JSON. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
@@ -1016,10 +1015,8 @@
                 return `
                 <div class="flex flex-col exercise-item" data-id="${exId}">
                     <div class="bg-[#1C1C1E] rounded-[32px] overflow-hidden shadow-xl border border-white/5 relative">
-                        <div class="relative h-44 w-full bg-[#2C2C2E] overflow-hidden">
-                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                                <i data-lucide="dumbbell" class="w-16 h-16 text-white/10"></i>
-                            </div>
+                        <div class="relative h-44 w-full bg-[#2C2C2E] overflow-hidden flex items-center justify-center">
+                            <i data-lucide="dumbbell" class="w-16 h-16 text-white/10 absolute z-0 pointer-events-none"></i>
                             <img src="${ex.img}" loading="lazy" decoding="async" onerror="this.style.display='none'" class="w-full h-full object-cover opacity-60 relative z-10 transition-opacity">
                             <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/50 to-transparent z-20 pointer-events-none"></div>
                             
@@ -1192,6 +1189,7 @@
 
             if (requestAI && localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
                 document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
+                document.getElementById('ai-loading-desc').innerText = "Analisi biomeccanica della sessione in corso...";
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
                     let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
@@ -1223,6 +1221,7 @@
             if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
 
             document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
+            document.getElementById('ai-loading-desc').innerText = "Revisione allenamento storico...";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             try {
                 let sessionDataForAI = {};
@@ -1287,14 +1286,25 @@
             const apiKey = localStorage.getItem('gemini_api_key');
             if (apiKey) {
                 document.getElementById('ai-loading-title').innerText = "1/2 Guida Tecnica AI...";
+                document.getElementById('ai-loading-desc').innerText = "Elaborazione biomeccanica professionale...";
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
-                    let prompt = `Sei un biomeccanico e fotografo sportivo. L'atleta ha inserito l'esercizio: "${name}" per la categoria "${cat}".`;
-                    if (hint) {
-                        prompt += ` Istruzioni specifiche date dall'atleta sull'assetto: "${hint}".`;
-                    }
-                    prompt += ` Rispondi SOLO con un JSON valido con questa struttura:
-{"esecuzione": "Istruzioni biomeccaniche accurate basate sul setup in 2-3 frasi.", "target": "Muscoli target principali e secondari.", "tempo": "es. 1s salita, 2s discesa", "image_prompt": "Hyper-realistic fitness photography, Apple Fitness Plus aesthetic, muscular male model with defined V-taper physique performing ${name}${hint ? ', ' + hint : ''}, cinematic dark modern gym background, dramatic studio rim lighting, 85mm prime lens, sharp focus, 8k"}`;
+                    const prompt = `Sei un biomeccanico e coach elitario di bodybuilding.
+L'atleta inserisce l'esercizio: "${name}" per la categoria "${cat}".
+${hint ? `Note/vincoli specificati dall'atleta: "${hint}".` : ''}
+
+REGOLE FONDAMENTALI:
+1. NON limitarti a ripetere o copiare le parole dell'atleta!
+2. In "esecuzione", struttura una spiegazione tecnica dettagliata (3-4 frasi):
+   - Assetto e posizione articolare di partenza (inclinazione panca, blocco scapolare, posizione gomiti).
+   - Fase concentrica (traiettoria, contrazione di picco senza compensazioni).
+   - Fase eccentrica (discesa frenata, stretching sotto carico).
+3. In "target", indica muscoli primari e secondari coinvolti.
+4. In "tempo", specifica i secondi (es. "1s salita, 1s picco, 3s discesa").
+5. In "image_prompt", crea un prompt in inglese per generare una foto iperrealistica: "Hyper-realistic fitness photography, Apple Fitness Plus aesthetic, muscular male model with defined V-taper physique performing ${name}${hint ? ', ' + hint : ''}, cinematic dark modern gym background, dramatic studio rim lighting, 85mm prime lens, sharp focus, 8k".
+
+Restituisci SOLO un JSON valido con questi campi:
+{"esecuzione": "...", "target": "...", "tempo": "...", "image_prompt": "..."}`;
                     
                     const responseText = await askGemini(prompt, true);
                     const parsed = parseAIResponse(responseText);
@@ -1302,10 +1312,11 @@
                     
                     if (parsed && parsed.image_prompt) {
                         document.getElementById('ai-loading-title').innerText = "2/2 Creazione Foto Studio...";
+                        document.getElementById('ai-loading-desc').innerText = "Rendering studio con motore Flux (10-15s)...";
                         try {
-                            photoUrl = await generateExerciseImage(parsed.image_prompt);
+                            photoUrl = await generateExerciseImageFlux(parsed.image_prompt);
                         } catch(imgErr) {
-                            console.warn("Generazione immagine non riuscita, mantenuto fallback locale", imgErr);
+                            console.warn("Generazione immagine Flux fallita, mantenuto fallback", imgErr);
                         }
                     }
                 } catch (e) {
@@ -1338,18 +1349,23 @@
             if (!ex) return;
             if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
             
-            const newHint = prompt("Vuoi aggiungere indicazioni specifiche per l'AI? (es. su panca a 45°, gomiti stretti, ecc.)", ex.hint || "");
+            const newHint = prompt("Aggiungi note sull'assetto per guidare l'AI (es. panca a 45°, gomiti stretti):", ex.hint || "");
             if (newHint !== null) ex.hint = newHint.trim();
 
             document.getElementById('ai-loading-title').innerText = "Generazione Guida Tecnica...";
+            document.getElementById('ai-loading-desc').innerText = "Elaborazione biomeccanica professionale...";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             try {
-                let prompt = `Sei un biomeccanico e personal trainer. Scrivi la guida tecnica per l'esercizio "${ex.name}" per la categoria "${ex.category}".`;
-                if (ex.hint) {
-                    prompt += ` Dettagli biomeccanici specificati dall'atleta: "${ex.hint}".`;
-                }
-                prompt += ` Rispondi SOLO con un JSON valido:
-{"esecuzione": "Istruzioni biomeccaniche accurate basate sui dettagli in 2-3 frasi.", "target": "Muscoli target principali e secondari.", "tempo": "es. 1s spinta, 2s eccentrica controllata"}`;
+                const prompt = `Sei un biomeccanico e coach di bodybuilding. Scrivi la guida tecnica per l'esercizio "${ex.name}" (categoria: "${ex.category}").
+${ex.hint ? `Note/vincoli dell'atleta: "${ex.hint}".` : ''}
+
+NON limitarti a copiare le note dell'atleta. Spiega in modo rigoroso:
+1. Setup articolare e ancoraggio di partenza.
+2. Traiettoria concentrica e contrazione di picco.
+3. Ritorno eccentrico controllato con tensione continua.
+
+Restituisci SOLO un JSON valido:
+{"esecuzione": "Guida tecnica approfondita in 3-4 frasi.", "target": "Muscoli target primari e stabilizzatori.", "tempo": "es. 1s spinta, 1s contrazione, 3s discesa"}`;
                 
                 const responseText = await askGemini(prompt, true);
                 const parsed = parseAIResponse(responseText);
@@ -1361,7 +1377,7 @@
                         localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
                     }
                     openInfo(exId);
-                    showMessage("Guida tecnica aggiornata dall'AI!");
+                    showMessage("Guida tecnica aggiornata!");
                 }
             } catch(e) {
                 console.error(e);
@@ -1374,13 +1390,13 @@
         async function regenerateImageAI(exId) {
             const ex = exerciseData[exId];
             if (!ex) return;
-            if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
 
-            document.getElementById('ai-loading-title').innerText = "Generazione Foto Studio...";
+            document.getElementById('ai-loading-title').innerText = "Creazione Foto Studio...";
+            document.getElementById('ai-loading-desc').innerText = "Rendering studio con motore Flux (10-15s)...";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             try {
                 const imgPrompt = `Hyper-realistic fitness photography, Apple Fitness Plus aesthetic, muscular male model with defined V-taper physique performing ${ex.name}${ex.hint ? ', ' + ex.hint : ''}. Cinematic studio lighting, clean dark modern gym background, dramatic rim light highlighting muscle definition. Shot on 85mm prime lens, sharp focus, photorealistic, 8k.`;
-                const photoUrl = await generateExerciseImage(imgPrompt);
+                const photoUrl = await generateExerciseImageFlux(imgPrompt);
                 ex.img = photoUrl;
                 
                 if (exId.startsWith('c_')) {
@@ -1392,13 +1408,24 @@
                 if (currentWorkoutId) renderWorkout(currentWorkoutId);
                 renderLibrary(ex.category);
                 openInfo(exId);
-                showMessage("Nuova foto salvata!");
+                showMessage("Nuova foto salvata con successo!");
             } catch (e) {
                 console.error(e);
                 showMessage(`Errore Foto: ${e.message}`);
             } finally {
                 document.getElementById('ai-loading-overlay').style.display = 'none';
             }
+        }
+
+        function copyPromptNanobanana(exId) {
+            const ex = exerciseData[exId];
+            if (!ex) return;
+            const promptStr = `Hyper-realistic fitness photography, Apple Fitness Plus aesthetic, muscular male model with defined V-taper physique performing ${ex.name}${ex.hint ? ', ' + ex.hint : ''}. Cinematic studio lighting, clean dark modern gym background, dramatic rim light highlighting muscle definition. Shot on 85mm prime lens, sharp focus, photorealistic, 8k --ar 1:1`;
+            navigator.clipboard.writeText(promptStr).then(() => {
+                showMessage("Prompt Nanobanana copiato!");
+            }).catch(() => {
+                prompt("Copia manualmente il prompt:", promptStr);
+            });
         }
 
         function renameExercise(exId) {
@@ -1500,11 +1527,14 @@
                         <i data-lucide="sparkles" class="w-4 h-4"></i> Guida AI
                     </button>
                     <button onclick="regenerateImageAI('${exId}')" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
-                        <i data-lucide="camera" class="w-4 h-4"></i> Foto AI
+                        <i data-lucide="camera" class="w-4 h-4"></i> Foto Automatica
                     </button>
                 </div>
+                <button onclick="copyPromptNanobanana('${exId}')" class="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-2 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copia Prompt per Nanobanana
+                </button>
                 <div class="bg-white/5 p-4 rounded-2xl border border-white/5 mt-3 text-center">
-                    <p class="text-[11px] text-gray-400">File locale opzionale: <code class="text-white font-mono">${exId}.png</code></p>
+                    <p class="text-[11px] text-gray-400">File locale alternativo: <code class="text-white font-mono">${exId}.png</code></p>
                 </div>`;
             }
 
