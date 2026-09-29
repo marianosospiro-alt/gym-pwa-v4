@@ -21,7 +21,7 @@
         :root { --apple-blue: #0A84FF; --apple-bg: #000000; --apple-card: #1C1C1E; }
         body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--apple-bg); color: white; -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
         
-        .glass { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transform: translateZ(0); }
+        .glass { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .apple-card { background-color: var(--apple-card); border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); }
         .btn-primary { background-color: var(--apple-blue); border-radius: 16px; font-weight: 800; transition: transform 0.1s, opacity 0.1s; }
         .btn-primary:active { transform: scale(0.96); opacity: 0.9; }
@@ -29,7 +29,7 @@
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
         .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
         
-        .animate-slide { animation: slide 0.3s ease-out forwards; will-change: transform, opacity; }
+        .animate-slide { animation: slide 0.3s ease-out forwards; }
         @keyframes slide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
         .modal-sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; align-items: flex-end; }
@@ -42,8 +42,7 @@
         input:focus, textarea:focus { border-color: var(--apple-blue); outline: none; }
         label { color: #8E8E93; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; display: block; }
         
-        .img-thumb { width: 64px !important; height: 64px !important; background: #2C2C2E; border-radius: 16px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; aspect-ratio: 1 / 1 !important; }
-        .img-thumb img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+        .img-thumb { width: 64px !important; height: 64px !important; border-radius: 16px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; aspect-ratio: 1 / 1 !important; }
         
         .superset-connector { width: 4px; height: 40px; background: linear-gradient(to bottom, #AF52DE, rgba(175, 82, 222, 0.1)); margin: -20px auto; position: relative; z-index: 1; border-radius: 4px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -83,7 +82,7 @@
         <div class="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center ai-glow border border-purple-500/50 mb-6">
             <i data-lucide="sparkles" class="w-10 h-10 text-purple-400 animate-pulse"></i>
         </div>
-        <h2 class="text-2xl font-black text-white tracking-tight mb-2">Coach AI in elaborazione</h2>
+        <h2 id="ai-loading-title" class="text-2xl font-black text-white tracking-tight mb-2">Coach AI in elaborazione</h2>
         <p class="text-sm text-gray-400 font-medium">Questa operazione richiede qualche secondo...</p>
     </div>
 
@@ -148,7 +147,7 @@
                 
                 <div id="notes-area" class="mt-8">
                     <label class="ml-1 mb-2">Note di sessione</label>
-                    <textarea id="session-note" rows="3" placeholder="Com'è andata oggi?" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></textarea>
+                    <textarea id="session-note" rows="3" placeholder="Com'è andata oggi?"></textarea>
                 </div>
             </div>
         </div>
@@ -248,31 +247,31 @@
             <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-4 px-1 mt-10">Nuova Misurazione Completa</h2>
             <div class="apple-card p-5 space-y-4 mb-4">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label>Altezza (cm)</label><input type="number" id="bio-height" placeholder="es. 180" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                    <div><label>Peso (kg)</label><input type="number" id="bio-weight" step="0.1" placeholder="es. 80.5" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Altezza (cm)</label><input type="number" id="bio-height" placeholder="es. 180"></div>
+                    <div><label>Peso (kg)</label><input type="number" id="bio-weight" step="0.1" placeholder="es. 80.5"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label>Massa Magra (%)</label><input type="number" id="bio-lean" step="0.1" placeholder="es. 45" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                    <div><label>Massa Grassa (%)</label><input type="number" id="bio-fat" step="0.1" placeholder="es. 15" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Massa Magra (%)</label><input type="number" id="bio-lean" step="0.1" placeholder="es. 45"></div>
+                    <div><label>Massa Grassa (%)</label><input type="number" id="bio-fat" step="0.1" placeholder="es. 15"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
-                    <div><label>Spalle (cm)</label><input type="number" id="bio-shoulders" placeholder="es. 120" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                    <div><label>Petto (cm)</label><input type="number" id="bio-chest" placeholder="es. 105" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Spalle (cm)</label><input type="number" id="bio-shoulders" placeholder="es. 120"></div>
+                    <div><label>Petto (cm)</label><input type="number" id="bio-chest" placeholder="es. 105"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
-                    <div><label>Braccio Sx (cm)</label><input type="number" id="bio-arm-sx" step="0.1" placeholder="es. 38" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                    <div><label>Braccio Dx (cm)</label><input type="number" id="bio-arm-dx" step="0.1" placeholder="es. 38.5" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Braccio Sx (cm)</label><input type="number" id="bio-arm-sx" step="0.1" placeholder="es. 38"></div>
+                    <div><label>Braccio Dx (cm)</label><input type="number" id="bio-arm-dx" step="0.1" placeholder="es. 38.5"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label>Coscia Sx (cm)</label><input type="number" id="bio-leg-sx" step="0.1" placeholder="es. 60" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                    <div><label>Coscia Dx (cm)</label><input type="number" id="bio-leg-dx" step="0.1" placeholder="es. 60.5" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Coscia Sx (cm)</label><input type="number" id="bio-leg-sx" step="0.1" placeholder="es. 60"></div>
+                    <div><label>Coscia Dx (cm)</label><input type="number" id="bio-leg-dx" step="0.1" placeholder="es. 60.5"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label>Polpaccio Sx (cm)</label><input type="number" id="bio-calf-sx" step="0.1" placeholder="es. 40" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                    <div><label>Polpaccio Dx (cm)</label><input type="number" id="bio-calf-dx" step="0.1" placeholder="es. 40.5" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Polpaccio Sx (cm)</label><input type="number" id="bio-calf-sx" step="0.1" placeholder="es. 40"></div>
+                    <div><label>Polpaccio Dx (cm)</label><input type="number" id="bio-calf-dx" step="0.1" placeholder="es. 40.5"></div>
                 </div>
                 <div class="border-t border-white/5 pt-4 mt-4">
-                    <label>Vita (cm)</label><input type="number" id="bio-waist" placeholder="es. 82" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)">
+                    <label>Vita (cm)</label><input type="number" id="bio-waist" placeholder="es. 82">
                 </div>
             </div>
             <button onclick="saveBiometrics()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-500/20">
@@ -314,7 +313,7 @@
                     <button onclick="closeProgramModal()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="space-y-6 mb-8">
-                    <div><label>Nome Programma</label><input type="text" id="prog-name" placeholder="es. FULL BODY" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Nome Programma</label><input type="text" id="prog-name" placeholder="es. FULL BODY"></div>
                     <div><label>Scegli Colore</label>
                         <div class="flex gap-4 justify-center mt-2">
                             <div class="color-dot bg-blue-500" data-color="#0A84FF" onclick="selectColor(this)"></div>
@@ -344,8 +343,8 @@
                     <button onclick="closeAIGenerator()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="space-y-6 mb-8 scrollable-area">
-                    <div><label>Minuti a disposizione</label><input type="number" id="ai-time" placeholder="es. 45" class="!text-2xl !py-4" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                    <div><label>Focus e Obiettivo</label><textarea id="ai-focus" rows="3" placeholder="es. Gambe e Glutei, focus ipertrofia." class="!text-sm" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></textarea></div>
+                    <div><label>Minuti a disposizione</label><input type="number" id="ai-time" placeholder="es. 45" class="!text-2xl !py-4"></div>
+                    <div><label>Focus e Obiettivo</label><textarea id="ai-focus" rows="3" placeholder="es. Gambe e Glutei, focus ipertrofia." class="!text-sm"></textarea></div>
                 </div>
                 <button onclick="generateWorkoutAI()" class="w-full bg-purple-600 hover:bg-purple-500 py-4 rounded-2xl font-black text-white uppercase tracking-widest text-[12px] transition-colors shadow-[0_10px_20px_rgba(175,82,222,0.3)]">GENERA SCHEDA MAGICA</button>
             </div>
@@ -394,8 +393,8 @@
                     <button onclick="closeCardioModal()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="space-y-6 mb-8 scrollable-area">
-                    <div><label>Durata (Minuti)</label><input type="number" id="cardio-min" placeholder="es. 45" class="!text-2xl !py-4" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                    <div><label>Distanza (Km) o Livello (1-10)</label><input type="number" step="0.1" id="cardio-dist" placeholder="es. 8.5" class="!text-2xl !py-4" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Durata (Minuti)</label><input type="number" id="cardio-min" placeholder="es. 45" class="!text-2xl !py-4"></div>
+                    <div><label>Distanza (Km) o Livello (1-10)</label><input type="number" step="0.1" id="cardio-dist" placeholder="es. 8.5" class="!text-2xl !py-4"></div>
                 </div>
                 <button onclick="confirmCardioLogs()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest">CONFERMA CARDIO</button>
             </div>
@@ -410,8 +409,8 @@
                 </div>
                 <div class="scrollable-area space-y-6">
                     <div class="grid grid-cols-2 gap-5">
-                        <div><label>Serie</label><input type="number" id="edit-sets" placeholder="es. 4" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
-                        <div><label>Reps / Carico</label><input type="text" id="edit-reps" placeholder="es. 10 @ 50kg" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                        <div><label>Serie</label><input type="number" id="edit-sets" placeholder="es. 4"></div>
+                        <div><label>Reps / Carico</label><input type="text" id="edit-reps" placeholder="es. 10 @ 50kg"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-5 mt-5">
                         <div class="flex flex-col justify-end"><label>Intensità</label><button id="toggle-drop" onclick="toggleDropSetLocal()" class="w-full py-4 rounded-2xl border border-white/10 text-xs font-black tracking-widest transition-all">DROP SET: OFF</button></div>
@@ -445,7 +444,7 @@
                     <button onclick="closeCustomEx()" class="bg-[#2C2C2E] p-2.5 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="space-y-6 mb-8 scrollable-area">
-                    <div><label>Nome Esercizio</label><input type="text" id="custom-ex-name" placeholder="es. Lat Machine Inversa" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                    <div><label>Nome Esercizio</label><input type="text" id="custom-ex-name" placeholder="es. Lat Machine Inversa"></div>
                     <div><label>Categoria Muscolare</label>
                         <select id="custom-ex-cat" class="bg-[#2C2C2E] text-white">
                             <option value="petto">Petto</option>
@@ -458,8 +457,15 @@
                             <option value="aerobica">Aerobica / Cardio</option>
                         </select>
                     </div>
+                    <div class="flex items-center justify-between bg-[#2C2C2E] p-4 rounded-2xl border border-white/5">
+                        <div>
+                            <p class="text-sm font-bold text-white">A Corpo Libero (senza Kg)</p>
+                            <p class="text-[10px] text-gray-400">Non chiederà il peso durante la registrazione</p>
+                        </div>
+                        <input type="checkbox" id="custom-ex-isbw" class="w-6 h-6 accent-blue-500 rounded">
+                    </div>
                     <div class="bg-blue-500/10 border border-blue-500/20 p-4 rounded-2xl">
-                        <p class="text-xs text-blue-400 font-bold leading-relaxed"><i data-lucide="image" class="w-4 h-4 inline mb-1"></i> <b>Generazione Istruzioni:</b> L'AI compilerà per te i dettagli tecnici e i muscoli coinvolti (richiede API Key attiva). Altrimenti verranno usati dati base.</p>
+                        <p class="text-xs text-blue-400 font-bold leading-relaxed"><i data-lucide="sparkles" class="w-4 h-4 inline mb-1"></i> Se l'API Key è configurata, l'AI scriverà automaticamente biomeccanica e muscoli target in sottofondo.</p>
                     </div>
                 </div>
                 <button onclick="saveCustomEx()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest">SALVA NEL CATALOGO</button>
@@ -503,7 +509,7 @@
                 <div class="w-14 h-14 rounded-full bg-orange-500/20 flex items-center justify-center mx-auto mb-4 border border-orange-500/30"><i data-lucide="flame" class="w-7 h-7 text-orange-500"></i></div>
                 <h3 class="text-2xl font-black mb-2 text-white tracking-tight">Ottimo Lavoro!</h3>
                 <p class="text-sm text-gray-400 mb-8 leading-relaxed">Inserisci le calorie attive lette dal tuo Apple Watch per questa sessione.</p>
-                <div class="mb-8"><input type="number" id="session-kcal" placeholder="Kcal bruciate" class="!text-xl !py-5 bg-[#2C2C2E] border-2 focus:border-orange-500 transition-colors" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>
+                <div class="mb-8"><input type="number" id="session-kcal" placeholder="Kcal bruciate" class="!text-xl !py-5 bg-[#2C2C2E] border-2 focus:border-orange-500 transition-colors"></div>
                 <div class="flex flex-col gap-3">
                     <button onclick="preSaveWorkoutFinal(false, true)" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 py-4 rounded-2xl font-black text-white uppercase tracking-widest text-[11px] transition-colors shadow-lg flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Salva e Analizza AI</button>
                     <button onclick="preSaveWorkoutFinal(false, false)" class="w-full bg-orange-500 hover:bg-orange-400 py-4 rounded-2xl font-black text-black uppercase tracking-widest text-[11px] transition-colors shadow-lg shadow-orange-500/20">Salva nel Diario</button>
@@ -565,7 +571,7 @@
             'leg_ext': { name: 'Leg Extension', sets: '3', reps: '15-20', img: 'img/leg_ext.png', category: 'gambe', coach: { esecuzione: "Siediti ben saldo col sedere incollato al sedile. Estendi le tibie cercando il blocco articolare in cima.", target: "Isolamento Quadricipite (soprattutto retto femorale).", tempo: "1s estensione, 1s fermo in cima, 3s discesa" } },
             'leg_press': { name: 'Leg Press 45°', sets: '4', reps: '10-12', img: 'img/leg_press.png', category: 'gambe', coach: { esecuzione: "Piedi a larghezza spalle. Scendi lentamente finché le ginocchia arrivano vicine al petto, ma senza staccare mai il sedere o la zona lombare dal pad.", target: "Massa generale per quadricipiti, femorali e glutei.", tempo: "1s spinta potente, 3s discesa frenata" } },
             'leg_curl': { name: 'Leg Curl', sets: '3', reps: '12-15', img: 'img/leg_curl.png', category: 'gambe', coach: { esecuzione: "Sdraiato o seduto. Fletti le ginocchia portando il pad verso i glutei. Punta i piedi verso il corpo (dorsiflessione) per maggior focus.", target: "Isolamento Femorali (Ischiocrurali).", tempo: "1s flessione, 1s contrazione di picco, 3s discesa lenta" } },
-            'polpacci': { name: 'Calf Seduto/In Piedi', sets: '4', reps: '15-20', img: 'img/polpacci.png', category: 'gambe', isBW: true, coach: { esecuzione: "Punte sui rialzi. Scendi in massimo allungamento finché tiri tutto. Poi spingi fin sulla punta massima dell'alluce.", target: "Polpacci (Gastrocnemio in piedi, Soleo seduto).", tempo: "1s spinta, 1s in punta, 3s discesa, 1s fermo in basso" } },
+            'polpacci': { name: 'Calf Seduto/In Piedi', sets: '4', reps: '15-20', img: 'img/polpacci.png', category: 'gambe', coach: { esecuzione: "Punte sui rialzi. Scendi in massimo allungamento finché tiri tutto. Poi spingi fin sulla punta massima dell'alluce.", target: "Polpacci (Gastrocnemio in piedi, Soleo seduto).", tempo: "1s spinta, 1s in punta, 3s discesa, 1s fermo in basso" } },
             'squat': { name: 'Squat Bilanciere', sets: '4', reps: '6-8', img: 'img/squat.png', category: 'gambe', coach: { esecuzione: "Bilanciere sui trapezi. Prendi aria, contrai l'addome. Scendi spingendo le ginocchia in fuori finché il bacino rompe il parallelo. Torna su mantenendo il core di marmo.", target: "Il Re degli esercizi per la massa totale di gambe e glutei.", tempo: "1-2s spinta, 3s discesa controllata" } },
             'step_up': { name: 'Step-up', sets: '3', reps: '10-12', img: 'img/step_up.png', category: 'gambe', coach: { esecuzione: "Piede saldamente appoggiato sul box. Spingi dal tallone e sali senza darti slancio con il piede a terra. Controlla la discesa come se fosse uno squat a una gamba.", target: "Gluteo e Quadricipite unilaterale. Ottimo per stabilità e bilanciamento.", tempo: "1s salita esplosiva, 3-4s discesa molto lenta" } },
             'affondi_inversi_man': { name: 'Affondi Inversi Manubri', sets: '3', reps: '10-12', img: 'img/affondi_inversi_man.png', category: 'gambe', coach: { esecuzione: "In piedi con un manubrio per mano. Fai un passo all'indietro e scendi finché il ginocchio posteriore sfiora il suolo. Spingi con il tallone della gamba anteriore per risalire.", target: "Quadricipiti, glutei e femorali. Minor stress sulle ginocchia rispetto agli affondi frontali.", tempo: "1s spinta in su, 2s discesa controllata" } },
@@ -590,55 +596,55 @@
             'croci_cavi_bassi': { name: 'Croci Cavi Bassi', sets: '3', reps: '12-15', img: 'img/croci_cavi_bassi.png', category: 'petto', coach: { esecuzione: "Prendi i cavi dal basso. Tira incrociando/unendo le maniglie verso l'alto a livello del naso/occhi, mantenendo il petto gonfio.", target: "Isolamento del petto alto, ottima tensione in massimo accorciamento.", tempo: "1s salita, 1s strizzata in cima, 2s discesa" } },
             'croci_inc': { name: 'Croci Panca Inclinata', sets: '3', reps: '12-15', img: 'img/croci_inc.png', category: 'petto', coach: { esecuzione: "Panca a 30°. Braccia tese ma sbloccate al gomito. Apri i manubri lateralmente finché senti tirare il petto, poi richiudi abbracciando una 'botte' immaginaria.", target: "Allungamento estremo per l'ipertrofia del pettorale alto.", tempo: "1s chiusura, 3-4s di apertura lentissima" } },
             'crossover': { name: 'Crossover ai Cavi', sets: '3', reps: '15-20', img: 'img/crossover.png', category: 'petto', coach: { esecuzione: "Cavi alti. Piegati in avanti. Porta le mani a toccarsi o incrociarsi davanti alla zona addominale/inguine. Tieni le spalle indietro.", target: "Scolpisce la parte bassa e centrale del pettorale.", tempo: "1s chiusura, 1s strizzata, 2s ritorno controllato" } },
-            'dips_petto': { name: 'Dip Parallele (Petto)', sets: '4', reps: '8-10', img: 'img/dips_petto.png', category: 'petto', isBW: true, coach: { esecuzione: "Scendi piegando il busto molto in avanti (circa 45°) e allargando leggermente i gomiti. Scendi finché la spalla è sotto il gomito (se la mobilità lo permette).", target: "Costruttore formidabile per il petto basso e tricipiti.", tempo: "1s spinta in su, 3s discesa lenta" } },
-            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5', reps: '5-8', img: 'img/panca_piana.png', category: 'petto', coach: { esecuzione: "Piedi incollati a terra. Scapole chiuse. Porta il bilanciere allo sterno (capezzoli) controllando il peso, sfiora il petto e spingi su violentemente.", target: "Esercizio fondamentale di forza e ipertrofia per il petto e tutta la catena di spinta.", tempo: "Spinta esplosiva, 2-3s eccentrica" } },
+            'dips_petto': { name: 'Dip Parallele (Petto)', sets: '4', reps: '8-10', img: 'img/dips_petto.png', category: 'petto', isBW: true, coach: { esecuzione: "Scendi piegando il busto molto in avanti (circa 45°) e allargando leggermente i gomiti. Scendi finché la spalla è sotto il gomito.", target: "Costruttore formidabile per il petto basso e tricipiti.", tempo: "1s spinta in su, 3s discesa lenta" } },
+            'panca_piana': { name: 'Panca Piana Bilanciere', sets: '5', reps: '5-8', img: 'img/panca_piana.png', category: 'petto', coach: { esecuzione: "Piedi incollati a terra. Scapole chiuse. Porta il bilanciere allo sterno controllando il peso, sfiora il petto e spingi su violentemente.", target: "Esercizio fondamentale di forza e ipertrofia per il petto.", tempo: "Spinta esplosiva, 2-3s eccentrica" } },
             'pectoral': { name: 'Pectoral Machine', sets: '4', reps: '12-15', img: 'img/pectoral.png', category: 'petto', coach: { esecuzione: "Gomiti o mani sui pad. Chiudi le braccia cercando di unire idealmente l'interno dei gomiti. Rilascia controllando.", target: "Pompaggio e isolamento totale per la separazione sternale del petto.", tempo: "1s chiusura, 1s pausa isometrica al centro, 2s apertura" } },
-            'spinte_inc': { name: 'Spinte Inclinata Manubri', sets: '4', reps: '8-10', img: 'img/spinte_inc.png', category: 'petto', coach: { esecuzione: "Panca 30-45°. Scendi con i manubri fino al lato del petto, gomiti a 45° rispetto al busto (non a 'T'). Spingi verso l'alto chiudendo l'arco.", target: "Sviluppo della parte alta della gabbia toracica e del petto.", tempo: "1s spinta, 2s discesa" } },
-            'pec_deck': { name: 'Pec Deck (Fly Machine)', sets: '3', reps: '12-15', img: 'img/pec_deck.png', category: 'petto', coach: { esecuzione: "Braccia distese, gomiti leggermente flessi. Chiudi senza stringere le mani sui pad, pensa a spingere con i bicipiti uno contro l'altro.", target: "Isolamento e tensione continua al centro del petto.", tempo: "1s chiusura, 1s strizzata forte, 3s apertura lenta" } },
+            'spinte_inc': { name: 'Spinte Inclinata Manubri', sets: '4', reps: '8-10', img: 'img/spinte_inc.png', category: 'petto', coach: { esecuzione: "Panca 30-45°. Scendi con i manubri fino al lato del petto, gomiti a 45° rispetto al busto. Spingi verso l'alto.", target: "Sviluppo della parte alta della gabbia toracica e del petto.", tempo: "1s spinta, 2s discesa" } },
+            'pec_deck': { name: 'Pec Deck (Fly Machine)', sets: '3', reps: '12-15', img: 'img/pec_deck.png', category: 'petto', coach: { esecuzione: "Braccia distese, gomiti leggermente flessi. Chiudi pensando a spingere con i bicipiti uno contro l'altro.", target: "Isolamento e tensione continua al centro del petto.", tempo: "1s chiusura, 1s strizzata forte, 3s apertura lenta" } },
             
-            'curl_cavi': { name: 'Curl ai Cavi', sets: '3', reps: '12-15', img: 'img/curl_cavi.png', category: 'bicipiti', coach: { esecuzione: "Sbarra dritta o angolata ai cavi bassi. Tieni i gomiti bloccati ai lati del corpo. Tira su contraendo il bicipite. Usa il cavo per resistere in discesa.", target: "Tensione continua in ogni punto della rep, ottimo per il pump.", tempo: "1s contrazione, 2-3s discesa" } },
-            'curl_concentrazione': { name: 'Curl Concentrazione', sets: '3', reps: '10-12', img: 'img/curl_concentrazione.png', category: 'bicipiti', coach: { esecuzione: "Seduto, gomito incastrato all'interno della coscia. Esegui la flessione ruotando leggermente il polso verso l'esterno alla fine (supinazione).", target: "Costruisce il 'picco' e la massima rotondità del bicipite.", tempo: "1s contrazione, 1s pausa strizzando, 2s discesa" } },
-            'curl_ez': { name: 'Curl Bilanciere EZ', sets: '4', reps: '8-10', img: 'img/curl_ez.png', category: 'bicipiti', coach: { esecuzione: "Presa sulla curva per salvare i polsi. Solleva pesi importanti evitando di dondolare eccessivamente col busto. Gomiti fissi.", target: "Costruttore primario di massa globale per i flessori del braccio.", tempo: "1s flessione, 2s eccentrica controllata" } },
-            'hammer_curl': { name: 'Hammer Curl Manubri', sets: '3', reps: '10-12', img: 'img/hammer_curl.png', category: 'bicipiti', coach: { esecuzione: "Impugnatura neutra (a martello). Solleva i manubri alternati o insieme portandoli verso la spalla. Tieni sempre il polso dritto.", target: "Focus su muscolo brachiale e brachioradiale. Fa apparire il braccio più largo frontalmente.", tempo: "1s salita, 2s discesa" } },
-            'hammer_curl_cavi': { name: 'Hammer Curl Cavi', sets: '3', reps: '12-15', img: 'img/hammer_curl_cavi.png', category: 'bicipiti', coach: { esecuzione: "Cavo basso con corda. Afferra la fune mantenendo le mani parallele. Separa la corda al vertice della salita per extra stimolo.", target: "Tensione brutale per avambracci e brachiale in tutto l'arco di movimento.", tempo: "1s tirata, 1s apertura in cima, 2s ritorno" } },
-            'incline_curl': { name: 'Incline Dumbbell Curl', sets: '3', reps: '10-12', img: 'img/incline_curl.png', category: 'bicipiti', coach: { esecuzione: "Seduto su panca inclinata a 45°. Lascia cadere le braccia perpendicolari al pavimento. Fletti i manubri supinando il polso.", target: "Lavora il bicipite in massimo allungamento, reclutando il capo lungo.", tempo: "1s flessione, 3s discesa lentissima (stretching attivo)" } },
-            'preacher_curl': { name: 'Preacher Curl (Panca Scott)', sets: '3', reps: '10-12', img: 'img/preacher_curl.png', category: 'bicipiti', coach: { esecuzione: "Incastra ascelle e tricipiti sulla panca. Fletti il bilanciere. Attenzione nella discesa: non estendere il braccio fino a bloccare il gomito sotto carico.", target: "Focus brutale sul capo corto. Impossibile usare slanci.", tempo: "1s salita, 2-3s discesa (non iper-estendere in basso)" } },
-            'spider_curl': { name: 'Spider Curl (Manubri)', sets: '3', reps: '10-12', img: 'img/spider_curl.png', category: 'bicipiti', coach: { esecuzione: "Pancia in giù su panca inclinata (45°). Lascia pendere le braccia verticali a terra. Fletti i bicipiti portando i manubri alle spalle.", target: "Picco del bicipite lavorato in massimo accorciamento. Elimina lo slancio.", tempo: "1s contrazione, 1s pausa stringendo il muscolo, 2s discesa" } },
-            'cross_curl': { name: 'Cross Body Curl Manubri', sets: '3', reps: '10-12', img: 'img/cross_curl.png', category: 'bicipiti', coach: { esecuzione: "In piedi, solleva il manubrio in diagonale (verso la spalla opposta) mantenendo la presa a martello.", target: "Muscolo brachiale e brachioradiale per aumentare lo spessore visivo del braccio.", tempo: "1s salita, 2s discesa" } },
-            'bayesian_curl': { name: 'Bayesian Curl ai Cavi', sets: '3', reps: '12-15', img: 'img/bayesian_curl.png', category: 'bicipiti', coach: { esecuzione: "Dai le spalle al cavo basso. Fai un passo avanti in modo che il braccio sia teso all'indietro. Fletti in avanti senza muovere il gomito.", target: "Capo lungo del bicipite sotto sforzo massimo in fase di allungamento.", tempo: "1s flessione, 3s allungamento lentissimo" } },
+            'curl_cavi': { name: 'Curl ai Cavi', sets: '3', reps: '12-15', img: 'img/curl_cavi.png', category: 'bicipiti', coach: { esecuzione: "Sbarra dritta o angolata ai cavi bassi. Tieni i gomiti bloccati ai lati del corpo. Tira su contraendo il bicipite.", target: "Tensione continua in ogni punto della rep, ottimo per il pump.", tempo: "1s contrazione, 2-3s discesa" } },
+            'curl_concentrazione': { name: 'Curl Concentrazione', sets: '3', reps: '10-12', img: 'img/curl_concentrazione.png', category: 'bicipiti', coach: { esecuzione: "Seduto, gomito incastrato all'interno della coscia. Esegui la flessione ruotando leggermente il polso verso l'esterno.", target: "Costruisce il picco e la massima rotondità del bicipite.", tempo: "1s contrazione, 1s pausa strizzando, 2s discesa" } },
+            'curl_ez': { name: 'Curl Bilanciere EZ', sets: '4', reps: '8-10', img: 'img/curl_ez.png', category: 'bicipiti', coach: { esecuzione: "Presa sulla curva per salvare i polsi. Solleva pesi importanti evitando di dondolare con il busto. Gomiti fissi.", target: "Costruttore primario di massa globale per i flessori del braccio.", tempo: "1s flessione, 2s eccentrica controllata" } },
+            'hammer_curl': { name: 'Hammer Curl Manubri', sets: '3', reps: '10-12', img: 'img/hammer_curl.png', category: 'bicipiti', coach: { esecuzione: "Impugnatura neutra (a martello). Solleva i manubri alternati o insieme portandoli verso la spalla.", target: "Focus su muscolo brachiale e brachioradiale per braccia più larghe frontalmente.", tempo: "1s salita, 2s discesa" } },
+            'hammer_curl_cavi': { name: 'Hammer Curl Cavi', sets: '3', reps: '12-15', img: 'img/hammer_curl_cavi.png', category: 'bicipiti', coach: { esecuzione: "Cavo basso con corda. Afferra la fune mantenendo le mani parallele. Separa la corda al vertice.", target: "Tensione costante per avambracci e brachiale in tutto l'arco di movimento.", tempo: "1s tirata, 1s apertura in cima, 2s ritorno" } },
+            'incline_curl': { name: 'Incline Dumbbell Curl', sets: '3', reps: '10-12', img: 'img/incline_curl.png', category: 'bicipiti', coach: { esecuzione: "Seduto su panca a 45°. Lascia cadere le braccia perpendicolari al pavimento. Fletti supinando il polso.", target: "Lavora il bicipite in massimo allungamento, reclutando il capo lungo.", tempo: "1s flessione, 3s discesa lentissima" } },
+            'preacher_curl': { name: 'Preacher Curl (Panca Scott)', sets: '3', reps: '10-12', img: 'img/preacher_curl.png', category: 'bicipiti', coach: { esecuzione: "Incastra ascelle e tricipiti sulla panca. Fletti il bilanciere. Attenzione a non iper-estendere in basso.", target: "Focus marcato sul capo corto. Elimina qualsiasi slancio.", tempo: "1s salita, 2-3s discesa controllata" } },
+            'spider_curl': { name: 'Spider Curl (Manubri)', sets: '3', reps: '10-12', img: 'img/spider_curl.png', category: 'bicipiti', coach: { esecuzione: "Pancia in giù su panca a 45°. Braccia verticali a terra. Fletti i bicipiti portando i manubri alle spalle.", target: "Picco del bicipite lavorato in massimo accorciamento.", tempo: "1s contrazione, 1s pausa strizzando, 2s discesa" } },
+            'cross_curl': { name: 'Cross Body Curl Manubri', sets: '3', reps: '10-12', img: 'img/cross_curl.png', category: 'bicipiti', coach: { esecuzione: "In piedi, solleva il manubrio in diagonale verso la spalla opposta con presa a martello.", target: "Brachiale e brachioradiale per spessore visivo del braccio.", tempo: "1s salita, 2s discesa" } },
+            'bayesian_curl': { name: 'Bayesian Curl ai Cavi', sets: '3', reps: '12-15', img: 'img/bayesian_curl.png', category: 'bicipiti', coach: { esecuzione: "Dai le spalle al cavo basso. Fai un passo avanti col braccio teso all'indietro. Fletti senza muovere il gomito.", target: "Capo lungo del bicipite sotto sforzo massimo in allungamento.", tempo: "1s flessione, 3s ritorno lentissimo" } },
             
-            'dips_tricipiti': { name: 'Dip Parallele (Tricipiti)', sets: '3', reps: '10-12', img: 'img/dips_tricipiti.png', category: 'tricipiti', isBW: true, coach: { esecuzione: "Busto dritto e verticale (non chinato in avanti come nel petto), gomiti strettissimi rasenti i fianchi. Scendi a 90 gradi, poi spingi fino a bloccare i gomiti.", target: "Il miglior costruttore di massa 'pesante' per i tricipiti.", tempo: "1s spinta, 2s discesa frenata" } },
-            'estensioni_testa': { name: 'Estensioni Dietro Nuca', sets: '3', reps: '12-15', img: 'img/estensioni_testa.png', category: 'tricipiti', coach: { esecuzione: "Un manubrio pesante a due mani o singolo. Tieni le braccia vicino alla testa. Scendi col peso dietro la nuca allungando al massimo, poi estendi in alto.", target: "Colpisce intensamente il capo lungo del tricipite in massimo allungamento.", tempo: "1s estensione in alto, 2s discesa profonda" } },
-            'french_press': { name: 'French Press', sets: '3', reps: '8-10', img: 'img/french_press.png', category: 'tricipiti', coach: { esecuzione: "Sdraiato su panca, bilanciere EZ. Le braccia non sono perfettamente a 90° ma leggermente inclinate all'indietro. Porta il peso dietro o alla sommità della fronte.", target: "Spessore generale del tricipite. La leggera inclinazione all'indietro mantiene tensione costante.", tempo: "1s estensione, 2-3s discesa controllata" } },
-            'kickback': { name: 'Kickback Manubri', sets: '3', reps: '12-15', img: 'img/kickback.png', category: 'tricipiti', coach: { esecuzione: "Busto piegato a 90°. Gomiti fissi alti sui fianchi. Estendi solo l'avambraccio all'indietro finché il braccio non è parallelo a terra.", target: "Isolamento di picco. L'obiettivo è contrarre fortissimo a fine corsa, non usare pesi enormi.", tempo: "1s spinta, 1s pausa (strizzata isometrica), 2s ritorno" } },
-            'pushdown': { name: 'Push Down Cavi', sets: '4', reps: '10-12', img: 'img/pushdown.png', category: 'tricipiti', coach: { esecuzione: "Sbarra dritta o a V. Gomiti incollati al busto o leggermente davanti. Spingi in basso fino a bloccare l'articolazione, apri il petto.", target: "Riscaldamento eccellente e isolamento isolato per il capo laterale.", tempo: "1s spinta in basso, 2s ritorno controllando il cavo" } },
-            'pushdown_corda': { name: 'Pushdown Corda', sets: '3', reps: '12-15', img: 'img/pushdown_corda.png', category: 'tricipiti', coach: { esecuzione: "Come il pushdown classico, ma alla fine del movimento 'strappa' e allarga la corda all'esterno, ruotando i palmi verso il basso.", target: "Extra reclutamento e 'strizzata' del capo laterale a fine arco di movimento.", tempo: "1s spinta e apertura in basso, 2s risalita" } },
-            'pushdown_fune': { name: 'Pushdown Fune', sets: '3', reps: '12-15', img: 'img/pushdown_fune.png', category: 'tricipiti', coach: { esecuzione: "Presa neutra con fune singola o doppia lunga. Stesso principio ma con focus su estensione pulita.", target: "Più ergonomico sui polsi, focus sul pump del tricipite.", tempo: "1s spinta in basso, 2s risalita" } },
-            'skull_crusher': { name: 'Skull Crusher', sets: '3', reps: '10-12', img: 'img/skull_crusher.png', category: 'tricipiti', coach: { esecuzione: "Versione cruda della French Press. Gomiti puntati dritti a soffitto. Porta il bilanciere fino alla fronte (o sfiorando il naso) ed estendi verticalmente.", target: "Esercizio fondamentale di forza e ipertrofia. Attenzione ai gomiti: usa carichi gestibili.", tempo: "1s spinta esplosiva, 3s discesa rallentata" } },
-            'tri_ext_single': { name: 'Estensione Tricep Singola Sopra Testa', sets: '3', reps: '12-15', img: 'img/tri_ext_single.png', category: 'tricipiti', coach: { esecuzione: "Cavo posizionato in basso o medio. Afferra la maniglia, portala dietro la nuca e distendi il braccio verso l'alto.", target: "Isolamento estremo del capo lungo del tricipite. Corregge asimmetrie.", tempo: "1s estensione, 2s discesa profonda" } },
-            'kickback_cavi': { name: 'Kickback ai Cavi', sets: '3', reps: '12-15', img: 'img/kickback_cavi.png', category: 'tricipiti', coach: { esecuzione: "Piegato in avanti a 90°, puleggia ad altezza anca. Estendi all'indietro solo l'avambraccio, fermando il gomito sui fianchi.", target: "Picco del tricipite senza perdere tensione grazie al cavo.", tempo: "1s spinta indietro, 1s pausa di massima contrazione, 2s discesa" } },
-            'estensioni_testa_cavi': { name: 'Estensioni Dietro Nuca Cavi', sets: '3', reps: '10-12', img: 'img/estensioni_testa_cavi.png', category: 'tricipiti', coach: { esecuzione: "Dai le spalle al cavo basso o medio. Afferra la corda dietro la testa con i gomiti puntati verso l'alto. Estendi le braccia verso l'alto e l'esterno, mantenendo la posizione dei gomiti ferma e stabile.", target: "Isolamento profondo del capo lungo del tricipite in posizione di massimo allungamento.", tempo: "1s estensione, 1s contrazione in cima, 3s discesa lenta" } },
+            'dips_tricipiti': { name: 'Dip Parallele (Tricipiti)', sets: '3', reps: '10-12', img: 'img/dips_tricipiti.png', category: 'tricipiti', isBW: true, coach: { esecuzione: "Busto dritto e verticale, gomiti strettissimi rasenti i fianchi. Scendi a 90 gradi, poi spingi estendendo le braccia.", target: "Costruttore fondamentale di forza e volume per i tricipiti.", tempo: "1s spinta, 2s discesa frenata" } },
+            'estensioni_testa': { name: 'Estensioni Dietro Nuca', sets: '3', reps: '12-15', img: 'img/estensioni_testa.png', category: 'tricipiti', coach: { esecuzione: "Un manubrio a due mani o singolo. Braccia vicine alla testa. Scendi dietro la nuca allungando al massimo.", target: "Colpisce intensamente il capo lungo del tricipite in massimo allungamento.", tempo: "1s estensione in alto, 2s discesa profonda" } },
+            'french_press': { name: 'French Press', sets: '3', reps: '8-10', img: 'img/french_press.png', category: 'tricipiti', coach: { esecuzione: "Sdraiato su panca, bilanciere EZ. Braccia leggermente inclinate all'indietro. Porta il peso alla sommità del capo.", target: "Spessore generale del tricipite con tensione continua.", tempo: "1s estensione, 2-3s discesa controllata" } },
+            'kickback': { name: 'Kickback Manubri', sets: '3', reps: '12-15', img: 'img/kickback.png', category: 'tricipiti', coach: { esecuzione: "Busto flesso a 90°. Gomiti fissi sui fianchi. Estendi solo l'avambraccio all'indietro finché il braccio è orizzontale.", target: "Isolamento di picco. Focalizzati sulla massima contrazione a fine corsa.", tempo: "1s spinta, 1s strizzata, 2s ritorno" } },
+            'pushdown': { name: 'Push Down Cavi', sets: '4', reps: '10-12', img: 'img/pushdown.png', category: 'tricipiti', coach: { esecuzione: "Sbarra dritta o a V. Gomiti incollati al busto. Spingi in basso fino al blocco dell'articolazione.", target: "Riscaldamento ed isolamento per il capo laterale del tricipite.", tempo: "1s spinta in basso, 2s ritorno controllato" } },
+            'pushdown_corda': { name: 'Pushdown Corda', sets: '3', reps: '12-15', img: 'img/pushdown_corda.png', category: 'tricipiti', coach: { esecuzione: "Come il pushdown classico, ma a fine corsa allarga la corda all'esterno ruotando i palmi in basso.", target: "Extra reclutamento e contrazione per il capo laterale.", tempo: "1s spinta e apertura, 2s risalita" } },
+            'pushdown_fune': { name: 'Pushdown Fune', sets: '3', reps: '12-15', img: 'img/pushdown_fune.png', category: 'tricipiti', coach: { esecuzione: "Presa neutra con corda. Movimento fluido senza dondolare con le spalle.", target: "Ergonomico sui polsi, focus sul pump del tricipite.", tempo: "1s spinta, 2s risalita" } },
+            'skull_crusher': { name: 'Skull Crusher', sets: '3', reps: '10-12', img: 'img/skull_crusher.png', category: 'tricipiti', coach: { esecuzione: "Gomiti puntati a soffitto. Porta il bilanciere verso la fronte ed estendi verticalmente.", target: "Costruttore classico di forza e ipertrofia per le braccia.", tempo: "1s spinta esplosiva, 3s discesa lenta" } },
+            'tri_ext_single': { name: 'Estensione Tricep Singola Sopra Testa', sets: '3', reps: '12-15', img: 'img/tri_ext_single.png', category: 'tricipiti', coach: { esecuzione: "Cavo medio-basso. Afferra la maniglia, portala dietro la nuca e distendi il braccio verso l'alto.", target: "Isolamento del capo lungo del tricipite. Corregge asimmetrie.", tempo: "1s estensione, 2s discesa profonda" } },
+            'kickback_cavi': { name: 'Kickback ai Cavi', sets: '3', reps: '12-15', img: 'img/kickback_cavi.png', category: 'tricipiti', coach: { esecuzione: "Busto a 90°, puleggia all'anca. Estendi solo l'avambraccio all'indietro tenendo il gomito fisso.", target: "Picco del tricipite senza perdere tensione grazie al cavo.", tempo: "1s spinta, 1s pausa, 2s discesa" } },
+            'estensioni_testa_cavi': { name: 'Estensioni Dietro Nuca Cavi', sets: '3', reps: '10-12', img: 'img/estensioni_testa_cavi.png', category: 'tricipiti', coach: { esecuzione: "Dai le spalle al cavo basso o medio. Afferra la corda dietro la testa con gomiti in alto ed estendi le braccia.", target: "Isolamento del capo lungo in posizione di massimo allungamento.", tempo: "1s estensione, 1s contrazione in cima, 3s discesa lenta" } },
             
-            'lat_larga': { name: 'Lat Machine Presa Larga', sets: '4', reps: '12-15', img: 'img/lat_larga.png', category: 'dorso', coach: { esecuzione: "Presa prona ben oltre le spalle. Deprimi le scapole e tira la sbarra verso l'alto petto espandendo il torace. Immagina di tirare con i gomiti in basso e indietro.", target: "Sviluppa l'ampiezza dorsale, donando la classica forma a V.", tempo: "1s tirata, 1s pausa toccando il petto, 2s ritorno" } },
-            'lat_neutra': { name: 'Lat Machine Presa Neutra', sets: '4', reps: '10-12', img: 'img/lat_neutra.png', category: 'dorso', coach: { esecuzione: "Utilizza la maniglia a V (trazione stretta neutra). Tira verso lo sterno, i gomiti scivolano vicini al corpo.", target: "Coinvolge di più i dorsali medi/bassi e dà maggiore spessore alla schiena. Usa più carico rispetto alla presa larga.", tempo: "1s tirata esplosiva, 2s ritorno controllato" } },
-            'meadows_row': { name: 'Meadows Row', sets: '3', reps: '10-12', img: 'img/meadows_row.png', category: 'dorso', coach: { esecuzione: "Posizione perpendicolare a un landmine. Impugna la punta del bilanciere e tira su verso i fianchi, portando il gomito ben in alto allargandolo un po'.", target: "Spessore devastante per la parte alta del dorso e deltoidi posteriori.", tempo: "1s tirata esplosiva, 3s di discesa controllando il peso" } },
-            'pullover_cavi': { name: 'Pullover ai Cavi', sets: '3', reps: '12-15', img: 'img/pullover_cavi.png', category: 'dorso', coach: { esecuzione: "In piedi o leggermente piegato in avanti. Braccia quasi tese. Tira la sbarra o la fune dall'alto fin verso le cosce, pensando di spingere le mani in basso.", target: "Isolamento puro del gran dorsale. Ottimo per pre-affaticamento o pump finale.", tempo: "1s tirata, 1s contrazione sulle cosce, 3s allungamento in salita" } },
-            'pullover_manubrio': { name: 'Pullover Manubrio', sets: '3', reps: '12-15', img: 'img/pullover_manubrio.png', category: 'dorso', coach: { esecuzione: "Di traverso su panca appoggiando solo il dorso. Bacino basso. Abbassa il manubrio dietro la testa a braccia sbloccate finché senti stirare il petto e i dorsali.", target: "Allarga la cassa toracica, recluta forte dorsale basso e dentato.", tempo: "1s tirata su, 3s discesa lentissima per lo stretching" } },
-            'rematore_manubrio': { name: 'Rematore Manubrio', sets: '3', reps: '10-12', img: 'img/rematore_manubrio.png', category: 'dorso', coach: { esecuzione: "Ginocchio e mano in appoggio su panca. Lascia 'cadere' la spalla a terra per il massimo allungamento, poi tira il gomito verso l'anca o l'ombelico (non verso il petto).", target: "Costruttore unilaterale per massa e spessore, bilancia le asimmetrie.", tempo: "1s tirata decisa, 2-3s discesa focalizzandosi sull'allungamento in basso" } },
-            'rematore_pendlay': { name: 'Pendlay Row', sets: '4', reps: '6-8', img: 'img/rematore_pendlay.png', category: 'dorso', coach: { esecuzione: "Busto rigidamente parallelo al suolo (90°). Il bilanciere poggia a terra a ogni rep. Tirata esplosiva verso lo sterno.", target: "Pura forza esplosiva per lo spessore del dorso (trapezi e romboidi medi).", tempo: "Spinta brutale in su, lascia cadere controllato, pausa netta a terra" } },
-            'tbar_row': { name: 'T-Bar Row', sets: '4', reps: '8-10', img: 'img/tbar_row.png', category: 'dorso', coach: { esecuzione: "In piedi, bilanciere in mezzo alle gambe (landmine con maniglia a V). Piegati in avanti a 45°. Tira i dischi al petto strizzando forte le scapole.", target: "Forse il miglior esercizio per il blocco centrale e lo spessore del dorso.", tempo: "1s tirata potente, 1s pausa contratta, 2s ritorno al centro" } },
-            'scapular_pullups': { name: 'Scapular Pullups', sets: '3', reps: '10-12', img: 'img/scapular_pullups.png', category: 'dorso', isBW: true, coach: { esecuzione: "Appeso alla sbarra (hang passivo). Le braccia rimangono tese per tutto l'esercizio. Sollevati 'incassando' le scapole verso il basso e il petto in alto (hang attivo).", target: "Rinforza e sensibilizza i muscoli di controllo scapolare per prepararti alle trazioni.", tempo: "1s contrazione (su), 1s fermo, 2s ritorno" } },
-            'seal_row': { name: 'Seal Row', sets: '3', reps: '10-12', img: 'img/seal_row.png', category: 'dorso', coach: { esecuzione: "Sdraiato a pancia in giù su una panca alta. Tira il bilanciere o i manubri da terra fino a far toccare la panca.", target: "Lavoro durissimo sui dorsali e romboidi azzerando completamente lo stress su glutei e lombari.", tempo: "1s tirata decisa, 1s pausa isometrica sulla panca, 2s discesa" } },
-            'trazioni': { name: 'Trazioni alla Sbarra', sets: '4', reps: '6-8', img: 'img/trazioni.png', category: 'dorso', isBW: true, coach: { esecuzione: "Presa prona larga. Parti a braccia tese. Inizia incassando le scapole in giù, poi tira il mento oltre la sbarra cercando di toccare quest'ultima col petto alto.", target: "Esercizio maestro a corpo libero per l'ampiezza estrema della schiena.", tempo: "Tirata potente e fluida, 2s discesa controllata fino a blocco braccia" } },
-            'trazioni_supine': { name: 'Trazioni Supine (Chin-ups)', sets: '4', reps: '8-10', img: 'img/trazioni_supine.png', category: 'dorso', isBW: true, coach: { esecuzione: "Presa inversa (palmi verso di te) a larghezza spalle. Tira finché il mento oltrepassa la sbarra. Tieni i gomiti vicini.", target: "Doppio beneficio: spessore impressionante per i dorsali inferiori e costruzione incredibile dei bicipiti.", tempo: "1s salita completa, 2-3s discesa lenta resistendo al carico" } },
-            'facepull': { name: 'Face Pull ai Cavi', sets: '4', reps: '12-15', img: 'img/facepull.png', category: 'dorso', coach: { esecuzione: "Posiziona la puleggia all'altezza degli occhi. Afferra la corda, tieni il petto in fuori e tira verso il viso separando le mani e portando i polsi dietro le orecchie. I gomiti devono rimanere alti.", target: "Deltoide posteriore, cuffia dei rotatori, trapezi e romboidi. Fondamentale per la salute delle spalle e la postura.", tempo: "1s tirata, 1s pausa in chiusura, 2s discesa controllata" } },
-            'row_high': { name: 'Row Machine Presa Alta', sets: '3', reps: '10-12', img: 'img/row_high.png', category: 'dorso', coach: { esecuzione: "Regola il sedile per avere le maniglie alte. Tira portando i gomiti all'indietro a 45 gradi.", target: "Spessore della parte alta della schiena (trapezi e romboidi medi).", tempo: "1s tirata, 1s contrazione delle scapole, 2s ritorno" } },
-            'row_low': { name: 'Row Machine Presa Bassa', sets: '3', reps: '10-12', img: 'img/row_low.png', category: 'dorso', coach: { esecuzione: "Afferra le maniglie dal basso o in presa neutra. Tira tenendo i gomiti sfregati ai fianchi.", target: "Sviluppo del gran dorsale basso.", tempo: "1s tirata, 1s contrazione in accorciamento, 2s ritorno" } },
-            'lat_single': { name: 'Lat Pulldown Unilaterale Cavi', sets: '3', reps: '12-15', img: 'img/lat_single.png', category: 'dorso', coach: { esecuzione: "In ginocchio davanti a un cavo alto. Tira una maniglia singola verso il basso, ruotando leggermente il busto verso il braccio che lavora.", target: "Allungamento estremo e correzione asimmetrie dorsali.", tempo: "1s tirata, 1s strizzata al fianco, 3s risalita lenta" } },
-            'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Seduto al pulley basso, barra dritta larga. Tira verso lo sterno alto allargando i gomiti a 90°.", target: "Spessore eccezionale per deltoidi posteriori e trapezi centrali.", tempo: "1s tirata, 1s pausa contratta, 2s ritorno controllato" } }
+            'lat_larga': { name: 'Lat Machine Presa Larga', sets: '4', reps: '12-15', img: 'img/lat_larga.png', category: 'dorso', coach: { esecuzione: "Presa prona oltre le spalle. Deprimi le scapole e tira la sbarra verso il petto alto aprendo il torace.", target: "Ampiezza dorsale, classica conformazione V-Shape.", tempo: "1s tirata, 1s tocco petto, 2s ritorno" } },
+            'lat_neutra': { name: 'Lat Machine Presa Neutra', sets: '4', reps: '10-12', img: 'img/lat_neutra.png', category: 'dorso', coach: { esecuzione: "Maniglia a V. Tira verso lo sterno con i gomiti che scorrono aderenti al corpo.", target: "Spessore dorsale e dorsali inferiori.", tempo: "1s tirata, 2s ritorno controllato" } },
+            'meadows_row': { name: 'Meadows Row', sets: '3', reps: '10-12', img: 'img/meadows_row.png', category: 'dorso', coach: { esecuzione: "Posizione perpendicolare al bilanciere a terra. Tira verso il fianco portando il gomito in alto.", target: "Spessore per la parte alta del dorso e deltoidi posteriori.", tempo: "1s tirata, 3s discesa lenta" } },
+            'pullover_cavi': { name: 'Pullover ai Cavi', sets: '3', reps: '12-15', img: 'img/pullover_cavi.png', category: 'dorso', coach: { esecuzione: "Braccia quasi tese. Tira la barra dall'alto verso le cosce spingendo le mani verso il basso.", target: "Isolamento puro del gran dorsale.", tempo: "1s tirata, 1s tocco cosce, 3s risalita" } },
+            'pullover_manubrio': { name: 'Pullover Manubrio', sets: '3', reps: '12-15', img: 'img/pullover_manubrio.png', category: 'dorso', coach: { esecuzione: "Di traverso su panca con bacino basso. Abbassa il manubrio dietro la testa finché senti stirare i dorsali.", target: "Espansione toracica e attivazione gran dorsale in allungamento.", tempo: "1s tirata, 3s discesa lenta" } },
+            'rematore_manubrio': { name: 'Rematore Manubrio', sets: '3', reps: '10-12', img: 'img/rematore_manubrio.png', category: 'dorso', coach: { esecuzione: "Ginocchio su panca. Lascia cadere la spalla in basso, poi tira il gomito dritto verso l'anca.", target: "Costruttore unilaterale per spessore e simmetria dorsale.", tempo: "1s tirata decisa, 2-3s discesa con allungamento" } },
+            'rematore_pendlay': { name: 'Pendlay Row', sets: '4', reps: '6-8', img: 'img/rematore_pendlay.png', category: 'dorso', coach: { esecuzione: "Busto a 90° parallelo al suolo. Il carico riparte da terra a ogni rep. Tirata esplosiva allo sterno.", target: "Forza pura e spessore per trapezi e romboidi.", tempo: "Tirata esplosiva, ritorno a terra netto" } },
+            'tbar_row': { name: 'T-Bar Row', sets: '4', reps: '8-10', img: 'img/tbar_row.png', category: 'dorso', coach: { esecuzione: "Busto inclinato a 45°. Tira il bilanciere al petto serrando le scapole.", target: "Massa e densità centrale per l'intera schiena.", tempo: "1s tirata, 1s pausa, 2s discesa" } },
+            'scapular_pullups': { name: 'Scapular Pullups', sets: '3', reps: '10-12', img: 'img/scapular_pullups.png', category: 'dorso', isBW: true, coach: { esecuzione: "Appeso alla sbarra a braccia sempre tese. Sollevati deprimendo ed adducendo le scapole.", target: "Salute articolare e forza nei muscoli stabilizzatori scapolari.", tempo: "1s contrazione in su, 1s pausa, 2s rilascio" } },
+            'seal_row': { name: 'Seal Row', sets: '3', reps: '10-12', img: 'img/seal_row.png', category: 'dorso', coach: { esecuzione: "Sdraiato prono su panca rialzata. Tira il bilanciere o i manubri fino al contatto con la tavola.", target: "Isolamento dorsale assoluto con zero carico lombare.", tempo: "1s tirata, 1s tocco panca, 2s discesa" } },
+            'trazioni': { name: 'Trazioni alla Sbarra', sets: '4', reps: '6-8', img: 'img/trazioni.png', category: 'dorso', isBW: true, coach: { esecuzione: "Presa prona. Parti a braccia completamente distese. Tira portando il petto verso la sbarra.", target: "Esercizio principe a corpo libero per l'ampiezza dorsale.", tempo: "Tirata esplosiva, 2s discesa controllata" } },
+            'trazioni_supine': { name: 'Trazioni Supine (Chin-ups)', sets: '4', reps: '8-10', img: 'img/trazioni_supine.png', category: 'dorso', isBW: true, coach: { esecuzione: "Presa inversa a larghezza spalle. Tira finché il mento supera la sbarra tenendo i gomiti vicini.", target: "Spessore dorsale e grande stimolo di carico sui bicipiti.", tempo: "1s salita completa, 2-3s discesa lenta" } },
+            'facepull': { name: 'Face Pull ai Cavi', sets: '4', reps: '12-15', img: 'img/facepull.png', category: 'dorso', coach: { esecuzione: "Puleggia agli occhi con fune. Tira verso il viso separando le mani e portando i polsi dietro le orecchie.", target: "Deltoide posteriore, cuffia dei rotatori e postura.", tempo: "1s tirata, 1s pausa, 2s discesa controllata" } },
+            'row_high': { name: 'Row Machine Presa Alta', sets: '3', reps: '10-12', img: 'img/row_high.png', category: 'dorso', coach: { esecuzione: "Regola il sellino in modo da tirare verso il petto con gomiti larghi a 45 gradi.", target: "Spessore per l'alta schiena, trapezi e romboidi.", tempo: "1s tirata, 1s contrazione, 2s ritorno" } },
+            'row_low': { name: 'Row Machine Presa Bassa', sets: '3', reps: '10-12', img: 'img/row_low.png', category: 'dorso', coach: { esecuzione: "Maniglie basse o presa neutra. Tira tenendo i gomiti radenti al torace.", target: "Gran dorsale e fascia medio-bassa della schiena.", tempo: "1s tirata, 1s contrazione, 2s ritorno" } },
+            'lat_single': { name: 'Lat Pulldown Unilaterale Cavi', sets: '3', reps: '12-15', img: 'img/lat_single.png', category: 'dorso', coach: { esecuzione: "In ginocchio davanti al cavo alto. Tira una maniglia singola portando il gomito verso l'anca.", target: "Allungamento estremo e correzione asimmetrie dorsali.", tempo: "1s tirata, 1s strizzata, 3s risalita lenta" } },
+            'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Barra dritta larga al pulley. Tira allo sterno allargando i gomiti a 90 gradi.", target: "Spessore marcato per deltoidi posteriori e trapezi medi.", tempo: "1s tirata, 1s pausa, 2s ritorno" } }
         };
 
-        // Unisce gli esercizi personalizzati ed elimina quelli cestinati
+        // Unisce gli esercizi personalizzati ed esclude quelli cestinati
         const customExDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
         Object.assign(exerciseData, customExDb);
         const deletedExDb = JSON.parse(localStorage.getItem('deleted_exercises_v5')) || [];
@@ -681,13 +687,13 @@
                 const match = text.match(/\{[\s\S]*\}/);
                 const clean = match ? match[0] : text;
                 return JSON.parse(clean);
-            } catch(e) { console.error("JSON parse failed", text); throw e; }
+            } catch(e) { console.error("JSON parse fallito", text); throw e; }
         }
 
         async function askGemini(promptText, isJson = false) {
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) throw new Error("API Key mancante");
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
             const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
             if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
@@ -701,18 +707,22 @@
         async function generateWorkoutAI() {
             const time = document.getElementById('ai-time').value; const focus = document.getElementById('ai-focus').value;
             if(!time || !focus) { showMessage("Compila tutti i campi!"); return; }
-            closeAIGenerator(); document.getElementById('ai-loading-overlay').style.display = 'flex';
+            closeAIGenerator(); 
+            document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
             const validIds = Object.keys(exerciseData).join(', ');
             const prompt = `Sei un personal trainer elitario. Crea un allenamento di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID: [${validIds}]. Restituisci SOLO E SOLTANTO UN OGGETTO JSON. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Struttura: {"title": "Nome", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
             try {
                 const responseText = await askGemini(prompt, true); const generatedPlan = parseAIResponse(responseText);
                 const newId = 'AI_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
                 document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Scheda Magica Creata!"); goHome(); setTimeout(() => openWorkout(newId), 500);
-            } catch (err) { console.error(err); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore AI."); }
+            } catch (err) { console.error(err); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore AI: verifica API Key"); }
         }
 
         async function generateCorrectiveWorkout() {
-            closeAIFeedback(); document.getElementById('ai-loading-overlay').style.display = 'flex';
+            closeAIFeedback(); 
+            document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
             const feedback = document.getElementById('ai-feedback-text').innerText; const validIds = Object.keys(exerciseData).join(', ');
             const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" per correggere i punti deboli. Scegli ESERCIZI SOLO da: [${validIds}]. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Restituisci SOLO JSON. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
             try {
@@ -727,19 +737,7 @@
         function closeConfirm() { document.getElementById('modal-confirm').style.display = 'none'; confirmCallback = null; }
         document.getElementById('confirm-btn').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirm(); };
 
-        function showMessage(text) { const box = document.getElementById('message-box'); box.innerText = text; box.style.display = 'block'; setTimeout(() => { box.style.display = 'none'; }, 5000); }
-        
-        // BUGFIX: Il fallback dell'immagine prima copriva il titolo e il bottone info. Ora va dietro a tutto.
-        function handleImgError(el) { 
-            el.style.display = 'none'; 
-            if (!el.parentElement.querySelector('.fallback-bg')) {
-                const placeholder = document.createElement('div'); 
-                placeholder.className = "absolute inset-0 flex items-center justify-center bg-[#2C2C2E] fallback-bg z-0"; 
-                placeholder.innerHTML = '<i data-lucide="dumbbell" class="w-12 h-12 text-gray-600 opacity-30"></i>'; 
-                el.parentElement.prepend(placeholder); 
-                lucide.createIcons(); 
-            }
-        }
+        function showMessage(text) { const box = document.getElementById('message-box'); box.innerText = text; box.style.display = 'block'; setTimeout(() => { box.style.display = 'none'; }, 4000); }
 
         function openProgramModal(id = null) {
             editingProgramId = id; document.getElementById('modal-program').style.display = 'flex'; 
@@ -883,12 +881,12 @@
                 html += `<div class="text-center font-bold text-gray-500">${i + 1}</div>`;
                 
                 if (!isBW) {
-                    html += `<div><input type="number" step="0.5" id="log-w-${i}" value="${wVal}" placeholder="${wPh}" class="bg-[#1C1C1E] !py-2 !text-sm" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>`;
+                    html += `<div><input type="number" step="0.5" id="log-w-${i}" value="${wVal}" placeholder="${wPh}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>`;
                 } else {
                     html += `<input type="hidden" id="log-w-${i}" value="0">`; 
                 }
                 
-                html += `<div><input type="number" id="log-r-${i}" value="${rVal}" placeholder="${rPh}" class="bg-[#1C1C1E] !py-2 !text-sm" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>`;
+                html += `<div><input type="number" id="log-r-${i}" value="${rVal}" placeholder="${rPh}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>`;
                 html += `<button id="log-ds-${i}" onclick="toggleRowDS(${i})" class="ds-btn h-full rounded-xl border border-white/10 text-[10px] font-black ${isDs ? 'active' : 'text-gray-500'}">DS</button></div>`;
             }
             document.getElementById('log-rows-container').innerHTML = html; document.getElementById('modal-log-sets').style.display = 'flex'; lucide.createIcons();
@@ -951,18 +949,26 @@
                     }
                 }
 
-                // z-0 allo sfondo e all'immagine, z-10 ai testi per evitare che il placeholder nasconda i bottoni
                 return `
                 <div class="flex flex-col exercise-item" data-id="${exId}">
                     <div class="bg-[#1C1C1E] rounded-[32px] overflow-hidden shadow-xl border border-white/5 relative">
-                        <div class="relative h-44 w-full bg-black z-0">
-                            <img src="${ex.img}" loading="lazy" decoding="async" onerror="handleImgError(this)" class="w-full h-full object-cover opacity-60">
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/40 to-transparent pointer-events-none z-10"></div>
-                            ${isDrop ? `<div class="absolute top-5 left-5 bg-red-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-lg z-20">Drop Set</div>` : ''}
-                            <div class="absolute top-5 right-5 flex gap-2 z-20">
-                                <button onclick="openInfo('${exId}')" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white active:scale-90 transition-transform cursor-pointer pointer-events-auto"><i data-lucide="info" class="w-5 h-5"></i></button>
+                        <!-- Intestazione con Fallback Nativo (Nessun div a coprire il testo!) -->
+                        <div class="relative h-44 w-full bg-[#2C2C2E] overflow-hidden">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                                <i data-lucide="dumbbell" class="w-16 h-16 text-white/10"></i>
                             </div>
-                            <div class="absolute bottom-4 left-5 right-5 z-20 pointer-events-none">
+                            <img src="${ex.img}" loading="lazy" decoding="async" onerror="this.style.opacity='0'" class="w-full h-full object-cover opacity-60 relative z-10 transition-opacity">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/50 to-transparent z-20 pointer-events-none"></div>
+                            
+                            ${isDrop ? `<div class="absolute top-5 left-5 bg-red-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-lg z-30">Drop Set</div>` : ''}
+                            
+                            <div class="absolute top-5 right-5 flex gap-2 z-30">
+                                <button onclick="openInfo('${exId}')" class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-90 transition-transform">
+                                    <i data-lucide="info" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="absolute bottom-4 left-5 right-5 z-30 pointer-events-none">
                                 <span class="${isCardio ? 'text-orange-400' : 'text-blue-400'} text-[10px] font-black uppercase tracking-widest block mb-1">${ex.category}</span>
                                 <h3 class="text-[22px] font-black text-white leading-tight drop-shadow-md">${ex.name}</h3>
                             </div>
@@ -1122,13 +1128,14 @@
             activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); document.getElementById('session-note').value = ''; 
 
             if (requestAI && localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
+                document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
                     let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
                     let workoutTitle = userPlan[currentWorkoutId].title;
                     let aiContext = isAIGenerated ? "NOTA: Questa scheda l'hai creata TU tramite il generatore AI. Verifica severamente se il cliente ha rispettato i carichi e i volumi che gli avevi prescritto." : "";
                     
-                    const prompt = `Agisci come uno strength coach severo. ${aiContext} Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato del risultato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale". 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Valuta i volumi in modo realistico in base allo scopo della scheda. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato. Modello: gemini-3-flash-preview.`;
+                    const prompt = `Agisci come uno strength coach severo. ${aiContext} Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato del risultato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale". 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Valuta i volumi in modo realistico in base allo scopo della scheda. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato.`;
                     
                     const feedback = await askGemini(prompt, false);
                     document.getElementById('ai-loading-overlay').style.display = 'none';
@@ -1152,6 +1159,7 @@
 
             if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
 
+            document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             try {
                 let sessionDataForAI = {};
@@ -1181,7 +1189,7 @@
                 let workoutTitle = entry.title;
                 let aiContext = isAIGenerated ? "NOTA: Questa scheda l'hai creata TU tramite il generatore AI in passato. Controlla se il cliente aveva rispettato i TUOI parametri." : "";
 
-                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale" in base allo scopo della scheda. ${aiContext} 2. Se isDrop=true, è un Drop Set corretto. 3. I carichi (w) sono IL PESO TOTALE. Dammi un feedback TECNICO di 2-3 frasi. Sii spietato. Modello: gemini-3-flash-preview.`;
+                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale" in base allo scopo della scheda. ${aiContext} 2. Se isDrop=true, è un Drop Set corretto. 3. I carichi (w) sono IL PESO TOTALE. Dammi un feedback TECNICO di 2-3 frasi. Sii spietato.`;
 
                 const feedback = await askGemini(prompt, false);
                 document.getElementById('ai-loading-overlay').style.display = 'none';
@@ -1199,22 +1207,26 @@
         async function saveCustomEx() {
             const name = document.getElementById('custom-ex-name').value.trim();
             const cat = document.getElementById('custom-ex-cat').value;
+            const isBW = document.getElementById('custom-ex-isbw').checked;
             if(!name) { showMessage("Inserisci il nome dell'esercizio!"); return; }
             
             const safeName = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
             const newId = 'c_' + safeName;
             
             let coachData = { 
-                esecuzione: "Esercizio personalizzato creato da te.", 
-                target: cat, 
-                tempo: "Regolare" 
+                esecuzione: "Esercizio personalizzato.", 
+                target: `Distretto muscolare: ${cat}.`, 
+                tempo: "Controllato" 
             };
 
             const apiKey = localStorage.getItem('gemini_api_key');
             if (apiKey) {
+                document.getElementById('ai-loading-title').innerText = "Creazione Scheda Tecnica con AI...";
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
-                    const prompt = `Sei un esperto personal trainer. L'utente ha aggiunto l'esercizio "${name}" nella categoria "${cat}". Scrivi i dettagli tecnici. Restituisci SOLO UN OGGETTO JSON con questa struttura esatta: {"esecuzione": "Istruzioni biomeccaniche brevi in italiano.", "target": "Muscoli specifici coinvolti.", "tempo": "es. 1s spinta, 2s discesa controllata"}`;
+                    const prompt = `Sei un biomeccanico e personal trainer. L'atleta ha inserito l'esercizio: "${name}" per la categoria "${cat}".
+Scrivi la guida tecnica. Rispondi con un JSON che abbia esattamente questi campi:
+{"esecuzione": "Brevi istruzioni di esecuzione in 2 frasi", "target": "Distretti muscolari target", "tempo": "es. 1s salita, 2s discesa"}`;
                     const responseText = await askGemini(prompt, true);
                     const parsed = parseAIResponse(responseText);
                     if (parsed && parsed.esecuzione) { coachData = parsed; }
@@ -1223,12 +1235,10 @@
                 } finally {
                     document.getElementById('ai-loading-overlay').style.display = 'none';
                 }
-            } else {
-                showMessage("Chiave API non trovata. Istruzioni base applicate.");
             }
             
             const newEx = {
-                name: name, category: cat, sets: '3', reps: '10', img: `img/${newId}.png`, coach: coachData, isBW: (cat === 'core')
+                name: name, category: cat, sets: '3', reps: '10', img: `img/${newId}.png`, coach: coachData, isBW: isBW
             };
             
             const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
@@ -1237,12 +1247,41 @@
             exerciseData[newId] = newEx;
             
             document.getElementById('custom-ex-name').value = '';
+            document.getElementById('custom-ex-isbw').checked = false;
             closeCustomEx();
             renderLibrary(cat); 
+            showMessage(`Salvato! Nome immagine: ${newId}.png`);
+        }
+
+        async function regenerateCoachAI(exId) {
+            const ex = exerciseData[exId];
+            if (!ex) return;
+            if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
             
-            setTimeout(() => {
-                alert(`ESERCIZIO SALVATO!\n\nPer aggiungere l'immagine, salvala nella cartella 'img/' chiamandola esattamente:\n\n${newId}.png`);
-            }, 500);
+            document.getElementById('ai-loading-title').innerText = "Generazione Guida Tecnica...";
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
+            try {
+                const prompt = `Sei un biomeccanico e personal trainer. Scrivi la guida tecnica per l'esercizio "${ex.name}" per la categoria "${ex.category}".
+Rispondi SOLO con un JSON valido:
+{"esecuzione": "Istruzioni biomeccaniche accurate in 2-3 frasi.", "target": "Muscoli target principali e secondari.", "tempo": "es. 1s spinta, 2s eccentrica controllata"}`;
+                const responseText = await askGemini(prompt, true);
+                const parsed = parseAIResponse(responseText);
+                if (parsed && parsed.esecuzione) {
+                    ex.coach = parsed;
+                    if (exId.startsWith('c_')) {
+                        const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+                        customDb[exId] = ex;
+                        localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
+                    }
+                    openInfo(exId);
+                    showMessage("Guida tecnica aggiornata dall'AI!");
+                }
+            } catch(e) {
+                console.error(e);
+                showMessage("Errore durante la generazione AI");
+            } finally {
+                document.getElementById('ai-loading-overlay').style.display = 'none';
+            }
         }
 
         function openLibrary(index, cat) { swappingIndex = index; renderLibrary(cat); document.getElementById('modal-library').style.display = 'flex'; }
@@ -1256,10 +1295,13 @@
             list.innerHTML = Object.entries(exerciseData).filter(([id, data]) => data.category === cat).map(([id, ex]) => {
                 const isCardio = cat === 'aerobica';
                 return `<div onclick="processSelection('${id}')" class="bg-[#1C1C1E] p-4 rounded-2xl flex items-center gap-4 border border-white/5 active:bg-[#2C2C2E] cursor-pointer transition-colors shadow-md">
-                    <div class="img-thumb relative"><img src="${ex.img}" loading="lazy" decoding="async" onerror="handleImgError(this)" class="relative z-10"></div>
+                    <div class="img-thumb bg-[#2C2C2E] relative overflow-hidden flex items-center justify-center">
+                        <i data-lucide="dumbbell" class="w-6 h-6 text-white/20 absolute z-0"></i>
+                        <img src="${ex.img}" loading="lazy" decoding="async" onerror="this.style.opacity='0'" class="w-full h-full object-cover relative z-10 transition-opacity">
+                    </div>
                     <div class="flex-1 text-left">
                         <h4 class="font-bold text-[16px] text-white leading-tight">${ex.name}</h4>
-                        <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mt-1">${isCardio ? 'CARDIO' : `${ex.sets}x${ex.reps}`}</p>
+                        <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mt-1">${isCardio ? 'CARDIO' : `${ex.sets}x${ex.reps}`}${ex.isBW ? ' • CORPO LIBERO' : ''}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-10 h-10 flex items-center justify-center rounded-full ${items.includes(id) ? 'bg-orange-500/10 border border-orange-500/20' : 'bg-blue-500/10 border border-blue-500/20'}">
@@ -1275,7 +1317,7 @@
 
         function deleteExerciseFromLibrary(e, exId, cat) {
             e.stopPropagation();
-            openConfirm("Elimina Esercizio", "Vuoi rimuovere per sempre questo esercizio dal catalogo?", () => {
+            openConfirm("Elimina Esercizio", "Vuoi rimuovere questo esercizio dal catalogo?", () => {
                 if (exId.startsWith('c_')) {
                     const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
                     delete customDb[exId];
@@ -1287,7 +1329,7 @@
                 }
                 delete exerciseData[exId];
                 renderLibrary(cat);
-                showMessage("Esercizio eliminato.");
+                showMessage("Esercizio rimosso dal catalogo.");
                 if (currentWorkoutId) renderWorkout(currentWorkoutId);
             });
         }
@@ -1299,20 +1341,40 @@
         function openInfo(exId) {
             const ex = exerciseData[exId]; if (!ex) return;
             const modal = document.getElementById('modal-info'); const content = document.getElementById('info-content'); document.getElementById('info-title').innerText = ex.name;
-            const esecuzione = ex.coach?.esecuzione || "Mantieni la schiena dritta, il core contratto e controlla il peso.";
-            const suggerimenti = ex.coach?.target || `Sviluppo del distretto: ${ex.category}.`;
-            const tempo = ex.coach?.tempo || "Costante o controllato.";
+            const esecuzione = ex.coach?.esecuzione || "Nessuna istruzione registrata.";
+            const suggerimenti = ex.coach?.target || `Distretto: ${ex.category}.`;
+            const tempo = ex.coach?.tempo || "Controllato.";
             
-            let imageNote = '';
+            let customActions = '';
             if (exId.startsWith('c_')) {
-                imageNote = `<div class="bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 mt-4">
-                    <h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-2"><i data-lucide="image" class="w-4 h-4 inline"></i> Promemoria Foto</h4>
-                    <p class="text-[13px] leading-relaxed text-gray-300 mb-2">Salva la foto in <b class="text-white">img/</b> col nome esatto:</p>
-                    <div class="bg-[#1C1C1E] border border-white/10 p-3 rounded-xl text-center shadow-inner"><code class="text-white font-mono font-bold text-base select-all">${exId}.png</code></div>
-                </div>`;
+                customActions = `
+                <div class="bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 mt-4">
+                    <h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i> Nome File Immagine</h4>
+                    <p class="text-[13px] leading-relaxed text-gray-300 mb-2">Salva l'immagine nella cartella <b>img/</b> col nome esatto:</p>
+                    <div class="bg-[#1C1C1E] border border-white/10 p-3 rounded-xl text-center"><code class="text-white font-mono font-bold text-sm">${exId}.png</code></div>
+                </div>
+                <button onclick="regenerateCoachAI('${exId}')" class="w-full bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] mt-4 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i> Rigenera Guida con Coach AI
+                </button>`;
             }
 
-            content.innerHTML = `<div class="space-y-4"><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> Distretto Muscolare</h4><p class="text-sm font-bold text-white uppercase">${ex.category}</p></div><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-emerald-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Esecuzione</h4><p class="text-sm leading-relaxed text-gray-300">${esecuzione}</p></div><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Suggerimenti e Tempo</h4><p class="text-sm leading-relaxed text-gray-300 mb-2">${suggerimenti}</p><p class="text-xs font-bold text-gray-400 mt-2"><i data-lucide="clock" class="w-3 h-3 inline"></i> ${tempo}</p></div>${imageNote}</div>`;
+            content.innerHTML = `
+            <div class="space-y-4">
+                <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
+                    <h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> Distretto Muscolare</h4>
+                    <p class="text-sm font-bold text-white uppercase">${ex.category}</p>
+                </div>
+                <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
+                    <h4 class="text-emerald-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Esecuzione Tecnica</h4>
+                    <p class="text-sm leading-relaxed text-gray-300">${esecuzione}</p>
+                </div>
+                <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
+                    <h4 class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Focus & Tempo</h4>
+                    <p class="text-sm leading-relaxed text-gray-300 mb-2">${suggerimenti}</p>
+                    <p class="text-xs font-bold text-gray-400 mt-2 flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 inline"></i> ${tempo}</p>
+                </div>
+                ${customActions}
+            </div>`;
             modal.style.display = 'flex'; lucide.createIcons();
         }
         function closeInfo() { document.getElementById('modal-info').style.display = 'none'; }
@@ -1670,19 +1732,22 @@
             goHome(); lucide.createIcons();
             if(localStorage.getItem('gemini_api_key')) document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key');
             
-            // FIX TASTIERA iOS: Nasconde la barra inferiore quando scrivi
-            document.addEventListener('focusin', function(e) {
-                if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            // Gestione tastiera mobile: nasconde navbar e centra i campi
+            window.addEventListener('focusin', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
                     const nav = document.querySelector('.glass-nav');
-                    if(nav) nav.style.display = 'none';
+                    if (nav) nav.style.setProperty('display', 'none', 'important');
+                    setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
                 }
             });
-            document.addEventListener('focusout', function(e) {
-                if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            window.addEventListener('focusout', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
                     setTimeout(() => {
                         const nav = document.querySelector('.glass-nav');
-                        if(nav) nav.style.display = 'flex';
-                    }, 100);
+                        if (nav) nav.style.removeProperty('display');
+                    }, 150);
                 }
             });
         };
