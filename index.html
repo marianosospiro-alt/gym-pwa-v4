@@ -21,7 +21,6 @@
         :root { --apple-blue: #0A84FF; --apple-bg: #000000; --apple-card: #1C1C1E; }
         body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--apple-bg); color: white; -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
         
-        /* Ottimizzazione Performance: blur ridotto e accelerazione hardware */
         .glass { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transform: translateZ(0); }
         .apple-card { background-color: var(--apple-card); border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); }
         .btn-primary { background-color: var(--apple-blue); border-radius: 16px; font-weight: 800; transition: transform 0.1s, opacity 0.1s; }
@@ -30,7 +29,6 @@
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
         .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
         
-        /* Animazioni limitate solo agli elementi indispensabili */
         .animate-slide { animation: slide 0.3s ease-out forwards; will-change: transform, opacity; }
         @keyframes slide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -64,9 +62,6 @@
         
         #chart-modal { z-index: 300; }
         .glass-nav { background: rgba(28, 28, 30, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        
-        /* FIX TASTIERA iOS: Nasconde la navbar e centra l'input quando si apre la tastiera */
-        body:has(input:focus, textarea:focus) .glass-nav { display: none !important; }
         
         .vshape-gradient { background: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(10,132,255,0.1) 100%); }
         .drag-handle { touch-action: none; cursor: grab; }
@@ -141,7 +136,6 @@
                 </div>
             </header>
             
-            <!-- Rimosso animate-slide dai singoli item per evitare scatti allo scroll -->
             <main id="exercise-list" class="p-5 space-y-8 mt-2"></main>
             
             <div class="p-5 space-y-6">
@@ -154,7 +148,6 @@
                 
                 <div id="notes-area" class="mt-8">
                     <label class="ml-1 mb-2">Note di sessione</label>
-                    <!-- onfocus centra la vista sull'elemento quando si apre la tastiera -->
                     <textarea id="session-note" rows="3" placeholder="Com'è andata oggi?" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></textarea>
                 </div>
             </div>
@@ -540,7 +533,7 @@
     </div>
 
     <script>
-        // Database Esercizi RTF - Aggiunto isBW (BodyWeight) per non chiedere i Kg negli esercizi a corpo libero
+        // Database Esercizi RTF
         const exerciseData = {
             'corsa': { name: 'Corsa / Tapis Roulant', sets: '1', reps: '30m', img: 'img/corsa.png', category: 'aerobica', coach: { esecuzione: "Mantieni una postura eretta, sguardo dritto. Non aggrapparti ai corrimano del tapis roulant.", target: "Sistema cardiovascolare, resistenza e consumo calorico.", tempo: "Andatura costante o interval training (HIIT)" } },
             'spin_bike': { name: 'Spin Bike / Cyclette', sets: '1', reps: '30m', img: 'img/spin_bike.png', category: 'aerobica', coach: { esecuzione: "Regola il sellino ad altezza anca. Mantieni una pedalata fluida e rotonda, spingendo e 'tirando' i pedali.", target: "Flessori dell'anca, quadricipiti e sistema cardiovascolare. Ottimo a basso impatto articolare.", tempo: "RPM costante tra 70 e 90" } },
@@ -735,7 +728,18 @@
         document.getElementById('confirm-btn').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirm(); };
 
         function showMessage(text) { const box = document.getElementById('message-box'); box.innerText = text; box.style.display = 'block'; setTimeout(() => { box.style.display = 'none'; }, 5000); }
-        function handleImgError(el) { el.style.display = 'none'; const placeholder = document.createElement('div'); placeholder.className = "absolute inset-0 flex items-center justify-center bg-[#2C2C2E]"; placeholder.innerHTML = '<i data-lucide="dumbbell" class="w-10 h-10 text-gray-600 opacity-40"></i>'; el.parentElement.appendChild(placeholder); lucide.createIcons(); }
+        
+        // BUGFIX: Il fallback dell'immagine prima copriva il titolo e il bottone info. Ora va dietro a tutto.
+        function handleImgError(el) { 
+            el.style.display = 'none'; 
+            if (!el.parentElement.querySelector('.fallback-bg')) {
+                const placeholder = document.createElement('div'); 
+                placeholder.className = "absolute inset-0 flex items-center justify-center bg-[#2C2C2E] fallback-bg z-0"; 
+                placeholder.innerHTML = '<i data-lucide="dumbbell" class="w-12 h-12 text-gray-600 opacity-30"></i>'; 
+                el.parentElement.prepend(placeholder); 
+                lucide.createIcons(); 
+            }
+        }
 
         function openProgramModal(id = null) {
             editingProgramId = id; document.getElementById('modal-program').style.display = 'flex'; 
@@ -844,7 +848,7 @@
             const isCardio = exerciseData[exId].category === 'aerobica';
             if (isCardio) { openCardioModal(exId); return; }
 
-            const isBW = exerciseData[exId].isBW === true; // Verifica se è a corpo libero
+            const isBW = exerciseData[exId].isBW === true;
             currentLoggingExId = exId; document.getElementById('log-title').innerText = exerciseData[exId].name;
             let existingData = activeSession[exId] || []; let html = '';
             const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastSessionSet = h.length > 0 ? h[h.length-1] : null;
@@ -859,7 +863,6 @@
                 }
             }
 
-            // Layout dinamico: se è isBW, nasconde la colonna Kg
             const gridClass = isBW ? 'grid-cols-[40px_1fr_40px]' : 'grid-cols-[30px_1fr_1fr_40px]';
             
             html += `<div class="grid ${gridClass} gap-2 px-2 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">`;
@@ -882,7 +885,7 @@
                 if (!isBW) {
                     html += `<div><input type="number" step="0.5" id="log-w-${i}" value="${wVal}" placeholder="${wPh}" class="bg-[#1C1C1E] !py-2 !text-sm" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>`;
                 } else {
-                    html += `<input type="hidden" id="log-w-${i}" value="0">`; // Input nascosto per mantenere la logica JS funzionante
+                    html += `<input type="hidden" id="log-w-${i}" value="0">`; 
                 }
                 
                 html += `<div><input type="number" id="log-r-${i}" value="${rVal}" placeholder="${rPh}" class="bg-[#1C1C1E] !py-2 !text-sm" onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)"></div>`;
@@ -926,7 +929,6 @@
             const visibleItems = items.filter(exId => exerciseData[exId] !== undefined);
             if(visibleItems.length === 0) { container.innerHTML = `<div class="text-center p-10 text-gray-500 font-bold">Nessun esercizio presente. Clicca su + in basso per iniziare!</div>`; return; }
 
-            // L'animazione di entrata è rimossa dal singolo loop per evitare lag su liste lunghe
             container.innerHTML = visibleItems.map((exId, idx) => {
                 const ex = exerciseData[exId]; const isCardio = ex.category === 'aerobica';
                 const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastEntry = h.length > 0 ? h[h.length-1] : null; let last = '--';
@@ -949,17 +951,18 @@
                     }
                 }
 
+                // z-0 allo sfondo e all'immagine, z-10 ai testi per evitare che il placeholder nasconda i bottoni
                 return `
                 <div class="flex flex-col exercise-item" data-id="${exId}">
                     <div class="bg-[#1C1C1E] rounded-[32px] overflow-hidden shadow-xl border border-white/5 relative">
-                        <div class="relative h-44 w-full bg-black">
+                        <div class="relative h-44 w-full bg-black z-0">
                             <img src="${ex.img}" loading="lazy" decoding="async" onerror="handleImgError(this)" class="w-full h-full object-cover opacity-60">
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/40 to-transparent"></div>
-                            ${isDrop ? `<div class="absolute top-5 left-5 bg-red-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-lg">Drop Set</div>` : ''}
-                            <div class="absolute top-5 right-5 flex gap-2">
-                                <button onclick="openInfo('${exId}')" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white active:scale-90 transition-transform"><i data-lucide="info" class="w-5 h-5"></i></button>
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/40 to-transparent pointer-events-none z-10"></div>
+                            ${isDrop ? `<div class="absolute top-5 left-5 bg-red-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-lg z-20">Drop Set</div>` : ''}
+                            <div class="absolute top-5 right-5 flex gap-2 z-20">
+                                <button onclick="openInfo('${exId}')" class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white active:scale-90 transition-transform cursor-pointer pointer-events-auto"><i data-lucide="info" class="w-5 h-5"></i></button>
                             </div>
-                            <div class="absolute bottom-4 left-5 right-5">
+                            <div class="absolute bottom-4 left-5 right-5 z-20 pointer-events-none">
                                 <span class="${isCardio ? 'text-orange-400' : 'text-blue-400'} text-[10px] font-black uppercase tracking-widest block mb-1">${ex.category}</span>
                                 <h3 class="text-[22px] font-black text-white leading-tight drop-shadow-md">${ex.name}</h3>
                             </div>
@@ -1211,7 +1214,7 @@
             if (apiKey) {
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
-                    const prompt = `Sei un esperto personal trainer. L'utente ha aggiunto l'esercizio "${name}" nella categoria "${cat}". Scrivi i dettagli tecnici. Restituisci SOLO UN OGGETTO JSON con questa struttura esatta: {"esecuzione": "Istruzioni biomeccaniche.", "target": "Muscoli coinvolti.", "tempo": "es. 1s spinta, 2s discesa"}`;
+                    const prompt = `Sei un esperto personal trainer. L'utente ha aggiunto l'esercizio "${name}" nella categoria "${cat}". Scrivi i dettagli tecnici. Restituisci SOLO UN OGGETTO JSON con questa struttura esatta: {"esecuzione": "Istruzioni biomeccaniche brevi in italiano.", "target": "Muscoli specifici coinvolti.", "tempo": "es. 1s spinta, 2s discesa controllata"}`;
                     const responseText = await askGemini(prompt, true);
                     const parsed = parseAIResponse(responseText);
                     if (parsed && parsed.esecuzione) { coachData = parsed; }
@@ -1220,6 +1223,8 @@
                 } finally {
                     document.getElementById('ai-loading-overlay').style.display = 'none';
                 }
+            } else {
+                showMessage("Chiave API non trovata. Istruzioni base applicate.");
             }
             
             const newEx = {
@@ -1235,9 +1240,8 @@
             closeCustomEx();
             renderLibrary(cat); 
             
-            // Un alert di sistema per essere sicuri che tu legga il nome immagine
             setTimeout(() => {
-                alert(`ESERCIZIO SALVATO!\n\nPer inserire la foto in futuro, chiamala esattamente:\n${newId}.png`);
+                alert(`ESERCIZIO SALVATO!\n\nPer aggiungere l'immagine, salvala nella cartella 'img/' chiamandola esattamente:\n\n${newId}.png`);
             }, 500);
         }
 
@@ -1248,11 +1252,11 @@
             renderLibraryList(activeCat);
         }
         function renderLibraryList(cat) {
-            const list = document.getElementById('library-list'); const items = userPlan[currentWorkoutId].items || [];
+            const list = document.getElementById('library-list'); const items = userPlan[currentWorkoutId] ? userPlan[currentWorkoutId].items || [] : [];
             list.innerHTML = Object.entries(exerciseData).filter(([id, data]) => data.category === cat).map(([id, ex]) => {
                 const isCardio = cat === 'aerobica';
                 return `<div onclick="processSelection('${id}')" class="bg-[#1C1C1E] p-4 rounded-2xl flex items-center gap-4 border border-white/5 active:bg-[#2C2C2E] cursor-pointer transition-colors shadow-md">
-                    <div class="img-thumb"><img src="${ex.img}" loading="lazy" decoding="async" onerror="handleImgError(this)"></div>
+                    <div class="img-thumb relative"><img src="${ex.img}" loading="lazy" decoding="async" onerror="handleImgError(this)" class="relative z-10"></div>
                     <div class="flex-1 text-left">
                         <h4 class="font-bold text-[16px] text-white leading-tight">${ex.name}</h4>
                         <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mt-1">${isCardio ? 'CARDIO' : `${ex.sets}x${ex.reps}`}</p>
@@ -1302,9 +1306,9 @@
             let imageNote = '';
             if (exId.startsWith('c_')) {
                 imageNote = `<div class="bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 mt-4">
-                    <h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-2"><i data-lucide="image" class="w-4 h-4 inline"></i> Foto Esercizio</h4>
-                    <p class="text-[13px] leading-relaxed text-gray-300 mb-2">Salva la foto in <b>img/</b> col nome:</p>
-                    <div class="bg-[#1C1C1E] border border-white/10 p-3 rounded-xl text-center shadow-inner"><code class="text-white font-mono font-bold">${exId}.png</code></div>
+                    <h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-2"><i data-lucide="image" class="w-4 h-4 inline"></i> Promemoria Foto</h4>
+                    <p class="text-[13px] leading-relaxed text-gray-300 mb-2">Salva la foto in <b class="text-white">img/</b> col nome esatto:</p>
+                    <div class="bg-[#1C1C1E] border border-white/10 p-3 rounded-xl text-center shadow-inner"><code class="text-white font-mono font-bold text-base select-all">${exId}.png</code></div>
                 </div>`;
             }
 
@@ -1665,22 +1669,23 @@
             document.getElementById('date-label').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
             goHome(); lucide.createIcons();
             if(localStorage.getItem('gemini_api_key')) document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key');
-        };
-		// FIX TASTIERA iOS: Nasconde la barra inferiore quando scrivi
-        document.addEventListener('focusin', function(e) {
-            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                const nav = document.querySelector('.glass-nav');
-                if(nav) nav.style.display = 'none';
-            }
-        });
-        document.addEventListener('focusout', function(e) {
-            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                setTimeout(() => {
+            
+            // FIX TASTIERA iOS: Nasconde la barra inferiore quando scrivi
+            document.addEventListener('focusin', function(e) {
+                if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
                     const nav = document.querySelector('.glass-nav');
-                    if(nav) nav.style.display = 'flex';
-                }, 100);
-            }
-        });
+                    if(nav) nav.style.display = 'none';
+                }
+            });
+            document.addEventListener('focusout', function(e) {
+                if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                    setTimeout(() => {
+                        const nav = document.querySelector('.glass-nav');
+                        if(nav) nav.style.display = 'flex';
+                    }, 100);
+                }
+            });
+        };
     </script>
 </body>
 </html>
