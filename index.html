@@ -1211,7 +1211,7 @@
             if (apiKey) {
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
-                    const prompt = `Sei un esperto personal trainer. L'utente ha aggiunto l'esercizio "${name}" nella categoria "${cat}". Scrivi i dettagli tecnici. Restituisci SOLO E SOLTANTO UN OGGETTO JSON con questa struttura: {"esecuzione": "Istruzioni biomeccaniche brevi.", "target": "Muscoli specifici coinvolti.", "tempo": "es. 1s spinta, 2s discesa controllata"}`;
+                    const prompt = `Sei un esperto personal trainer. L'utente ha aggiunto l'esercizio "${name}" nella categoria "${cat}". Scrivi i dettagli tecnici. Restituisci SOLO UN OGGETTO JSON con questa struttura esatta: {"esecuzione": "Istruzioni biomeccaniche.", "target": "Muscoli coinvolti.", "tempo": "es. 1s spinta, 2s discesa"}`;
                     const responseText = await askGemini(prompt, true);
                     const parsed = parseAIResponse(responseText);
                     if (parsed && parsed.esecuzione) { coachData = parsed; }
@@ -1220,12 +1220,10 @@
                 } finally {
                     document.getElementById('ai-loading-overlay').style.display = 'none';
                 }
-            } else {
-                showMessage("Chiave API non trovata. Istruzioni base applicate.");
             }
             
             const newEx = {
-                name: name, category: cat, sets: '3', reps: '10', img: `img/${newId}.png`, coach: coachData, isBW: (cat === 'core') // Imposta bodyweight di default per il core
+                name: name, category: cat, sets: '3', reps: '10', img: `img/${newId}.png`, coach: coachData, isBW: (cat === 'core')
             };
             
             const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
@@ -1237,9 +1235,9 @@
             closeCustomEx();
             renderLibrary(cat); 
             
-            // Alert prolungato per assicurarsi che l'utente veda il nome immagine
+            // Un alert di sistema per essere sicuri che tu legga il nome immagine
             setTimeout(() => {
-                alert(`ESERCIZIO SALVATO!\n\nPer aggiungere l'immagine, salvala nella cartella 'img/' chiamandola esattamente:\n\n${newId}.png`);
+                alert(`ESERCIZIO SALVATO!\n\nPer inserire la foto in futuro, chiamala esattamente:\n${newId}.png`);
             }, 500);
         }
 
@@ -1303,7 +1301,11 @@
             
             let imageNote = '';
             if (exId.startsWith('c_')) {
-                imageNote = `<div class="bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 mt-2"><h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i> Promemoria Immagine</h4><p class="text-sm leading-relaxed text-gray-300 mb-3">Salva la foto nella cartella <b>img/</b> col nome:</p><div class="bg-[#1C1C1E] border border-white/10 p-3 rounded-xl text-center shadow-inner"><code class="text-white font-mono font-bold text-lg">${exId}.png</code></div></div>`;
+                imageNote = `<div class="bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 mt-4">
+                    <h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-2"><i data-lucide="image" class="w-4 h-4 inline"></i> Foto Esercizio</h4>
+                    <p class="text-[13px] leading-relaxed text-gray-300 mb-2">Salva la foto in <b>img/</b> col nome:</p>
+                    <div class="bg-[#1C1C1E] border border-white/10 p-3 rounded-xl text-center shadow-inner"><code class="text-white font-mono font-bold">${exId}.png</code></div>
+                </div>`;
             }
 
             content.innerHTML = `<div class="space-y-4"><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> Distretto Muscolare</h4><p class="text-sm font-bold text-white uppercase">${ex.category}</p></div><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-emerald-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Esecuzione</h4><p class="text-sm leading-relaxed text-gray-300">${esecuzione}</p></div><div class="bg-black/20 p-5 rounded-2xl border border-white/5"><h4 class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Suggerimenti e Tempo</h4><p class="text-sm leading-relaxed text-gray-300 mb-2">${suggerimenti}</p><p class="text-xs font-bold text-gray-400 mt-2"><i data-lucide="clock" class="w-3 h-3 inline"></i> ${tempo}</p></div>${imageNote}</div>`;
@@ -1664,6 +1666,21 @@
             goHome(); lucide.createIcons();
             if(localStorage.getItem('gemini_api_key')) document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key');
         };
+		// FIX TASTIERA iOS: Nasconde la barra inferiore quando scrivi
+        document.addEventListener('focusin', function(e) {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                const nav = document.querySelector('.glass-nav');
+                if(nav) nav.style.display = 'none';
+            }
+        });
+        document.addEventListener('focusout', function(e) {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                setTimeout(() => {
+                    const nav = document.querySelector('.glass-nav');
+                    if(nav) nav.style.display = 'flex';
+                }, 100);
+            }
+        });
     </script>
 </body>
 </html>
