@@ -78,6 +78,9 @@
 <body class="pt-safe">
     <div id="message-box"></div>
     
+    <!-- Input invisibile per caricare foto da fotocamera/galleria -->
+    <input type="file" id="global-photo-input" accept="image/*" class="hidden">
+
     <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex-col items-center justify-center text-center">
         <div class="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center ai-glow border border-purple-500/50 mb-6">
             <i data-lucide="sparkles" class="w-10 h-10 text-purple-400 animate-pulse"></i>
@@ -262,11 +265,11 @@
                     <div><label>Braccio Sx (cm)</label><input type="number" id="bio-arm-sx" step="0.1" placeholder="es. 38"></div>
                     <div><label>Braccio Dx (cm)</label><input type="number" id="bio-arm-dx" step="0.1" placeholder="es. 38.5"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
                     <div><label>Coscia Sx (cm)</label><input type="number" id="bio-leg-sx" step="0.1" placeholder="es. 60"></div>
                     <div><label>Coscia Dx (cm)</label><input type="number" id="bio-leg-dx" step="0.1" placeholder="es. 60.5"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
                     <div><label>Polpaccio Sx (cm)</label><input type="number" id="bio-calf-sx" step="0.1" placeholder="es. 40"></div>
                     <div><label>Polpaccio Dx (cm)</label><input type="number" id="bio-calf-dx" step="0.1" placeholder="es. 40.5"></div>
                 </div>
@@ -444,7 +447,7 @@
                     <button onclick="closeCustomEx()" class="bg-[#2C2C2E] p-2.5 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="space-y-4 mb-6 scrollable-area">
-                    <div><label>Nome Esercizio</label><input type="text" id="custom-ex-name" placeholder="es. Curl Inclinato Panca"></div>
+                    <div><label>Nome Esercizio</label><input type="text" id="custom-ex-name" placeholder="es. Curl Panca Scott Singolo"></div>
                     <div><label>Categoria Muscolare</label>
                         <select id="custom-ex-cat" class="bg-[#2C2C2E] text-white">
                             <option value="petto">Petto</option>
@@ -458,8 +461,8 @@
                         </select>
                     </div>
                     <div>
-                        <label>Istruzioni / Dettagli per l'AI</label>
-                        <textarea id="custom-ex-hint" rows="2" placeholder="es. Appoggio del petto/braccio sullo schienale della panca inclinata a 45°, non sul ginocchio." class="!text-xs text-left"></textarea>
+                        <label>Assetto & Dettagli per l'AI (Vincoli Biomeccanici)</label>
+                        <textarea id="custom-ex-hint" rows="2" placeholder="es. Un braccio alla volta, ascellare ben incastrata sulla panca Scott, gomito fermo, discesa controllata." class="!text-xs text-left"></textarea>
                     </div>
                     <div class="flex items-center justify-between bg-[#2C2C2E] p-4 rounded-2xl border border-white/5">
                         <div>
@@ -468,6 +471,10 @@
                         </div>
                         <input type="checkbox" id="custom-ex-isbw" class="w-6 h-6 accent-blue-500 rounded">
                     </div>
+                    
+                    <button type="button" onclick="triggerPhotoUploadForCreation()" class="w-full bg-[#2C2C2E] border border-white/10 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest text-gray-300 flex items-center justify-center gap-2 active:bg-white/10 transition-colors">
+                        <i data-lucide="camera" class="w-4 h-4 text-blue-400"></i> <span id="custom-photo-btn-text">Scegli Foto dal Rullino (Opzionale)</span>
+                    </button>
                 </div>
                 <button onclick="saveCustomEx()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest">SALVA NEL CATALOGO</button>
             </div>
@@ -683,6 +690,8 @@
         let selectedProgColor = '#0A84FF'; let tempDropSet = false; let tempSuperset = false; let calendarDate = new Date();
         let sessionChart = null; let historyChart = null;
         let isArchiveViewOpen = false;
+        let targetExForUpload = null;
+        let creationPhotoBase64 = null;
 
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
@@ -716,7 +725,6 @@
         function compressImageBase64(base64Data, maxWidth = 350, maxHeight = 350, quality = 0.8) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.crossOrigin = "anonymous";
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
@@ -739,28 +747,53 @@
                     resolve(canvas.toDataURL('image/jpeg', quality));
                 };
                 img.onerror = (e) => reject(e);
-                img.src = base64Data.startsWith('data:') ? base64Data : `data:image/jpeg;base64,${base64Data}`;
+                img.src = base64Data;
             });
         }
 
-        async function generateExerciseImageFlux(promptText) {
-            const cleanPrompt = encodeURIComponent(promptText.trim());
-            const seed = Math.floor(Math.random() * 1000000);
-            const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=400&height=400&model=flux&nologo=true&seed=${seed}`;
-            
-            const response = await fetch(url);
-            if (!response.ok) throw new Error("Generatore foto occupato");
-            const blob = await response.blob();
-            
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    compressImageBase64(reader.result, 350, 350, 0.8).then(resolve).catch(reject);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
+        // Gestione Caricamento Foto Reale dal Rullino
+        function triggerPhotoUploadForCreation() {
+            targetExForUpload = 'CREATION';
+            document.getElementById('global-photo-input').click();
         }
+
+        function triggerPhotoUploadForExisting(exId) {
+            targetExForUpload = exId;
+            document.getElementById('global-photo-input').click();
+        }
+
+        document.getElementById('global-photo-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                try {
+                    const compressed = await compressImageBase64(evt.target.result, 350, 350, 0.82);
+                    if (targetExForUpload === 'CREATION') {
+                        creationPhotoBase64 = compressed;
+                        document.getElementById('custom-photo-btn-text').innerText = "Foto Selezionata con successo!";
+                        showMessage("Foto pronta per il salvataggio!");
+                    } else if (targetExForUpload && exerciseData[targetExForUpload]) {
+                        exerciseData[targetExForUpload].img = compressed;
+                        if (targetExForUpload.startsWith('c_')) {
+                            const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+                            customDb[targetExForUpload] = exerciseData[targetExForUpload];
+                            localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
+                        }
+                        if (currentWorkoutId) renderWorkout(currentWorkoutId);
+                        renderLibrary(exerciseData[targetExForUpload].category);
+                        openInfo(targetExForUpload);
+                        showMessage("Foto aggiornata!");
+                    }
+                } catch(err) {
+                    console.error("Errore compressione foto", err);
+                    showMessage("Errore nel caricamento della foto");
+                }
+            };
+            reader.readAsDataURL(file);
+            e.target.value = ''; // Reset input
+        });
 
         function openAIGenerator() { if(!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; } document.getElementById('modal-ai-gen').style.display = 'flex'; }
         function closeAIGenerator() { document.getElementById('modal-ai-gen').style.display = 'none'; }
@@ -1263,7 +1296,12 @@
         function closeAIFeedback() { document.getElementById('modal-ai-feedback').style.display = 'none'; }
         function finishWorkoutFinal() { closeAIFeedback(); showMessage("Sessione Salvata!"); goHome(); }
 
-        function openCustomEx() { document.getElementById('modal-custom-ex').style.display = 'flex'; lucide.createIcons(); }
+        function openCustomEx() { 
+            creationPhotoBase64 = null;
+            document.getElementById('custom-photo-btn-text').innerText = "Scegli Foto dal Rullino (Opzionale)";
+            document.getElementById('modal-custom-ex').style.display = 'flex'; 
+            lucide.createIcons(); 
+        }
         function closeCustomEx() { document.getElementById('modal-custom-ex').style.display = 'none'; }
         
         async function saveCustomEx() {
@@ -1281,12 +1319,14 @@
                 target: `Distretto muscolare: ${cat}.`, 
                 tempo: "Controllato" 
             };
-            let photoUrl = `img/${newId}.png`;
+            
+            // Usa la foto caricata dall'utente se presente, altrimenti il percorso standard
+            let photoUrl = creationPhotoBase64 || `img/${newId}.png`;
 
             const apiKey = localStorage.getItem('gemini_api_key');
             if (apiKey) {
-                document.getElementById('ai-loading-title').innerText = "1/2 Guida Tecnica AI...";
-                document.getElementById('ai-loading-desc').innerText = "Elaborazione biomeccanica professionale...";
+                document.getElementById('ai-loading-title').innerText = "Analisi Biomeccanica Coach AI...";
+                document.getElementById('ai-loading-desc').innerText = "Elaborazione guida tecnica dettagliata...";
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
                     const prompt = `Sei un biomeccanico e coach elitario di bodybuilding.
@@ -1298,27 +1338,16 @@ REGOLE FONDAMENTALI:
 2. In "esecuzione", struttura una spiegazione tecnica dettagliata (3-4 frasi):
    - Assetto e posizione articolare di partenza (inclinazione panca, blocco scapolare, posizione gomiti).
    - Fase concentrica (traiettoria, contrazione di picco senza compensazioni).
-   - Fase eccentrica (discesa frenata, stretching sotto carico).
+   - Fase eccentrica (discesa frenata, allungamento controllato salvatendini).
 3. In "target", indica muscoli primari e secondari coinvolti.
 4. In "tempo", specifica i secondi (es. "1s salita, 1s picco, 3s discesa").
-5. In "image_prompt", crea un prompt in inglese per generare una foto iperrealistica: "Hyper-realistic fitness photography, Apple Fitness Plus aesthetic, muscular male model with defined V-taper physique performing ${name}${hint ? ', ' + hint : ''}, cinematic dark modern gym background, dramatic studio rim lighting, 85mm prime lens, sharp focus, 8k".
 
 Restituisci SOLO un JSON valido con questi campi:
-{"esecuzione": "...", "target": "...", "tempo": "...", "image_prompt": "..."}`;
+{"esecuzione": "...", "target": "...", "tempo": "..."}`;
                     
                     const responseText = await askGemini(prompt, true);
                     const parsed = parseAIResponse(responseText);
                     if (parsed && parsed.esecuzione) { coachData = parsed; }
-                    
-                    if (parsed && parsed.image_prompt) {
-                        document.getElementById('ai-loading-title').innerText = "2/2 Creazione Foto Studio...";
-                        document.getElementById('ai-loading-desc').innerText = "Rendering studio con motore Flux (10-15s)...";
-                        try {
-                            photoUrl = await generateExerciseImageFlux(parsed.image_prompt);
-                        } catch(imgErr) {
-                            console.warn("Generazione immagine Flux fallita, mantenuto fallback", imgErr);
-                        }
-                    }
                 } catch (e) {
                     console.error("Errore AI Coach", e);
                     showMessage("Salvato con parametri base (Errore AI)");
@@ -1339,6 +1368,7 @@ Restituisci SOLO un JSON valido con questi campi:
             document.getElementById('custom-ex-name').value = '';
             document.getElementById('custom-ex-hint').value = '';
             document.getElementById('custom-ex-isbw').checked = false;
+            creationPhotoBase64 = null;
             closeCustomEx();
             renderLibrary(cat); 
             showMessage("Esercizio aggiunto al catalogo!");
@@ -1387,42 +1417,12 @@ Restituisci SOLO un JSON valido:
             }
         }
 
-        async function regenerateImageAI(exId) {
-            const ex = exerciseData[exId];
-            if (!ex) return;
-
-            document.getElementById('ai-loading-title').innerText = "Creazione Foto Studio...";
-            document.getElementById('ai-loading-desc').innerText = "Rendering studio con motore Flux (10-15s)...";
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-            try {
-                const imgPrompt = `Hyper-realistic fitness photography, Apple Fitness Plus aesthetic, muscular male model with defined V-taper physique performing ${ex.name}${ex.hint ? ', ' + ex.hint : ''}. Cinematic studio lighting, clean dark modern gym background, dramatic rim light highlighting muscle definition. Shot on 85mm prime lens, sharp focus, photorealistic, 8k.`;
-                const photoUrl = await generateExerciseImageFlux(imgPrompt);
-                ex.img = photoUrl;
-                
-                if (exId.startsWith('c_')) {
-                    const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-                    customDb[exId] = ex;
-                    localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
-                }
-                
-                if (currentWorkoutId) renderWorkout(currentWorkoutId);
-                renderLibrary(ex.category);
-                openInfo(exId);
-                showMessage("Nuova foto salvata con successo!");
-            } catch (e) {
-                console.error(e);
-                showMessage(`Errore Foto: ${e.message}`);
-            } finally {
-                document.getElementById('ai-loading-overlay').style.display = 'none';
-            }
-        }
-
         function copyPromptNanobanana(exId) {
             const ex = exerciseData[exId];
             if (!ex) return;
             const promptStr = `Hyper-realistic fitness photography, Apple Fitness Plus aesthetic, muscular male model with defined V-taper physique performing ${ex.name}${ex.hint ? ', ' + ex.hint : ''}. Cinematic studio lighting, clean dark modern gym background, dramatic rim light highlighting muscle definition. Shot on 85mm prime lens, sharp focus, photorealistic, 8k --ar 1:1`;
             navigator.clipboard.writeText(promptStr).then(() => {
-                showMessage("Prompt Nanobanana copiato!");
+                showMessage("Prompt Nanobanana copiato negli appunti!");
             }).catch(() => {
                 prompt("Copia manualmente il prompt:", promptStr);
             });
@@ -1526,8 +1526,8 @@ Restituisci SOLO un JSON valido:
                     <button onclick="regenerateCoachAI('${exId}')" class="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
                         <i data-lucide="sparkles" class="w-4 h-4"></i> Guida AI
                     </button>
-                    <button onclick="regenerateImageAI('${exId}')" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
-                        <i data-lucide="camera" class="w-4 h-4"></i> Foto Automatica
+                    <button onclick="triggerPhotoUploadForExisting('${exId}')" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
+                        <i data-lucide="camera" class="w-4 h-4"></i> Carica Foto
                     </button>
                 </div>
                 <button onclick="copyPromptNanobanana('${exId}')" class="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-2 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
