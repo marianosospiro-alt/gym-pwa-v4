@@ -692,17 +692,28 @@
 
         async function askGemini(promptText, isJson = false) {
             const apiKey = localStorage.getItem('gemini_api_key');
-            if (!apiKey) throw new Error("API Key mancante");
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            if (!apiKey) throw new Error("API Key mancante! Inseriscila nelle Opzioni.");
+            
+            // Endpoint ufficiale standard di Google AI Studio
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
             const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
             if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
-            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
-            if (!response.ok) throw new Error("Errore API Gemini");
-            const data = await response.json(); return data.candidates[0].content.parts[0].text;
+            
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(reqBody) 
+            });
+            
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                const msg = errData.error?.message || `Errore HTTP ${response.status}`;
+                throw new Error(msg);
+            }
+            
+            const data = await response.json(); 
+            return data.candidates[0].content.parts[0].text;
         }
-
-        function openAIGenerator() { if(!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; } document.getElementById('modal-ai-gen').style.display = 'flex'; }
-        function closeAIGenerator() { document.getElementById('modal-ai-gen').style.display = 'none'; }
 
         async function generateWorkoutAI() {
             const time = document.getElementById('ai-time').value; const focus = document.getElementById('ai-focus').value;
@@ -1256,7 +1267,6 @@ Scrivi la guida tecnica. Rispondi con un JSON che abbia esattamente questi campi
         async function regenerateCoachAI(exId) {
             const ex = exerciseData[exId];
             if (!ex) return;
-            if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
             
             document.getElementById('ai-loading-title').innerText = "Generazione Guida Tecnica...";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
@@ -1278,7 +1288,7 @@ Rispondi SOLO con un JSON valido:
                 }
             } catch(e) {
                 console.error(e);
-                showMessage("Errore durante la generazione AI");
+                showMessage(`Errore: ${e.message}`);
             } finally {
                 document.getElementById('ai-loading-overlay').style.display = 'none';
             }
