@@ -1153,7 +1153,7 @@
         function openCustomEx() { document.getElementById('modal-custom-ex').style.display = 'flex'; lucide.createIcons(); }
         function closeCustomEx() { document.getElementById('modal-custom-ex').style.display = 'none'; }
         
-        function saveCustomEx() {
+        async function saveCustomEx() {
             const name = document.getElementById('custom-ex-name').value.trim();
             const cat = document.getElementById('custom-ex-cat').value;
             
@@ -1162,16 +1162,41 @@
             const safeName = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
             const newId = 'c_' + safeName;
             
+            // Dati base in caso l'AI fallisca o manchi la chiave API
+            let coachData = { 
+                esecuzione: "Esercizio personalizzato creato da te.", 
+                target: cat, 
+                tempo: "Regolare" 
+            };
+
+            // Invocazione AI in background
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (apiKey) {
+                document.getElementById('ai-loading-overlay').style.display = 'flex';
+                try {
+                    const prompt = `Sei un esperto personal trainer e strength coach. L'utente ha appena aggiunto l'esercizio "${name}" nella categoria "${cat}".
+                    Scrivi i dettagli tecnici corretti per questo esercizio.
+                    Restituisci SOLO E SOLTANTO un oggetto JSON con questa esatta struttura:
+                    {"esecuzione": "Istruzioni biomeccaniche di esecuzione in 2-3 frasi.", "target": "Muscoli specifici coinvolti.", "tempo": "es. 1s spinta, 2s discesa controllata"}`;
+                    
+                    const responseText = await askGemini(prompt, true);
+                    const parsed = parseAIResponse(responseText);
+                    if (parsed && parsed.esecuzione) {
+                        coachData = parsed;
+                    }
+                } catch (e) {
+                    console.error("Errore AI Coach", e);
+                } finally {
+                    document.getElementById('ai-loading-overlay').style.display = 'none';
+                }
+            }
+            
             const newEx = {
                 name: name,
                 category: cat,
                 sets: '3', reps: '10',
                 img: `img/${newId}.png`,
-                coach: { 
-                    esecuzione: "Esercizio personalizzato creato da te.", 
-                    target: cat, 
-                    tempo: "Regolare" 
-                }
+                coach: coachData
             };
             
             const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
