@@ -274,7 +274,7 @@
             <h1 class="text-4xl font-black text-white mb-8 mt-2 tracking-tight">Opzioni</h1>
             <div class="apple-card p-6 mb-6 bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] border border-purple-500/20 shadow-[0_10px_30px_rgba(175,82,222,0.1)]">
                 <h3 class="font-bold text-xl mb-2 flex items-center gap-2"><i data-lucide="sparkles" class="w-5 h-5 text-purple-500"></i> Coach AI</h3>
-                <p class="text-sm text-gray-400 mb-4 leading-relaxed">Inserisci API Key di Google AI Studio per abilitare la generazione di schede intelligenti e l'analisi tecnica.</p>
+                <p class="text-sm text-gray-400 mb-4 leading-relaxed">Inserisci API Key di Google AI Studio per abilitare la generazione di schede intelligenti, analisi tecnica e creazione esercizi.</p>
                 <input type="password" id="api-key-input" placeholder="Incolla qui la tua API Key" class="mb-4 !py-3 !text-sm">
                 <button onclick="saveApiKey()" class="bg-purple-600 hover:bg-purple-500 rounded-xl w-full py-3 text-white text-xs font-black uppercase tracking-widest transition-colors shadow-lg">SALVA CHIAVE</button>
             </div>
@@ -448,7 +448,7 @@
                         </select>
                     </div>
                     <div class="bg-blue-500/10 border border-blue-500/20 p-4 rounded-2xl">
-                        <p class="text-xs text-blue-400 font-bold leading-relaxed"><i data-lucide="image" class="w-4 h-4 inline mb-1"></i> <b>Nota Immagine:</b> L'esercizio avrà un'icona generica. Per aggiungere la foto reale in futuro, ti basterà salvare un'immagine nella cartella "img/" chiamandola esattamente come ti indicherà l'app al salvataggio.</p>
+                        <p class="text-xs text-blue-400 font-bold leading-relaxed"><i data-lucide="image" class="w-4 h-4 inline mb-1"></i> <b>Nota Immagine:</b> L'esercizio avrà un'icona generica. Per aggiungere la foto in futuro, ti basterà salvare un'immagine nella cartella "img/" chiamandola esattamente come ti indicherà l'app al salvataggio.</p>
                     </div>
                 </div>
                 <button onclick="saveCustomEx()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest">SALVA NEL CATALOGO</button>
@@ -522,6 +522,7 @@
     </div>
 
     <script>
+        // Database Esercizi RTF
         const exerciseData = {
             'corsa': { name: 'Corsa / Tapis Roulant', sets: '1', reps: '30m', img: 'img/corsa.png', category: 'aerobica', coach: { esecuzione: "Mantieni una postura eretta, sguardo dritto. Non aggrapparti ai corrimano del tapis roulant.", target: "Sistema cardiovascolare, resistenza e consumo calorico.", tempo: "Andatura costante o interval training (HIIT)" } },
             'spin_bike': { name: 'Spin Bike / Cyclette', sets: '1', reps: '30m', img: 'img/spin_bike.png', category: 'aerobica', coach: { esecuzione: "Regola il sellino ad altezza anca. Mantieni una pedalata fluida e rotonda, spingendo e 'tirando' i pedali.", target: "Flessori dell'anca, quadricipiti e sistema cardiovascolare. Ottimo a basso impatto articolare.", tempo: "RPM costante tra 70 e 90" } },
@@ -626,9 +627,11 @@
             'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Seduto al pulley basso, barra dritta larga. Tira verso lo sterno alto allargando i gomiti a 90°.", target: "Spessore eccezionale per deltoidi posteriori e trapezi centrali.", tempo: "1s tirata, 1s pausa contratta, 2s ritorno controllato" } }
         };
 
-        // Carica e unisci gli esercizi personalizzati dell'utente al database principale
+        // Unisce gli esercizi personalizzati ed elimina quelli cestinati
         const customExDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
         Object.assign(exerciseData, customExDb);
+        const deletedExDb = JSON.parse(localStorage.getItem('deleted_exercises_v5')) || [];
+        deletedExDb.forEach(id => { delete exerciseData[id]; });
 
         const defaultPlan = {
             1: { title: 'PUSH (Forza)', color: '#007AFF', items: ['panca_piana', 'lento_avanti', 'chest_press_g1', 'alzate_lat', 'french_press', 'pushdown'], overrides: { 3: { isDropSet: true } } },
@@ -764,7 +767,7 @@
             localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
             closeProgramModal();
             goHome();
-            showMessage("Scheda clonata con successo!");
+            showMessage("Scheda clonata!");
         }
 
         function toggleArchiveProgram() {
@@ -885,10 +888,12 @@
             const container = document.getElementById('exercise-list'); const items = userPlan[id].items || []; const overrides = userPlan[id].overrides || {};
             const finishBtn = document.getElementById('finish-btn'); if (finishBtn) finishBtn.style.display = isHistory ? 'none' : 'block';
             if (document.getElementById('notes-area')) document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
-            if(items.length === 0) { container.innerHTML = `<div class="text-center p-10 text-gray-500 font-bold">Nessun esercizio presente. Clicca su + in basso per iniziare!</div>`; return; }
+            
+            const visibleItems = items.filter(exId => exerciseData[exId] !== undefined);
+            if(visibleItems.length === 0) { container.innerHTML = `<div class="text-center p-10 text-gray-500 font-bold">Nessun esercizio presente. Clicca su + in basso per iniziare!</div>`; return; }
 
-            container.innerHTML = items.map((exId, idx) => {
-                const ex = exerciseData[exId] || { name: exId, sets: '3', reps: '12', img: '', category: 'custom' }; const isCardio = ex.category === 'aerobica';
+            container.innerHTML = visibleItems.map((exId, idx) => {
+                const ex = exerciseData[exId]; const isCardio = ex.category === 'aerobica';
                 const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastEntry = h.length > 0 ? h[h.length-1] : null; let last = '--';
                 if (lastEntry) { if (isCardio) last = lastEntry.w > 0 ? `${lastEntry.w}km / ${lastEntry.r}m` : `${lastEntry.r} min`; else { if (lastEntry.w > 0) last = `${lastEntry.w}kg x${lastEntry.r}`; else if (lastEntry.r > 0) last = `${lastEntry.r} reps`; } }
                 
@@ -952,7 +957,7 @@
                             `}
                         </div>
                     </div>
-                    ${isSuper && idx < items.length - 1 ? `<div class="superset-connector"></div>` : ''}
+                    ${isSuper && idx < visibleItems.length - 1 ? `<div class="superset-connector"></div>` : ''}
                 </div>`;
             }).join('');
             lucide.createIcons();
@@ -1156,34 +1161,25 @@
         async function saveCustomEx() {
             const name = document.getElementById('custom-ex-name').value.trim();
             const cat = document.getElementById('custom-ex-cat').value;
-            
             if(!name) { showMessage("Inserisci il nome dell'esercizio!"); return; }
             
             const safeName = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
             const newId = 'c_' + safeName;
             
-            // Dati base in caso l'AI fallisca o manchi la chiave API
             let coachData = { 
                 esecuzione: "Esercizio personalizzato creato da te.", 
                 target: cat, 
                 tempo: "Regolare" 
             };
 
-            // Invocazione AI in background
             const apiKey = localStorage.getItem('gemini_api_key');
             if (apiKey) {
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
                 try {
-                    const prompt = `Sei un esperto personal trainer e strength coach. L'utente ha appena aggiunto l'esercizio "${name}" nella categoria "${cat}".
-                    Scrivi i dettagli tecnici corretti per questo esercizio.
-                    Restituisci SOLO E SOLTANTO un oggetto JSON con questa esatta struttura:
-                    {"esecuzione": "Istruzioni biomeccaniche di esecuzione in 2-3 frasi.", "target": "Muscoli specifici coinvolti.", "tempo": "es. 1s spinta, 2s discesa controllata"}`;
-                    
+                    const prompt = `Sei un esperto personal trainer. L'utente ha aggiunto l'esercizio "${name}" nella categoria "${cat}". Scrivi i dettagli tecnici. Restituisci SOLO E SOLTANTO UN OGGETTO JSON con questa struttura: {"esecuzione": "Istruzioni biomeccaniche brevi.", "target": "Muscoli specifici coinvolti.", "tempo": "es. 1s spinta, 2s discesa controllata"}`;
                     const responseText = await askGemini(prompt, true);
                     const parsed = parseAIResponse(responseText);
-                    if (parsed && parsed.esecuzione) {
-                        coachData = parsed;
-                    }
+                    if (parsed && parsed.esecuzione) { coachData = parsed; }
                 } catch (e) {
                     console.error("Errore AI Coach", e);
                 } finally {
@@ -1192,17 +1188,12 @@
             }
             
             const newEx = {
-                name: name,
-                category: cat,
-                sets: '3', reps: '10',
-                img: `img/${newId}.png`,
-                coach: coachData
+                name: name, category: cat, sets: '3', reps: '10', img: `img/${newId}.png`, coach: coachData
             };
             
             const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
             customDb[newId] = newEx;
             localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
-            
             exerciseData[newId] = newEx;
             
             document.getElementById('custom-ex-name').value = '';
@@ -1221,9 +1212,45 @@
             const list = document.getElementById('library-list'); const items = userPlan[currentWorkoutId].items || [];
             list.innerHTML = Object.entries(exerciseData).filter(([id, data]) => data.category === cat).map(([id, ex]) => {
                 const isCardio = cat === 'aerobica';
-                return `<div onclick="processSelection('${id}')" class="bg-[#1C1C1E] p-4 rounded-2xl flex items-center gap-4 border border-white/5 active:bg-[#2C2C2E] cursor-pointer transition-colors shadow-md"><div class="img-thumb"><img src="${ex.img}" onerror="handleImgError(this)"></div><div class="flex-1 text-left"><h4 class="font-bold text-[16px] text-white leading-tight">${ex.name}</h4><p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mt-1">${isCardio ? 'CARDIO' : `${ex.sets}x${ex.reps}`}</p></div><div class="w-10 h-10 flex items-center justify-center rounded-full ${items.includes(id) ? 'bg-red-500/10 border border-red-500/20' : 'bg-blue-500/10 border border-blue-500/20'}"><i data-lucide="${items.includes(id) ? 'alert-circle' : 'plus'}" class="${items.includes(id) ? 'text-red-500' : 'text-blue-500'} w-5 h-5"></i></div></div>`;
+                return `<div onclick="processSelection('${id}')" class="bg-[#1C1C1E] p-4 rounded-2xl flex items-center gap-4 border border-white/5 active:bg-[#2C2C2E] cursor-pointer transition-colors shadow-md">
+                    <div class="img-thumb"><img src="${ex.img}" onerror="handleImgError(this)"></div>
+                    <div class="flex-1 text-left">
+                        <h4 class="font-bold text-[16px] text-white leading-tight">${ex.name}</h4>
+                        <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mt-1">${isCardio ? 'CARDIO' : `${ex.sets}x${ex.reps}`}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-full ${items.includes(id) ? 'bg-orange-500/10 border border-orange-500/20' : 'bg-blue-500/10 border border-blue-500/20'}">
+                            <i data-lucide="${items.includes(id) ? 'check' : 'plus'}" class="${items.includes(id) ? 'text-orange-500' : 'text-blue-500'} w-5 h-5"></i>
+                        </div>
+                        <button onclick="deleteExerciseFromLibrary(event, '${id}', '${cat}')" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500/30 active:scale-90 transition-transform">
+                            <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
+                        </button>
+                    </div>
+                </div>`;
             }).join(''); lucide.createIcons();
         }
+
+        function deleteExerciseFromLibrary(e, exId, cat) {
+            e.stopPropagation(); // Previene il click sull'esercizio
+            openConfirm("Elimina Esercizio", "Vuoi rimuovere per sempre questo esercizio dal catalogo?", () => {
+                if (exId.startsWith('c_')) {
+                    const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+                    delete customDb[exId];
+                    localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
+                } else {
+                    const deletedExDb = JSON.parse(localStorage.getItem('deleted_exercises_v5')) || [];
+                    if (!deletedExDb.includes(exId)) deletedExDb.push(exId);
+                    localStorage.setItem('deleted_exercises_v5', JSON.stringify(deletedExDb));
+                }
+                delete exerciseData[exId];
+                renderLibrary(cat);
+                showMessage("Esercizio eliminato.");
+                
+                // Aggiorna la vista workout se l'esercizio era in scheda
+                if (currentWorkoutId) renderWorkout(currentWorkoutId);
+            });
+        }
+
         function processSelection(newId) { if (!userPlan[currentWorkoutId].items) userPlan[currentWorkoutId].items = []; if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Esercizio già in scheda!"); return; } if (swappingIndex === null) userPlan[currentWorkoutId].items.push(newId); else { userPlan[currentWorkoutId].items[swappingIndex] = newId; if(userPlan[currentWorkoutId].overrides) delete userPlan[currentWorkoutId].overrides[swappingIndex]; } localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeLibrary(); renderWorkout(currentWorkoutId); }
         function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
         function openAddMenu() { swappingIndex = null; renderLibrary('aerobica'); document.getElementById('modal-library').style.display = 'flex'; }
@@ -1235,7 +1262,6 @@
             const suggerimenti = ex.coach?.target || `Sviluppo del distretto: ${ex.category}.`;
             const tempo = ex.coach?.tempo || "Costante o controllato.";
             
-            // Genera il blocco info immagine se è un esercizio personalizzato
             let imageNote = '';
             if (exId.startsWith('c_')) {
                 imageNote = `<div class="bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 mt-2"><h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i> Promemoria Immagine</h4><p class="text-sm leading-relaxed text-gray-300 mb-3">Salva la tua foto nella cartella <b>img/</b> rinominandola esattamente così:</p><div class="bg-[#1C1C1E] border border-white/10 p-3 rounded-xl text-center shadow-inner"><code class="text-white font-mono font-bold">${exId}.png</code></div></div>`;
