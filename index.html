@@ -737,12 +737,13 @@
             const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
             if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
             
-            const models = ['gemini-3.8-flash'];
+            // Endpoint ufficiali stabili: Gemini 3.8 Flash con fallback a 2.5 Flash
+            const models = ['gemini-3.8-flash', 'gemini-2.5-flash'];
             let lastError = null;
 
             for (const model of models) {
                 try {
-                    const url = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){model}:generateContent?key=${apiKey}`;
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                     const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
                     if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
                     
