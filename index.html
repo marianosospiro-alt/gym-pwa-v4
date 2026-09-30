@@ -131,6 +131,22 @@
                 </button>
                 <h2 id="workout-title-text" class="font-black text-xs uppercase tracking-[0.15em] text-white text-center flex-1 mx-2 truncate">Allenamento</h2>
                 <div class="flex gap-2">
+                    <!-- NUOVO PULSANTE AUDIT BIOMECCANICO -->
+                    <button onclick="analyzePlanComposition()" title="Audit Biomeccanico Scheda" class="w-10 h-10 flex items-center justify-center bg-purple-600/20 border border-purple-500/30 rounded-full text-purple-300 active:scale-95 transition-transform">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="openProgramModal(currentWorkoutId)" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-gray-300 active:scale-95 transition-transform">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </button>
+                    <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-3 rounded-full shadow-[0_0_15px_rgba(52,199,89,0.4)] active:scale-95 transition-transform">CONCLUDI</button>
+                </div>
+            </header>
+            <header class="p-4 pt-safe glass flex justify-between items-center sticky top-0 z-50 border-b border-white/5">
+                <button onclick="goHome()" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-white active:scale-95 transition-transform">
+                    <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                </button>
+                <h2 id="workout-title-text" class="font-black text-xs uppercase tracking-[0.15em] text-white text-center flex-1 mx-2 truncate">Allenamento</h2>
+                <div class="flex gap-2">
                     <button onclick="openProgramModal(currentWorkoutId)" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-gray-300 active:scale-95 transition-transform">
                         <i data-lucide="settings" class="w-5 h-5"></i>
                     </button>
