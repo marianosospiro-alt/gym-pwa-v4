@@ -1341,7 +1341,71 @@
                 document.getElementById('modal-ai-feedback').style.display = 'flex';
             } catch (e) { console.error(e); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore connessione AI."); }
         }
+        function closePlanAudit() {
+            document.getElementById('modal-plan-audit').style.display = 'none';
+        }
 
+        async function analyzePlanComposition() {
+            if (!currentWorkoutId || !userPlan[currentWorkoutId]) return;
+            const plan = userPlan[currentWorkoutId];
+            const items = plan.items || [];
+            
+            if (items.length < 2) {
+                showMessage("Aggiungi almeno 2 esercizi per analizzare la scheda!");
+                return;
+            }
+
+            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+            if (!apiKey) {
+                showMessage("Inserisci l'API Key nelle Opzioni!");
+                return;
+            }
+
+            document.getElementById('ai-loading-title').innerText = "Audit Biomeccanico Scheda...";
+            document.getElementById('ai-loading-desc').innerText = "Analisi curve di resistenza, piani di lavoro e ridondanze...";
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
+
+            const exDetails = items.map((id, index) => {
+                const ex = exerciseData[id] || { name: id, category: 'altro' };
+                const ov = (plan.overrides && plan.overrides[index]) || {};
+                return {
+                    nome: ex.name,
+                    distretto: ex.category,
+                    sets_reps: `${ov.sets || ex.sets}x${ov.reps || ex.reps}`,
+                    target: ex.coach?.target || 'Non specificato',
+                    note: ex.hint || ''
+                };
+            });
+
+            const prompt = `Sei un biomeccanico e chinesiologo specializzato nell'allenamento con sovraccarichi e ipertrofia (approccio evidenze scientifiche e curve di resistenza).
+Analizza la composizione di questa routine di allenamento intitolata "${plan.title}":
+${JSON.stringify(exDetails, null, 2)}
+
+EFFETTUA UN AUDIT TECNICO STRUTTURATO NEI SEGUENTI PUNTI:
+
+1. VALUTAZIONE STRUTTURA & VOLUME:
+Commento sintetico sul volume e sulla coerenza dell'ordine degli esercizi.
+
+2. RIDONDANZE O CONFLITTI ARTICOLARI:
+Identifica se ci sono esercizi ridondanti (stesso piano di lavoro, stesso profilo di resistenza es. due esercizi che sovraccaricano solo l'accorciamento o solo l'allungamento, eccessivo stress cumulativo sullo stesso pattern articolare). Se la selezione è bilanciata, indicalo.
+
+3. SOSTITUZIONI & OTTIMIZZAZIONI CONSIGLIATE:
+Proponi cambi mirati (es. "Sostituisci [Esercizio A] con un movimento in [allungamento/cavo] per completare il range o preservare l'articolazione") e l'eventuale riordino consigliato.
+
+Usa uno stile asciutto, schematico, professionale ed elenchi puntati leggibili.`;
+
+            try {
+                const feedback = await askGemini(prompt, false);
+                document.getElementById('plan-audit-content').innerText = feedback;
+                document.getElementById('modal-plan-audit').style.display = 'flex';
+                lucide.createIcons();
+            } catch(e) {
+                console.error(e);
+                alert("Errore Audit AI: " + e.message);
+            } finally {
+                document.getElementById('ai-loading-overlay').style.display = 'none';
+            }
+        }
         function closeAIFeedback() { document.getElementById('modal-ai-feedback').style.display = 'none'; }
         function finishWorkoutFinal() { closeAIFeedback(); showMessage("Sessione Salvata!"); goHome(); }
 
