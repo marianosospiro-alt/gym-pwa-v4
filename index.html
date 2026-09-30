@@ -78,7 +78,7 @@
 <body class="pt-safe">
     <div id="message-box"></div>
     
-    <!-- Input invisibile per caricamento/scatto foto da smartphone -->
+    <!-- Input foto rullino/fotocamera -->
     <input type="file" id="global-photo-input" accept="image/*" class="hidden">
 
     <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex-col items-center justify-center text-center">
@@ -114,7 +114,6 @@
                 </button>
             </div>
 
-            <!-- SEZIONE ARCHIVIO -->
             <div id="archive-toggle-container" class="mt-8 text-center hidden">
                 <button onclick="toggleArchiveView()" id="btn-toggle-archive" class="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center justify-center gap-2 mx-auto bg-[#1C1C1E] px-4 py-2 rounded-full border border-white/5 transition-colors active:bg-white/5">
                     <i data-lucide="archive" class="w-3 h-3"></i> Mostra Archivio
@@ -123,17 +122,16 @@
             <section id="archived-cards-container" class="space-y-5 mt-4 hidden"></section>
         </div>
 
-        <!-- VISTA WORKOUT -->
+        <!-- VISTA WORKOUT (HEADER SINGOLO PULITO) -->
         <div id="view-workout" class="view hidden pb-40">
             <header class="p-4 pt-safe glass flex justify-between items-center sticky top-0 z-50 border-b border-white/5">
                 <button onclick="goHome()" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-white active:scale-95 transition-transform">
                     <i data-lucide="chevron-left" class="w-6 h-6"></i>
                 </button>
                 <h2 id="workout-title-text" class="font-black text-xs uppercase tracking-[0.15em] text-white text-center flex-1 mx-2 truncate">Allenamento</h2>
-                <div class="flex gap-2">
-                    <!-- Tasto Audit Biomeccanico Scheda -->
-                    <button onclick="analyzePlanComposition()" title="Audit Biomeccanico Scheda" class="w-10 h-10 flex items-center justify-center bg-purple-600/20 border border-purple-500/30 rounded-full text-purple-400 active:scale-95 transition-transform">
-                        <i data-lucide="scan-line" class="w-5 h-5"></i>
+                <div class="flex gap-2 items-center">
+                    <button onclick="analyzePlanComposition()" title="Audit Biomeccanico Scheda" class="w-10 h-10 flex items-center justify-center bg-purple-600/20 border border-purple-500/40 rounded-full text-purple-400 active:scale-95 transition-transform">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
                     </button>
                     <button onclick="openProgramModal(currentWorkoutId)" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-gray-300 active:scale-95 transition-transform">
                         <i data-lucide="settings" class="w-5 h-5"></i>
@@ -380,16 +378,16 @@
             </div>
         </div>
 
-        <!-- Modale Audit Biomeccanico Scheda -->
+        <!-- MODALE AUDIT BIOMECCANICO SCHEDA -->
         <div id="modal-plan-audit" class="modal-sheet" onclick="closePlanAudit()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="sheet-pill"></div>
                 <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4">
-                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-2"><i data-lucide="scan-line" class="w-6 h-6 text-purple-400"></i> Audit Scheda</h3>
+                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-2"><i data-lucide="sparkles" class="w-6 h-6 text-purple-400"></i> Audit Biomeccanico</h3>
                     <button onclick="closePlanAudit()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="scrollable-area space-y-4">
-                    <div id="plan-audit-content" class="text-sm leading-relaxed text-gray-200 whitespace-pre-line bg-[#2C2C2E]/60 border border-white/5 p-5 rounded-2xl"></div>
+                    <div id="plan-audit-content" class="text-sm leading-relaxed text-gray-200 whitespace-pre-line bg-[#2C2C2E]/60 border border-white/5 p-5 rounded-2xl font-medium"></div>
                 </div>
                 <button onclick="closePlanAudit()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest mt-4">RICEVUTO</button>
             </div>
@@ -1164,7 +1162,15 @@
         function switchView(viewId) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(`view-${viewId}`).classList.remove('hidden'); updateNav(viewId); window.scrollTo(0,0); }
         function goHome() { switchView('home'); renderHomeCards(); }
         function openSettings() { switchView('settings'); document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || ''; }
-        function openWorkout(id) { currentWorkoutId = id; document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById('view-workout').classList.remove('hidden'); document.getElementById('workout-title-text').innerText = userPlan[id].title; renderWorkout(id); window.scrollTo(0,0); }
+        
+        function openWorkout(id) { 
+            currentWorkoutId = id; 
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+            document.getElementById('view-workout').classList.remove('hidden'); 
+            document.getElementById('workout-title-text').innerText = userPlan[id].title; 
+            renderWorkout(id); 
+            window.scrollTo(0,0); 
+        }
 
         function renderHomeCards() {
             const container = document.getElementById('workout-cards-container');
@@ -1342,7 +1348,7 @@
         function closeAIFeedback() { document.getElementById('modal-ai-feedback').style.display = 'none'; }
         function finishWorkoutFinal() { closeAIFeedback(); showMessage("Sessione Salvata!"); goHome(); }
 
-        // AUDIT BIOMECCANICO SCHEDA COMPLETA
+        // AUDIT BIOMECCANICO DELLA SCHEDA COMPLETA
         function closePlanAudit() {
             document.getElementById('modal-plan-audit').style.display = 'none';
         }
@@ -1379,20 +1385,20 @@
                 };
             });
 
-            const prompt = `Sei un biomeccanico e chinesiologo specializzato nell'allenamento con sovraccarichi e ipertrofia (approccio evidenze scientifiche e curve di resistenza).
+            const prompt = `Sei un biomeccanico e chinesiologo specializzato nell'allenamento con sovraccarichi e ipertrofia muscolare basato su evidenze scientifiche.
 Analizza la composizione di questa routine di allenamento intitolata "${plan.title}":
 ${JSON.stringify(exDetails, null, 2)}
 
 EFFETTUA UN AUDIT TECNICO STRUTTURATO NEI SEGUENTI PUNTI:
 
 1. VALUTAZIONE STRUTTURA & VOLUME:
-Commento sintetico sul volume e sulla coerenza dell'ordine degli esercizi.
+Commento sintetico sull'adeguatezza del volume e sulla coerenza dell'ordine degli esercizi.
 
 2. RIDONDANZE O CONFLITTI ARTICOLARI:
-Identifica se ci sono esercizi ridondanti (stesso piano di lavoro, stesso profilo di resistenza es. due esercizi che sovraccaricano solo l'accorciamento o solo l'allungamento, eccessivo stress cumulativo sullo stesso pattern articolare). Se la selezione è bilanciata, indicalo.
+Identifica chiaramente se ci sono esercizi ridondanti (stesso piano di lavoro, stesso profilo di resistenza - es. due movimenti che sovraccaricano solo l'accorciamento o solo l'allungamento - o eccessivo stress cumulativo sullo stesso pattern articolare). Se la routine è equilibrata, indicalo chiaramente.
 
 3. SOSTITUZIONI & OTTIMIZZAZIONI CONSIGLIATE:
-Proponi cambi mirati (es. "Sostituisci [Esercizio A] con un movimento in [allungamento/cavo] per completare il range o preservare l'articolazione") e l'eventuale riordino consigliato.
+Proponi cambi mirati (es. "Sostituisci [Esercizio A] con [Esercizio B] per lavorare in allungamento/cavo") ed eventuale riordino consigliato.
 
 Usa uno stile asciutto, schematico, professionale ed elenchi puntati leggibili.`;
 
