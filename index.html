@@ -734,39 +734,29 @@
         }
 
         async function askGemini(promptText, isJson = false) {
-            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
-            if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
-            
-            // Endpoint ufficiali stabili: Gemini 3.8 Flash con fallback a 2.5 Flash
-            const models = ['gemini-3.8-flash', 'gemini-2.5-flash'];
-            let lastError = null;
-
-            for (const model of models) {
-                try {
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                    const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
-                    if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
-                    
-                    const response = await fetch(url, { 
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify(reqBody) 
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                        if (text) return text;
-                    } else {
-                        const errData = await response.json().catch(() => ({}));
-                        lastError = new Error(errData.error?.message || `HTTP ${response.status} su ${model}`);
-                    }
-                } catch (err) {
-                    lastError = err;
-                }
-            }
-            throw lastError || new Error("Impossibile contattare l'AI");
-        }
+    const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+    if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
+    
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+    const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
+    if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
+    
+    const response = await fetch(url, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(reqBody) 
+    });
+    
+    if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("Risposta vuota dall'AI");
+    return text;
+}
 
         function compressImageBase64(base64Data, maxWidth = 350, maxHeight = 350, quality = 0.8) {
             return new Promise((resolve, reject) => {
