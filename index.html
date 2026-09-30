@@ -708,19 +708,38 @@
         }
 
         async function askGemini(promptText, isJson = false) {
-            const apiKey = localStorage.getItem('gemini_api_key');
-            if (!apiKey) throw new Error("API Key mancante");
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+    if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
+    
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    let lastError = null;
+
+    for (const model of models) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
             const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
             if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
-            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
-            if (!response.ok) {
+            
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(reqBody) 
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (text) return text;
+            } else {
                 const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `HTTP ${response.status}`);
+                lastError = new Error(errData.error?.message || `HTTP ${response.status} su ${model}`);
             }
-            const data = await response.json(); 
-            return data.candidates[0].content.parts[0].text;
+        } catch (err) {
+            lastError = err;
         }
+    }
+    throw lastError || new Error("Impossibile contattare l'AI");
+}
 
         function compressImageBase64(base64Data, maxWidth = 350, maxHeight = 350, quality = 0.8) {
             return new Promise((resolve, reject) => {
@@ -1375,47 +1394,58 @@ Restituisci SOLO un JSON valido con questi campi:
         }
 
         async function regenerateCoachAI(exId) {
-            const ex = exerciseData[exId];
-            if (!ex) return;
-            if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
-            
-            const newHint = prompt("Aggiungi note sull'assetto per guidare l'AI (es. panca a 45°, gomiti stretti):", ex.hint || "");
-            if (newHint !== null) ex.hint = newHint.trim();
+    const ex = exerciseData[exId];
+    if (!ex) return;
+    const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+    if (!apiKey) { 
+        showMessage("Inserisci l'API Key nelle Opzioni!"); 
+        return; 
+    }
+    
+    const newHint = prompt("Vincoli di setup per l'AI (es. panca inclinata a 45°, gomiti fermi, manubrio singolo):", ex.hint || "");
+    if (newHint !== null) ex.hint = newHint.trim();
 
-            document.getElementById('ai-loading-title').innerText = "Generazione Guida Tecnica...";
-            document.getElementById('ai-loading-desc').innerText = "Elaborazione biomeccanica professionale...";
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-            try {
-                const prompt = `Sei un biomeccanico e coach di bodybuilding. Scrivi la guida tecnica per l'esercizio "${ex.name}" (categoria: "${ex.category}").
-${ex.hint ? `Note/vincoli dell'atleta: "${ex.hint}".` : ''}
+    document.getElementById('ai-loading-title').innerText = "Coach AI Biomeccanico...";
+    document.getElementById('ai-loading-desc').innerText = "Elaborazione guida tecnica specialistica...";
+    document.getElementById('ai-loading-overlay').style.display = 'flex';
+    
+    try {
+        const prompt = `Sei un biomeccanico e coach specializzato in bodybuilding e ipertrofia.
+Scrivi una guida tecnica per l'esercizio: "${ex.name}" (categoria: "${ex.category}").
+${ex.hint ? `Setup indicato dall'atleta: "${ex.hint}".` : ''}
 
-NON limitarti a copiare le note dell'atleta. Spiega in modo rigoroso:
-1. Setup articolare e ancoraggio di partenza.
-2. Traiettoria concentrica e contrazione di picco.
-3. Ritorno eccentrico controllato con tensione continua.
+REGOLE TASSATIVE:
+1. NON limitarti a ricopiare le parole dell'atleta.
+2. Descrivi: assetto articolare iniziale, traiettoria concentrica con contrazione di picco, discesa eccentrica controllata in 3 secondi.
+3. In "target", elenca muscoli target e stabilizzatori.
+4. In "tempo", indica i secondi (es. "1s salita, 1s picco, 3s discesa").
 
-Restituisci SOLO un JSON valido:
-{"esecuzione": "Guida tecnica approfondita in 3-4 frasi.", "target": "Muscoli target primari e stabilizzatori.", "tempo": "es. 1s spinta, 1s contrazione, 3s discesa"}`;
-                
-                const responseText = await askGemini(prompt, true);
-                const parsed = parseAIResponse(responseText);
-                if (parsed && parsed.esecuzione) {
-                    ex.coach = parsed;
-                    if (exId.startsWith('c_')) {
-                        const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-                        customDb[exId] = ex;
-                        localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
-                    }
-                    openInfo(exId);
-                    showMessage("Guida tecnica aggiornata!");
-                }
-            } catch(e) {
-                console.error(e);
-                showMessage("Errore durante la generazione AI");
-            } finally {
-                document.getElementById('ai-loading-overlay').style.display = 'none';
+Rispondi ESCLUSIVAMENTE con questo JSON:
+{
+  "esecuzione": "Testo dettagliato della guida tecnica...",
+  "target": "Muscoli coinvolti...",
+  "tempo": "Timing in secondi..."
+}`;
+        
+        const responseText = await askGemini(prompt, true);
+        const parsed = parseAIResponse(responseText);
+        if (parsed && parsed.esecuzione) {
+            ex.coach = parsed;
+            if (exId.startsWith('c_')) {
+                const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+                customDb[exId] = ex;
+                localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
             }
+            openInfo(exId);
+            showMessage("Guida tecnica aggiornata!");
         }
+    } catch(e) {
+        console.error(e);
+        alert("Errore Coach AI: " + e.message);
+    } finally {
+        document.getElementById('ai-loading-overlay').style.display = 'none';
+    }
+}
 
         function copyPromptNanobanana(exId) {
             const ex = exerciseData[exId];
