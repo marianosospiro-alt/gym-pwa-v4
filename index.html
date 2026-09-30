@@ -78,7 +78,7 @@
 <body class="pt-safe">
     <div id="message-box"></div>
     
-    <!-- Input invisibile per caricare foto da fotocamera/galleria -->
+    <!-- Input invisibile per caricamento/scatto foto da smartphone -->
     <input type="file" id="global-photo-input" accept="image/*" class="hidden">
 
     <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex-col items-center justify-center text-center">
@@ -131,22 +131,10 @@
                 </button>
                 <h2 id="workout-title-text" class="font-black text-xs uppercase tracking-[0.15em] text-white text-center flex-1 mx-2 truncate">Allenamento</h2>
                 <div class="flex gap-2">
-                    <!-- NUOVO PULSANTE AUDIT BIOMECCANICO -->
-                    <button onclick="analyzePlanComposition()" title="Audit Biomeccanico Scheda" class="w-10 h-10 flex items-center justify-center bg-purple-600/20 border border-purple-500/30 rounded-full text-purple-300 active:scale-95 transition-transform">
-                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <!-- Tasto Audit Biomeccanico Scheda -->
+                    <button onclick="analyzePlanComposition()" title="Audit Biomeccanico Scheda" class="w-10 h-10 flex items-center justify-center bg-purple-600/20 border border-purple-500/30 rounded-full text-purple-400 active:scale-95 transition-transform">
+                        <i data-lucide="scan-line" class="w-5 h-5"></i>
                     </button>
-                    <button onclick="openProgramModal(currentWorkoutId)" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-gray-300 active:scale-95 transition-transform">
-                        <i data-lucide="settings" class="w-5 h-5"></i>
-                    </button>
-                    <button id="finish-btn" onclick="finishWorkout()" class="bg-green-500 text-black text-[10px] font-black px-4 py-3 rounded-full shadow-[0_0_15px_rgba(52,199,89,0.4)] active:scale-95 transition-transform">CONCLUDI</button>
-                </div>
-            </header>
-            <header class="p-4 pt-safe glass flex justify-between items-center sticky top-0 z-50 border-b border-white/5">
-                <button onclick="goHome()" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-white active:scale-95 transition-transform">
-                    <i data-lucide="chevron-left" class="w-6 h-6"></i>
-                </button>
-                <h2 id="workout-title-text" class="font-black text-xs uppercase tracking-[0.15em] text-white text-center flex-1 mx-2 truncate">Allenamento</h2>
-                <div class="flex gap-2">
                     <button onclick="openProgramModal(currentWorkoutId)" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-gray-300 active:scale-95 transition-transform">
                         <i data-lucide="settings" class="w-5 h-5"></i>
                     </button>
@@ -281,11 +269,11 @@
                     <div><label>Braccio Sx (cm)</label><input type="number" id="bio-arm-sx" step="0.1" placeholder="es. 38"></div>
                     <div><label>Braccio Dx (cm)</label><input type="number" id="bio-arm-dx" step="0.1" placeholder="es. 38.5"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
+                <div class="grid grid-cols-2 gap-4">
                     <div><label>Coscia Sx (cm)</label><input type="number" id="bio-leg-sx" step="0.1" placeholder="es. 60"></div>
                     <div><label>Coscia Dx (cm)</label><input type="number" id="bio-leg-dx" step="0.1" placeholder="es. 60.5"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
+                <div class="grid grid-cols-2 gap-4">
                     <div><label>Polpaccio Sx (cm)</label><input type="number" id="bio-calf-sx" step="0.1" placeholder="es. 40"></div>
                     <div><label>Polpaccio Dx (cm)</label><input type="number" id="bio-calf-dx" step="0.1" placeholder="es. 40.5"></div>
                 </div>
@@ -303,7 +291,7 @@
             <h1 class="text-4xl font-black text-white mb-8 mt-2 tracking-tight">Opzioni</h1>
             <div class="apple-card p-6 mb-6 bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] border border-purple-500/20 shadow-[0_10px_30px_rgba(175,82,222,0.1)]">
                 <h3 class="font-bold text-xl mb-2 flex items-center gap-2"><i data-lucide="sparkles" class="w-5 h-5 text-purple-500"></i> Coach AI</h3>
-                <p class="text-sm text-gray-400 mb-4 leading-relaxed">Inserisci API Key di Google AI Studio per abilitare la generazione di schede intelligenti, analisi tecnica e creazione esercizi.</p>
+                <p class="text-sm text-gray-400 mb-4 leading-relaxed">Inserisci API Key di Google AI Studio per abilitare la generazione schede, l'audit biomeccanico e la guida tecnica.</p>
                 <input type="password" id="api-key-input" placeholder="Incolla qui la tua API Key" class="mb-4 !py-3 !text-sm">
                 <button onclick="saveApiKey()" class="bg-purple-600 hover:bg-purple-500 rounded-xl w-full py-3 text-white text-xs font-black uppercase tracking-widest transition-colors shadow-lg">SALVA CHIAVE</button>
             </div>
@@ -392,11 +380,12 @@
             </div>
         </div>
 
+        <!-- Modale Audit Biomeccanico Scheda -->
         <div id="modal-plan-audit" class="modal-sheet" onclick="closePlanAudit()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="sheet-pill"></div>
                 <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4">
-                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-2"><i data-lucide="scan-line" class="w-6 h-6 text-purple-400"></i> Audit Biomeccanico</h3>
+                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-2"><i data-lucide="scan-line" class="w-6 h-6 text-purple-400"></i> Audit Scheda</h3>
                     <button onclick="closePlanAudit()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="scrollable-area space-y-4">
@@ -405,7 +394,7 @@
                 <button onclick="closePlanAudit()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest mt-4">RICEVUTO</button>
             </div>
         </div>
-        
+
         <div id="modal-log-sets" class="modal-sheet" onclick="closeLogModal()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="sheet-pill"></div>
@@ -731,45 +720,54 @@
 
         function parseAIResponse(text) {
             try {
-                const match = text.match(/\{[\s\S]*\}/);
-                const clean = match ? match[0] : text;
+                let clean = text.replace(/^```json\s*/gi, '').replace(/^```\s*/gi, '').replace(/```\s*$/gi, '').trim();
+                const match = clean.match(/\{[\s\S]*\}/);
+                if (match) clean = match[0];
                 return JSON.parse(clean);
-            } catch(e) { console.error("JSON parse fallito", text); throw e; }
+            } catch(e) {
+                try {
+                    let sanitized = text.replace(/[\r\n]+/g, " ");
+                    const match = sanitized.match(/\{[\s\S]*\}/);
+                    if (match) return JSON.parse(match[0]);
+                } catch(e2) {}
+                console.error("JSON parse fallito:", text);
+                throw new Error("Risposta AI non valida");
+            }
         }
 
         async function askGemini(promptText, isJson = false) {
-    const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
-    if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
-    
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
-    let lastError = null;
+            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+            if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
+            
+            const models = ['gemini-1.5-flash', 'gemini-2.0-flash'];
+            let lastError = null;
 
-    for (const model of models) {
-        try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
-            if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
-            
-            const response = await fetch(url, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(reqBody) 
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (text) return text;
-            } else {
-                const errData = await response.json().catch(() => ({}));
-                lastError = new Error(errData.error?.message || `HTTP ${response.status} su ${model}`);
+            for (const model of models) {
+                try {
+                    const url = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){model}:generateContent?key=${apiKey}`;
+                    const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
+                    if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
+                    
+                    const response = await fetch(url, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(reqBody) 
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text) return text;
+                    } else {
+                        const errData = await response.json().catch(() => ({}));
+                        lastError = new Error(errData.error?.message || `HTTP ${response.status} su ${model}`);
+                    }
+                } catch (err) {
+                    lastError = err;
+                }
             }
-        } catch (err) {
-            lastError = err;
+            throw lastError || new Error("Impossibile contattare l'AI");
         }
-    }
-    throw lastError || new Error("Impossibile contattare l'AI");
-}
 
         function compressImageBase64(base64Data, maxWidth = 350, maxHeight = 350, quality = 0.8) {
             return new Promise((resolve, reject) => {
@@ -800,7 +798,6 @@
             });
         }
 
-        // Gestione Caricamento Foto Reale dal Rullino
         function triggerPhotoUploadForCreation() {
             targetExForUpload = 'CREATION';
             document.getElementById('global-photo-input').click();
@@ -821,7 +818,7 @@
                     const compressed = await compressImageBase64(evt.target.result, 350, 350, 0.82);
                     if (targetExForUpload === 'CREATION') {
                         creationPhotoBase64 = compressed;
-                        document.getElementById('custom-photo-btn-text').innerText = "Foto Selezionata con successo!";
+                        document.getElementById('custom-photo-btn-text').innerText = "Foto Selezionata!";
                         showMessage("Foto pronta per il salvataggio!");
                     } else if (targetExForUpload && exerciseData[targetExForUpload]) {
                         exerciseData[targetExForUpload].img = compressed;
@@ -841,7 +838,7 @@
                 }
             };
             reader.readAsDataURL(file);
-            e.target.value = ''; // Reset input
+            e.target.value = '';
         });
 
         function openAIGenerator() { if(!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; } document.getElementById('modal-ai-gen').style.display = 'flex'; }
@@ -1341,6 +1338,11 @@
                 document.getElementById('modal-ai-feedback').style.display = 'flex';
             } catch (e) { console.error(e); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore connessione AI."); }
         }
+
+        function closeAIFeedback() { document.getElementById('modal-ai-feedback').style.display = 'none'; }
+        function finishWorkoutFinal() { closeAIFeedback(); showMessage("Sessione Salvata!"); goHome(); }
+
+        // AUDIT BIOMECCANICO SCHEDA COMPLETA
         function closePlanAudit() {
             document.getElementById('modal-plan-audit').style.display = 'none';
         }
@@ -1406,8 +1408,6 @@ Usa uno stile asciutto, schematico, professionale ed elenchi puntati leggibili.`
                 document.getElementById('ai-loading-overlay').style.display = 'none';
             }
         }
-        function closeAIFeedback() { document.getElementById('modal-ai-feedback').style.display = 'none'; }
-        function finishWorkoutFinal() { closeAIFeedback(); showMessage("Sessione Salvata!"); goHome(); }
 
         function openCustomEx() { 
             creationPhotoBase64 = null;
@@ -1428,42 +1428,52 @@ Usa uno stile asciutto, schematico, professionale ed elenchi puntati leggibili.`
             const newId = 'c_' + safeName;
             
             let coachData = { 
-                esecuzione: hint || "Esercizio personalizzato.", 
+                esecuzione: "Esercizio personalizzato.", 
                 target: `Distretto muscolare: ${cat}.`, 
                 tempo: "Controllato" 
             };
             
-            // Usa la foto caricata dall'utente se presente, altrimenti il percorso standard
             let photoUrl = creationPhotoBase64 || `img/${newId}.png`;
+            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
 
-            const apiKey = localStorage.getItem('gemini_api_key');
-            if (apiKey) {
-                document.getElementById('ai-loading-title').innerText = "Analisi Biomeccanica Coach AI...";
-                document.getElementById('ai-loading-desc').innerText = "Elaborazione guida tecnica dettagliata...";
+            if (!apiKey) {
+                showMessage("Attenzione: Inserisci l'API Key nelle Opzioni per la guida AI!");
+                coachData.esecuzione = hint || "Esercizio personalizzato senza guida AI.";
+            } else {
+                document.getElementById('ai-loading-title').innerText = "Coach AI Biomeccanico...";
+                document.getElementById('ai-loading-desc').innerText = "Elaborazione guida tecnica specialistica...";
                 document.getElementById('ai-loading-overlay').style.display = 'flex';
+                
                 try {
-                    const prompt = `Sei un biomeccanico e coach elitario di bodybuilding.
-L'atleta inserisce l'esercizio: "${name}" per la categoria "${cat}".
-${hint ? `Note/vincoli specificati dall'atleta: "${hint}".` : ''}
+                    const prompt = `Sei un biomeccanico e docente di scienze motorie specializzato in bodybuilding e ipertrofia muscolare.
+Analizza in modo approfondito questo esercizio: "${name}" per la categoria muscolare "${cat}".
+${hint ? `Dettagli e vincoli di setup specificati dall'atleta: "${hint}".` : ''}
 
-REGOLE FONDAMENTALI:
-1. NON limitarti a ripetere o copiare le parole dell'atleta!
-2. In "esecuzione", struttura una spiegazione tecnica dettagliata (3-4 frasi):
-   - Assetto e posizione articolare di partenza (inclinazione panca, blocco scapolare, posizione gomiti).
-   - Fase concentrica (traiettoria, contrazione di picco senza compensazioni).
-   - Fase eccentrica (discesa frenata, allungamento controllato salvatendini).
-3. In "target", indica muscoli primari e secondari coinvolti.
-4. In "tempo", specifica i secondi (es. "1s salita, 1s picco, 3s discesa").
+ISTRUZIONI TASSATIVE:
+1. NON ricopiare o parafrasare semplicemente le parole dell'atleta!
+2. Sviluppa una GUIDA TECNICA COMPLETA in 3 sezioni descrittive:
+   - SETUP & ASSETTO ARTICOLARE: Posizionamento corporeo, regolazione panca/attrezzo, stabilità del tronco, blocco scapolare e angoli di lavoro.
+   - FASE CONCENTRICA: Traiettoria esatta del carico, punto di massima contrazione isometrica (senza slanci o compensi).
+   - FASE ECCENTRICA & RESPIRO: Discesa controllata e frenata (3 secondi), gestione dello stiramento miofasciale e respirazione.
+3. In "target", elenca i muscoli primari (focus) e secondari (sinergici/stabilizzatori).
+4. In "tempo", definisci il timing esatto in secondi (es. "1s salita, 1s picco, 3s discesa").
 
-Restituisci SOLO un JSON valido con questi campi:
-{"esecuzione": "...", "target": "...", "tempo": "..."}`;
-                    
+Restituisci ESCLUSIVAMENTE un JSON valido con questa struttura esatta:
+{
+  "esecuzione": "Testo completo della guida biomeccanica suddivisa in paragrafi...",
+  "target": "Muscoli primari e secondari coinvolti...",
+  "tempo": "Timing in secondi (es. 1s salita, 1s picco, 3s discesa)"
+}`;
+
                     const responseText = await askGemini(prompt, true);
                     const parsed = parseAIResponse(responseText);
-                    if (parsed && parsed.esecuzione) { coachData = parsed; }
+                    if (parsed && parsed.esecuzione) { 
+                        coachData = parsed; 
+                    }
                 } catch (e) {
                     console.error("Errore AI Coach", e);
-                    showMessage("Salvato con parametri base (Errore AI)");
+                    alert("Avviso Coach AI: " + e.message + "\n\nL'esercizio è stato comunque salvato.");
+                    coachData.esecuzione = hint || "Esercizio personalizzato.";
                 } finally {
                     document.getElementById('ai-loading-overlay').style.display = 'none';
                 }
@@ -1488,58 +1498,61 @@ Restituisci SOLO un JSON valido con questi campi:
         }
 
         async function regenerateCoachAI(exId) {
-    const ex = exerciseData[exId];
-    if (!ex) return;
-    const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
-    if (!apiKey) { 
-        showMessage("Inserisci l'API Key nelle Opzioni!"); 
-        return; 
-    }
-    
-    const newHint = prompt("Vincoli di setup per l'AI (es. panca inclinata a 45°, gomiti fermi, manubrio singolo):", ex.hint || "");
-    if (newHint !== null) ex.hint = newHint.trim();
+            const ex = exerciseData[exId];
+            if (!ex) return;
+            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+            if (!apiKey) { 
+                showMessage("Inserisci l'API Key nelle Opzioni!"); 
+                return; 
+            }
+            
+            const newHint = prompt("Vuoi aggiungere vincoli biomeccanici per guidare l'AI? (es. panca inclinata a 45°, gomiti bloccati, cavo basso):", ex.hint || "");
+            if (newHint !== null) ex.hint = newHint.trim();
 
-    document.getElementById('ai-loading-title').innerText = "Coach AI Biomeccanico...";
-    document.getElementById('ai-loading-desc').innerText = "Elaborazione guida tecnica specialistica...";
-    document.getElementById('ai-loading-overlay').style.display = 'flex';
-    
-    try {
-        const prompt = `Sei un biomeccanico e coach specializzato in bodybuilding e ipertrofia.
-Scrivi una guida tecnica per l'esercizio: "${ex.name}" (categoria: "${ex.category}").
-${ex.hint ? `Setup indicato dall'atleta: "${ex.hint}".` : ''}
+            document.getElementById('ai-loading-title').innerText = "Coach AI Biomeccanico...";
+            document.getElementById('ai-loading-desc').innerText = "Elaborazione guida tecnica specialistica...";
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
+            
+            try {
+                const prompt = `Sei un biomeccanico e docente di scienze motorie specializzato in bodybuilding e ipertrofia muscolare.
+Scrivi una guida tecnica rigorosa per l'esercizio: "${ex.name}" (categoria muscolare: "${ex.category}").
+${ex.hint ? `Dettagli e vincoli di setup specificati dall'atleta: "${ex.hint}".` : ''}
 
-REGOLE TASSATIVE:
-1. NON limitarti a ricopiare le parole dell'atleta.
-2. Descrivi: assetto articolare iniziale, traiettoria concentrica con contrazione di picco, discesa eccentrica controllata in 3 secondi.
-3. In "target", elenca muscoli target e stabilizzatori.
-4. In "tempo", indica i secondi (es. "1s salita, 1s picco, 3s discesa").
+ISTRUZIONI TASSATIVE:
+1. NON ricopiare o parafrasare semplicemente le parole dell'atleta!
+2. Sviluppa una GUIDA TECNICA COMPLETA in 3 sezioni descrittive:
+   - SETUP & ASSETTO ARTICOLARE: Posizionamento corporeo, regolazione panca/attrezzo, stabilità del tronco, blocco scapolare e angoli di lavoro.
+   - FASE CONCENTRICA: Traiettoria esatta del carico, punto di massima contrazione isometrica (senza slanci o compensi).
+   - FASE ECCENTRICA & RESPIRO: Discesa controllata e frenata (3 secondi), gestione dello stiramento miofasciale e respirazione.
+3. In "target", elenca i muscoli primari (focus) e secondari (sinergici/stabilizzatori).
+4. In "tempo", definisci il timing esatto in secondi (es. "1s spinta, 1s picco, 3s eccentrica controllata").
 
-Rispondi ESCLUSIVAMENTE con questo JSON:
+Restituisci ESCLUSIVAMENTE un JSON valido con questa struttura esatta:
 {
-  "esecuzione": "Testo dettagliato della guida tecnica...",
-  "target": "Muscoli coinvolti...",
+  "esecuzione": "Testo completo della guida biomeccanica suddivisa in paragrafi...",
+  "target": "Muscoli primari e secondari coinvolti...",
   "tempo": "Timing in secondi..."
 }`;
-        
-        const responseText = await askGemini(prompt, true);
-        const parsed = parseAIResponse(responseText);
-        if (parsed && parsed.esecuzione) {
-            ex.coach = parsed;
-            if (exId.startsWith('c_')) {
-                const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-                customDb[exId] = ex;
-                localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
+                
+                const responseText = await askGemini(prompt, true);
+                const parsed = parseAIResponse(responseText);
+                if (parsed && parsed.esecuzione) {
+                    ex.coach = parsed;
+                    if (exId.startsWith('c_')) {
+                        const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+                        customDb[exId] = ex;
+                        localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
+                    }
+                    openInfo(exId);
+                    showMessage("Guida tecnica Coach AI aggiornata!");
+                }
+            } catch(e) {
+                console.error(e);
+                alert("Errore Coach AI: " + e.message);
+            } finally {
+                document.getElementById('ai-loading-overlay').style.display = 'none';
             }
-            openInfo(exId);
-            showMessage("Guida tecnica aggiornata!");
         }
-    } catch(e) {
-        console.error(e);
-        alert("Errore Coach AI: " + e.message);
-    } finally {
-        document.getElementById('ai-loading-overlay').style.display = 'none';
-    }
-}
 
         function copyPromptNanobanana(exId) {
             const ex = exerciseData[exId];
@@ -1647,19 +1660,16 @@ Rispondi ESCLUSIVAMENTE con questo JSON:
             if (exId.startsWith('c_')) {
                 customActions = `
                 <div class="grid grid-cols-2 gap-3 mt-4">
-                    <button onclick="regenerateCoachAI('${exId}')" class="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i> Guida AI
+                    <button onclick="regenerateCoachAI('${exId}')" class="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> Guida Coach AI
                     </button>
-                    <button onclick="triggerPhotoUploadForExisting('${exId}')" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
+                    <button onclick="triggerPhotoUploadForExisting('${exId}')" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
                         <i data-lucide="camera" class="w-4 h-4"></i> Carica Foto
                     </button>
                 </div>
                 <button onclick="copyPromptNanobanana('${exId}')" class="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-2 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
                     <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copia Prompt per Nanobanana
-                </button>
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/5 mt-3 text-center">
-                    <p class="text-[11px] text-gray-400">File locale alternativo: <code class="text-white font-mono">${exId}.png</code></p>
-                </div>`;
+                </button>`;
             }
 
             content.innerHTML = `
@@ -1670,7 +1680,7 @@ Rispondi ESCLUSIVAMENTE con questo JSON:
                 </div>
                 <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
                     <h4 class="text-emerald-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Esecuzione Tecnica</h4>
-                    <p class="text-sm leading-relaxed text-gray-300">${esecuzione}</p>
+                    <p class="text-sm leading-relaxed text-gray-300 whitespace-pre-line">${esecuzione}</p>
                 </div>
                 <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
                     <h4 class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Focus & Tempo</h4>
