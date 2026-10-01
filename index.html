@@ -758,25 +758,65 @@
             const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
             if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
             
-            const url = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$){apiKey}`;
-            const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
-            if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
-            
-            const response = await fetch(url, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(reqBody) 
-            });
-            
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `HTTP ${response.status}`);
+            // 1. Endpoint ufficiale per Gemini 3.8 Flash (Interactions API)
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/interactions?key=${apiKey}`;
+                const reqBody = {
+                    model: "gemini-3.8-flash",
+                    input: promptText
+                };
+                if (isJson) {
+                    reqBody.response_format = {
+                        type: "text",
+                        mime_type: "application/json"
+                    };
+                }
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reqBody)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const text = data.output_text || data.outputs?.[0]?.text || data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) return text;
+                }
+            } catch (err) {
+                console.warn("Interactions API 3.8 non riuscita, tento fallback...", err);
             }
-            
-            const data = await response.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!text) throw new Error("Risposta vuota dall'AI");
-            return text;
+
+            // 2. Fallback di sicurezza su generateContent (es. gemini-2.5-flash)
+            const fallbackModels = ['gemini-2.5-flash', 'gemini-2.5-pro'];
+            let lastErr = null;
+
+            for (const model of fallbackModels) {
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
+                    if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(reqBody)
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text) return text;
+                    } else {
+                        const errData = await response.json().catch(() => ({}));
+                        lastErr = new Error(errData.error?.message || `HTTP ${response.status} (${model})`);
+                    }
+                } catch (e) {
+                    lastErr = e;
+                }
+            }
+
+            throw lastErr || new Error("Nessuna risposta valida dall'AI");
         }
 
         function compressImageBase64(base64Data, maxWidth = 350, maxHeight = 350, quality = 0.8) {
