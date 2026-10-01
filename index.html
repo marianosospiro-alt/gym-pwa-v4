@@ -1363,17 +1363,53 @@
 
         // AUDIT BIOMECCANICO DELLA SCHEDA COMPLETA
         function closePlanAudit() {
-            document.getElementById('modal-plan-audit').style.display = 'none';
+            const modal = document.getElementById('modal-plan-audit');
+            if (modal) modal.style.display = 'none';
         }
 
-        async function analyzePlanComposition() {
+        function showAuditModal(plan) {
+            const audit = plan.audit;
+            if (!audit) return;
+
+            const modal = document.getElementById('modal-plan-audit');
+            const content = document.getElementById('plan-audit-content');
+            const meta = document.getElementById('audit-meta');
+
+            if (!modal || !content) return;
+
+            const goalName = (audit.goal || plan.goal || 'ipertrofia').toUpperCase();
+            const goalBadgeClass = goalName === 'MASSA' 
+                ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' 
+                : 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+
+            if (meta) {
+                meta.innerHTML = `
+                    <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-md border ${goalBadgeClass}">
+                        ${goalName}
+                    </span>
+                    ${audit.date ? `<span class="text-[11px] text-gray-400 font-bold">• ${audit.date}</span>` : ''}
+                `;
+            }
+
+            content.innerText = audit.text;
+            modal.style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        async function analyzePlanComposition(forceRegenerate = false) {
             if (!currentWorkoutId || !userPlan[currentWorkoutId]) return;
             const plan = userPlan[currentWorkoutId];
             const items = plan.items || [];
             const goal = plan.goal || 'ipertrofia';
-            
+
             if (items.length < 2) {
                 showMessage("Aggiungi almeno 2 esercizi per analizzare la scheda!");
+                return;
+            }
+
+            // Se l'audit è già stato fatto e non si richiede di forzare la rigenerazione, aprilo all'istante
+            if (plan.audit && plan.audit.text && !forceRegenerate) {
+                showAuditModal(plan);
                 return;
             }
 
@@ -1384,7 +1420,7 @@
             }
 
             document.getElementById('ai-loading-title').innerText = "Audit Biomeccanico Scheda...";
-            document.getElementById('ai-loading-desc').innerText = `Analisi mirata per obiettivo: ${goal.toUpperCase()}...`;
+            document.getElementById('ai-loading-desc').innerText = `Analisi per obiettivo: ${goal.toUpperCase()}...`;
             document.getElementById('ai-loading-overlay').style.display = 'flex';
 
             const exDetails = items.map((id, index) => {
@@ -1431,12 +1467,24 @@ STRUTTURA RISPOSTA:
 
             try {
                 const feedback = await askGemini(prompt, false);
-                document.getElementById('plan-audit-content').innerText = feedback;
-                document.getElementById('modal-plan-audit').style.display = 'flex';
-                lucide.createIcons();
+                
+                // Salvataggio permanente nel database della scheda
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }) + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                
+                plan.audit = {
+                    text: feedback,
+                    goal: goal,
+                    date: dateStr
+                };
+                userPlan[currentWorkoutId] = plan;
+                localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
+
+                showAuditModal(plan);
+                showMessage("Audit completato e memorizzato!");
             } catch(e) {
                 console.error(e);
-                alert("Errore Audit AI: " + e.message);
+                showMessage("Errore Audit AI: " + e.message);
             } finally {
                 document.getElementById('ai-loading-overlay').style.display = 'none';
             }
