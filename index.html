@@ -877,6 +877,8 @@
                 document.getElementById('modal-prog-title').innerText = "Modifica Programma"; 
                 document.getElementById('prog-name').value = userPlan[id].title; 
                 selectedProgColor = userPlan[id].color; 
+                // Imposta lo scopo salvato (default: ipertrofia)
+                document.getElementById('prog-goal').value = userPlan[id].goal || 'ipertrofia';
                 actionRow.style.display = 'flex'; 
                 const archiveBtn = document.getElementById('btn-archive-prog');
                 if (userPlan[id].archived) {
@@ -890,19 +892,33 @@
                 document.getElementById('modal-prog-title').innerText = "Nuovo Programma"; 
                 document.getElementById('prog-name').value = ''; 
                 selectedProgColor = '#0A84FF'; 
+                document.getElementById('prog-goal').value = 'ipertrofia';
                 actionRow.style.display = 'none'; 
             }
             document.querySelectorAll('.color-dot').forEach(el => { if (el.getAttribute('data-color') === selectedProgColor) el.classList.add('selected'); else el.classList.remove('selected'); });
             lucide.createIcons();
         }
+
         function closeProgramModal() { document.getElementById('modal-program').style.display = 'none'; }
         function selectColor(el) { document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); selectedProgColor = el.getAttribute('data-color'); }
         
         function saveProgram() {
-            const title = document.getElementById('prog-name').value.trim(); if (!title) { showMessage("Inserisci un nome!"); return; }
-            if (editingProgramId) { userPlan[editingProgramId].title = title; userPlan[editingProgramId].color = selectedProgColor; document.getElementById('workout-title-text').innerText = title; } 
-            else { const newId = Date.now().toString(); userPlan[newId] = { title: title, color: selectedProgColor, items: [], overrides: {}, archived: false }; }
-            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeProgramModal(); goHome(); showMessage("Programma salvato.");
+            const title = document.getElementById('prog-name').value.trim(); 
+            const goal = document.getElementById('prog-goal').value;
+            if (!title) { showMessage("Inserisci un nome!"); return; }
+            if (editingProgramId) { 
+                userPlan[editingProgramId].title = title; 
+                userPlan[editingProgramId].color = selectedProgColor; 
+                userPlan[editingProgramId].goal = goal;
+                document.getElementById('workout-title-text').innerText = title; 
+            } else { 
+                const newId = Date.now().toString(); 
+                userPlan[newId] = { title: title, color: selectedProgColor, goal: goal, items: [], overrides: {}, archived: false }; 
+            }
+            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); 
+            closeProgramModal(); 
+            goHome(); 
+            showMessage("Programma salvato.");
         }
         
         function deleteProgram() { openConfirm("Elimina", "Eliminare questa intera scheda?", () => { delete userPlan[editingProgramId]; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeProgramModal(); goHome(); }); }
