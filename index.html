@@ -1376,22 +1376,23 @@
                 };
             });
 
-            const prompt = `Sei un biomeccanico e chinesiologo specializzato nell'allenamento con sovraccarichi e ipertrofia muscolare basato su evidenze scientifiche.
-Analizza la composizione di questa routine di allenamento intitolata "${plan.title}":
+            const prompt = `Sei un biomeccanico e chinesiologo specializzato in ipertrofia e aumento della massa muscolare. 
+Valuta la seguente scheda di allenamento intitolata "${plan.title}":
 ${JSON.stringify(exDetails, null, 2)}
 
-EFFETTUA UN AUDIT TECNICO STRUTTURATO NEI SEGUENTI PUNTI:
+EFFETTUA UN AUDIT OGGETTIVO SEGUENDO QUESTE REGOLE CRITICHE:
+1. NON forzare sostituzioni a tutti i costi. Se la routine è ben strutturata e non presenta sovrapposizioni critiche, DICHIARALO ESPLICITAMENTE (es. "Scheda promossa / Ottimale").
+2. Intervieni con proposte di cambio SOLO se ci sono reali errori biomeccanici:
+   - Duplicati identici (es. due esercizi con la stessa curva di resistenza e lo stesso identico piano di lavoro nello stesso distretto).
+   - Eccessivo stress da sovraccarico articolare cumulativo sullo stesso schema motorio.
+3. Mantieni coerenza logica: non contraddire principi di tensione continua o allungamento se sono già rispettati.
 
-1. VALUTAZIONE STRUTTURA & VOLUME:
-Commento sintetico sull'adeguatezza del volume e sulla coerenza dell'ordine degli esercizi.
-
-2. RIDONDANZE O CONFLITTI ARTICOLARI:
-Identifica chiaramente se ci sono esercizi ridondanti (stesso piano di lavoro, stesso profilo di resistenza - es. due movimenti che sovraccaricano solo l'accorciamento o solo l'allungamento - o eccessivo stress cumulativo sullo stesso pattern articolare). Se la routine è equilibrata, indicalo chiaramente.
-
-3. SOSTITUZIONI & OTTIMIZZAZIONI CONSIGLIATE:
-Proponi cambi mirati (es. "Sostituisci [Esercizio A] con [Esercizio B] per lavorare in allungamento/cavo") ed eventuale riordino consigliato.
-
-Usa uno stile asciutto, schematico, professionale ed elenchi puntati leggibili.`;
+STRUTTURA LA RISPOSTA IN:
+- SCOPO DELLA SCHEDA (aumento massa muscolare / ipertrofia)
+- VERDETTO GENERALE (Promossa / Ottimizzabile / Da rivedere)
+- ANALISI DEI PATTERN MOTORI & CURVE DI RESISTENZA (Sintetica)
+- EVENTUALI CRITICITÀ REALI (Se non ce ne sono, scrivi "Nessuna criticità rilevata")
+- SUGGERIMENTI FACOLTATIVI (Solo se realmente migliorativi, altrimenti ometti)`;
 
             try {
                 const feedback = await askGemini(prompt, false);
