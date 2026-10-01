@@ -1364,6 +1364,7 @@
             if (!currentWorkoutId || !userPlan[currentWorkoutId]) return;
             const plan = userPlan[currentWorkoutId];
             const items = plan.items || [];
+            const goal = plan.goal || 'ipertrofia';
             
             if (items.length < 2) {
                 showMessage("Aggiungi almeno 2 esercizi per analizzare la scheda!");
@@ -1375,6 +1376,65 @@
                 showMessage("Inserisci l'API Key nelle Opzioni!");
                 return;
             }
+
+            document.getElementById('ai-loading-title').innerText = "Audit Biomeccanico Scheda...";
+            document.getElementById('ai-loading-desc').innerText = `Analisi mirata per obiettivo: ${goal.toUpperCase()}...`;
+            document.getElementById('ai-loading-overlay').style.display = 'flex';
+
+            const exDetails = items.map((id, index) => {
+                const ex = exerciseData[id] || { name: id, category: 'altro' };
+                const ov = (plan.overrides && plan.overrides[index]) || {};
+                return {
+                    nome: ex.name,
+                    distretto: ex.category,
+                    sets_reps: `${ov.sets || ex.sets}x${ov.reps || ex.reps}`,
+                    target: ex.coach?.target || 'Non specificato',
+                    note: ex.hint || ''
+                };
+            });
+
+            const prompt = `Sei un biomeccanico e preparatore atletico specializzato nell'allenamento con sovraccarichi.
+Analizza la seguente scheda di allenamento:
+- Titolo Scheda: "${plan.title}"
+- Obiettivo Dichiarato: "${goal.toUpperCase()}"
+- Composizione Esercizi:
+${JSON.stringify(exDetails, null, 2)}
+
+PARAMETRI DI VALUTAZIONE IN BASE ALL'OBIETTIVO "${goal.toUpperCase()}":
+${goal === 'massa' ? `
+- OBIETTIVO MASSA / FORZA:
+  * Priorità alla tensione meccanica, al sovraccarico progressivo e ai grandi esercizi multiarticolari (bilancieri, manubri pesanti, macchine a carico libero).
+  * Non penalizzare la scheda se mancano angolazioni di isolamento o cavi, purché i pattern motori fondamentali siano coperti senza sovraccaricare le medesime articolazioni (es. evitare conflitti di compressione lombare o sulle spalle).
+  * Valuta favorevolmente la presenza di movimenti base all'inizio e un volume sostenibile ad alta intensità di carico.
+` : `
+- OBIETTIVO IPERTROFIA PURA:
+  * Priorità al rapporto stimolo/fatica (SFR), alla varietà delle curve di resistenza (sovraccarico in allungamento vs contrazione di picco) e alla tensione continua (cavi, macchine isotoniche guidate).
+  * Verifica che non ci siano esercizi ridondanti sullo stesso identico profilo di resistenza per lo stesso distretto.
+  * Valuta favorevolmente la completezza degli angoli di lavoro e la sicurezza articolare per massimizzare il pump e l'accumulo metabolico.
+`}
+
+REGOLE CRITICHE:
+1. NON forzare sostituzioni se la scheda è già coerente con l'obiettivo "${goal.toUpperCase()}". Dichiarala ottimale se non ha conflitti reali.
+2. Segnala SOLO reali ridondanze biomeccaniche o eccessi di stress articolare cumulativo.
+
+STRUTTURA RISPOSTA:
+- VERDETTO GENERALE (In linea con l'obiettivo / Ottimizzabile / Da rivedere)
+- ANALISI DELLA STRUTTURA & CURVE DI RESISTENZA (Sintetica)
+- CONFLITTI O RIDONDANZE (Se nessuno, scrivi "Nessuna criticità rilevata")
+- SUGGERIMENTI SPECIFICI (Solo se migliorano l'obiettivo ${goal.toUpperCase()}, altrimenti ometti)`;
+
+            try {
+                const feedback = await askGemini(prompt, false);
+                document.getElementById('plan-audit-content').innerText = feedback;
+                document.getElementById('modal-plan-audit').style.display = 'flex';
+                lucide.createIcons();
+            } catch(e) {
+                console.error(e);
+                alert("Errore Audit AI: " + e.message);
+            } finally {
+                document.getElementById('ai-loading-overlay').style.display = 'none';
+            }
+        }
 
             document.getElementById('ai-loading-title').innerText = "Audit Biomeccanico Scheda...";
             document.getElementById('ai-loading-desc').innerText = "Analisi curve di resistenza, piani di lavoro e ridondanze...";
