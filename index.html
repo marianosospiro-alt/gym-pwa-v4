@@ -78,7 +78,7 @@
 <body class="pt-safe">
     <div id="message-box"></div>
     
-    <!-- Input foto rullino/fotocamera -->
+    <!-- Input foto fotocamera/galleria -->
     <input type="file" id="global-photo-input" accept="image/*" class="hidden">
 
     <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex-col items-center justify-center text-center">
@@ -267,11 +267,11 @@
                     <div><label>Braccio Sx (cm)</label><input type="number" id="bio-arm-sx" step="0.1" placeholder="es. 38"></div>
                     <div><label>Braccio Dx (cm)</label><input type="number" id="bio-arm-dx" step="0.1" placeholder="es. 38.5"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
                     <div><label>Coscia Sx (cm)</label><input type="number" id="bio-leg-sx" step="0.1" placeholder="es. 60"></div>
                     <div><label>Coscia Dx (cm)</label><input type="number" id="bio-leg-dx" step="0.1" placeholder="es. 60.5"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4 mt-4">
                     <div><label>Polpaccio Sx (cm)</label><input type="number" id="bio-calf-sx" step="0.1" placeholder="es. 40"></div>
                     <div><label>Polpaccio Dx (cm)</label><input type="number" id="bio-calf-dx" step="0.1" placeholder="es. 40.5"></div>
                 </div>
@@ -317,17 +317,24 @@
                     <h3 id="modal-prog-title" class="text-xl font-black tracking-tight leading-tight">Nuovo Programma</h3>
                     <button onclick="closeProgramModal()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <div class="space-y-6 mb-8">
+                <div class="space-y-5 mb-8">
                     <div><label>Nome Programma</label><input type="text" id="prog-name" placeholder="es. FULL BODY"></div>
-                    <!-- NUOVO SELETTORE SCOPO SCHEDA -->
                     <div>
-                        <label>Scopo Principale</label>
+                        <label>Scopo Principale della Scheda</label>
                         <select id="prog-goal" class="bg-[#2C2C2E] text-white font-bold">
-                            <option value="ipertrofia">Ipertrofia Pura (Curve di resistenza, allungamento & pump)</option>
-                            <option value="massa">Massa / Forza (Tensione meccanica, multiarticolari pesanti)</option>
+                            <option value="ipertrofia">Ipertrofia (Curve di resistenza, SFR & pump)</option>
+                            <option value="massa">Massa / Forza (Tensione meccanica & multiarticolari pesanti)</option>
                         </select>
                     </div>
                     <div><label>Scegli Colore</label>
+                        <div class="flex gap-4 justify-center mt-2">
+                            <div class="color-dot bg-blue-500" data-color="#0A84FF" onclick="selectColor(this)"></div>
+                            <div class="color-dot bg-purple-500" data-color="#AF52DE" onclick="selectColor(this)"></div>
+                            <div class="color-dot bg-green-500" data-color="#34C759" onclick="selectColor(this)"></div>
+                            <div class="color-dot bg-orange-500" data-color="#FF9500" onclick="selectColor(this)"></div>
+                            <div class="color-dot bg-red-500" data-color="#FF3B30" onclick="selectColor(this)"></div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="hidden gap-2 mb-4" id="prog-actions-row">
@@ -355,7 +362,30 @@
             </div>
         </div>
 
-       <!-- MODALE AUDIT BIOMECCANICO SCHEDA CON SALVATAGGIO -->
+        <div id="modal-ai-feedback" class="modal-sheet" onclick="closeAIFeedback()">
+            <div class="sheet-content" onclick="event.stopPropagation()">
+                <div class="sheet-pill"></div>
+                <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4">
+                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-2"><i data-lucide="crosshair" class="w-6 h-6 text-red-500"></i> Analisi Tecnica</h3>
+                    <button onclick="closeAIFeedback()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="scrollable-area">
+                    <div class="bg-red-500/10 border border-red-500/20 p-5 rounded-2xl mb-4">
+                        <p id="ai-feedback-text" class="text-sm leading-relaxed text-gray-200 font-medium"></p>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3 mt-2">
+                    <button onclick="generateCorrectiveWorkout()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 py-4 rounded-2xl font-black text-white uppercase tracking-widest text-[11px] transition-colors shadow-lg flex items-center justify-center gap-2">
+                        <i data-lucide="wrench" class="w-4 h-4"></i> Elabora Scheda Ad Hoc
+                    </button>
+                    <button onclick="finishWorkoutFinal()" class="w-full bg-transparent border border-white/10 hover:bg-white/5 py-4 rounded-2xl font-black text-gray-400 uppercase tracking-widest text-[11px] transition-colors">
+                        Ricevuto. Torna alla Home
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALE AUDIT BIOMECCANICO SCHEDA CON SALVATAGGIO -->
         <div id="modal-plan-audit" class="modal-sheet" onclick="closePlanAudit()">
             <div class="sheet-content" onclick="event.stopPropagation()">
                 <div class="sheet-pill"></div>
@@ -381,21 +411,6 @@
                         Chiudi
                     </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- MODALE AUDIT BIOMECCANICO SCHEDA -->
-        <div id="modal-plan-audit" class="modal-sheet" onclick="closePlanAudit()">
-            <div class="sheet-content" onclick="event.stopPropagation()">
-                <div class="sheet-pill"></div>
-                <div class="flex justify-between items-center mb-6 text-white border-b border-white/5 pb-4">
-                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-2"><i data-lucide="sparkles" class="w-6 h-6 text-purple-400"></i> Audit Biomeccanico</h3>
-                    <button onclick="closePlanAudit()" class="bg-[#2C2C2E] p-2.5 rounded-full text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-                </div>
-                <div class="scrollable-area space-y-4">
-                    <div id="plan-audit-content" class="text-sm leading-relaxed text-gray-200 whitespace-pre-line bg-[#2C2C2E]/60 border border-white/5 p-5 rounded-2xl font-medium"></div>
-                </div>
-                <button onclick="closePlanAudit()" class="btn-primary w-full py-4 text-white text-sm font-black uppercase tracking-widest mt-4">RICEVUTO</button>
             </div>
         </div>
 
@@ -689,10 +704,10 @@
         deletedExDb.forEach(id => { delete exerciseData[id]; });
 
         const defaultPlan = {
-            1: { title: 'PUSH (Forza)', color: '#007AFF', items: ['panca_piana', 'lento_avanti', 'chest_press_g1', 'alzate_lat', 'french_press', 'pushdown'], overrides: { 3: { isDropSet: true } } },
-            2: { title: 'PULL (Forza)', color: '#AF52DE', items: ['trazioni_supine', 'tbar_row', 'pullover_cavi', 'alzate_90', 'curl_ez', 'hammer_curl', 'hanging_leg'], overrides: { 3: { isDropSet: true } } },
-            3: { title: 'LEGS (Volume)', color: '#34C759', items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'leg_curl', 'polpacci'], overrides: { 4: { isDropSet: true }, 5: { isDropSet: true } } },
-            4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', items: ['chest_press_g1', 'pec_deck', 'lat_larga', 'crossover', 'alzate_cavi', 'curl_cavi', 'pushdown_corda'], overrides: { 4: { isDropSet: true } } }
+            1: { title: 'PUSH (Forza)', color: '#007AFF', goal: 'massa', items: ['panca_piana', 'lento_avanti', 'chest_press_g1', 'alzate_lat', 'french_press', 'pushdown'], overrides: { 3: { isDropSet: true } } },
+            2: { title: 'PULL (Forza)', color: '#AF52DE', goal: 'massa', items: ['trazioni_supine', 'tbar_row', 'pullover_cavi', 'alzate_90', 'curl_ez', 'hammer_curl', 'hanging_leg'], overrides: { 3: { isDropSet: true } } },
+            3: { title: 'LEGS (Volume)', color: '#34C759', goal: 'ipertrofia', items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'leg_curl', 'polpacci'], overrides: { 4: { isDropSet: true }, 5: { isDropSet: true } } },
+            4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', goal: 'ipertrofia', items: ['chest_press_g1', 'pec_deck', 'lat_larga', 'crossover', 'alzate_cavi', 'curl_cavi', 'pushdown_corda'], overrides: { 4: { isDropSet: true } } }
         };
 
         function getLocalYYYYMMDD() {
@@ -740,29 +755,29 @@
         }
 
         async function askGemini(promptText, isJson = false) {
-    const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
-    if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
-    
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
-    const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
-    if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
-    
-    const response = await fetch(url, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(reqBody) 
-    });
-    
-    if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `HTTP ${response.status}`);
-    }
-    
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error("Risposta vuota dall'AI");
-    return text;
-}
+            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
+            if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
+            
+            const url = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=$){apiKey}`;
+            const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
+            if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
+            
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(reqBody) 
+            });
+            
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error?.message || `HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) throw new Error("Risposta vuota dall'AI");
+            return text;
+        }
 
         function compressImageBase64(base64Data, maxWidth = 350, maxHeight = 350, quality = 0.8) {
             return new Promise((resolve, reject) => {
@@ -847,7 +862,7 @@
             document.getElementById('ai-loading-desc').innerText = "Questa operazione richiede qualche secondo...";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             const validIds = Object.keys(exerciseData).join(', ');
-            const prompt = `Sei un personal trainer elitario. Crea un allenamento di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID: [${validIds}]. Restituisci SOLO E SOLTANTO UN OGGETTO JSON. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Struttura: {"title": "Nome", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
+            const prompt = `Sei un personal trainer elitario. Crea un allenamento di circa ${time} minuti. Focus richiesto: "${focus}". Scegli GLI ESERCIZI SOLO ED ESCLUSIVAMENTE da questa lista di ID: [${validIds}]. Restituisci SOLO E SOLTANTO UN OGGETTO JSON. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Struttura: {"title": "Nome", "color": "#AF52DE", "goal": "ipertrofia", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
             try {
                 const responseText = await askGemini(prompt, true); const generatedPlan = parseAIResponse(responseText);
                 const newId = 'AI_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
@@ -861,7 +876,7 @@
             document.getElementById('ai-loading-desc').innerText = "Questa operazione richiede qualche secondo...";
             document.getElementById('ai-loading-overlay').style.display = 'flex';
             const feedback = document.getElementById('ai-feedback-text').innerText; const validIds = Object.keys(exerciseData).join(', ');
-            const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" per correggere i punti deboli. Scegli ESERCIZI SOLO da: [${validIds}]. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Restituisci SOLO JSON. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
+            const prompt = `Sei uno strength coach elitario. Hai analizzato l'allenamento: "${feedback}". Crea la PROSSIMA scheda "Correttiva" per correggere i punti deboli. Scegli ESERCIZI SOLO da: [${validIds}]. Indica i carichi in "reps" (es. "8-10 @ 50kg"). Restituisci SOLO JSON. Struttura: {"title": "Scheda Correttiva", "color": "#AF52DE", "goal": "ipertrofia", "items": ["id1", "id2"], "overrides": {"0": {"sets": 4, "reps": "8-10 @ 50kg", "isDropSet": false}}}`;
             try {
                 const responseText = await askGemini(prompt, true); const generatedPlan = parseAIResponse(responseText);
                 const newId = 'AI_CORR_' + Date.now().toString(); userPlan[newId] = generatedPlan; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
@@ -883,7 +898,6 @@
                 document.getElementById('modal-prog-title').innerText = "Modifica Programma"; 
                 document.getElementById('prog-name').value = userPlan[id].title; 
                 selectedProgColor = userPlan[id].color; 
-                // Imposta lo scopo salvato (default: ipertrofia)
                 document.getElementById('prog-goal').value = userPlan[id].goal || 'ipertrofia';
                 actionRow.style.display = 'flex'; 
                 const archiveBtn = document.getElementById('btn-archive-prog');
@@ -904,7 +918,6 @@
             document.querySelectorAll('.color-dot').forEach(el => { if (el.getAttribute('data-color') === selectedProgColor) el.classList.add('selected'); else el.classList.remove('selected'); });
             lucide.createIcons();
         }
-
         function closeProgramModal() { document.getElementById('modal-program').style.display = 'none'; }
         function selectColor(el) { document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); selectedProgColor = el.getAttribute('data-color'); }
         
@@ -921,10 +934,7 @@
                 const newId = Date.now().toString(); 
                 userPlan[newId] = { title: title, color: selectedProgColor, goal: goal, items: [], overrides: {}, archived: false }; 
             }
-            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); 
-            closeProgramModal(); 
-            goHome(); 
-            showMessage("Programma salvato.");
+            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeProgramModal(); goHome(); showMessage("Programma salvato.");
         }
         
         function deleteProgram() { openConfirm("Elimina", "Eliminare questa intera scheda?", () => { delete userPlan[editingProgramId]; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeProgramModal(); goHome(); }); }
@@ -1361,7 +1371,7 @@
         function closeAIFeedback() { document.getElementById('modal-ai-feedback').style.display = 'none'; }
         function finishWorkoutFinal() { closeAIFeedback(); showMessage("Sessione Salvata!"); goHome(); }
 
-        // AUDIT BIOMECCANICO DELLA SCHEDA COMPLETA
+        // AUDIT BIOMECCANICO SCHEDA CON SALVATAGGIO
         function closePlanAudit() {
             const modal = document.getElementById('modal-plan-audit');
             if (modal) modal.style.display = 'none';
@@ -1407,7 +1417,7 @@
                 return;
             }
 
-            // Se l'audit è già stato fatto e non si richiede di forzare la rigenerazione, aprilo all'istante
+            // Se l'audit esiste già e non chiediamo il refresh forzato, mostralo all'istante
             if (plan.audit && plan.audit.text && !forceRegenerate) {
                 showAuditModal(plan);
                 return;
@@ -1485,53 +1495,6 @@ STRUTTURA RISPOSTA:
             } catch(e) {
                 console.error(e);
                 showMessage("Errore Audit AI: " + e.message);
-            } finally {
-                document.getElementById('ai-loading-overlay').style.display = 'none';
-            }
-        }
-
-            document.getElementById('ai-loading-title').innerText = "Audit Biomeccanico Scheda...";
-            document.getElementById('ai-loading-desc').innerText = "Analisi curve di resistenza, piani di lavoro e ridondanze...";
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-
-            const exDetails = items.map((id, index) => {
-                const ex = exerciseData[id] || { name: id, category: 'altro' };
-                const ov = (plan.overrides && plan.overrides[index]) || {};
-                return {
-                    nome: ex.name,
-                    distretto: ex.category,
-                    sets_reps: `${ov.sets || ex.sets}x${ov.reps || ex.reps}`,
-                    target: ex.coach?.target || 'Non specificato',
-                    note: ex.hint || ''
-                };
-            });
-
-            const prompt = `Sei un biomeccanico e chinesiologo specializzato in ipertrofia e aumento della massa muscolare. 
-Valuta la seguente scheda di allenamento intitolata "${plan.title}":
-${JSON.stringify(exDetails, null, 2)}
-
-EFFETTUA UN AUDIT OGGETTIVO SEGUENDO QUESTE REGOLE CRITICHE:
-1. NON forzare sostituzioni a tutti i costi. Se la routine è ben strutturata e non presenta sovrapposizioni critiche, DICHIARALO ESPLICITAMENTE (es. "Scheda promossa / Ottimale").
-2. Intervieni con proposte di cambio SOLO se ci sono reali errori biomeccanici:
-   - Duplicati identici (es. due esercizi con la stessa curva di resistenza e lo stesso identico piano di lavoro nello stesso distretto).
-   - Eccessivo stress da sovraccarico articolare cumulativo sullo stesso schema motorio.
-3. Mantieni coerenza logica: non contraddire principi di tensione continua o allungamento se sono già rispettati.
-
-STRUTTURA LA RISPOSTA IN:
-- SCOPO DELLA SCHEDA (aumento massa muscolare / ipertrofia)
-- VERDETTO GENERALE (Promossa / Ottimizzabile / Da rivedere)
-- ANALISI DEI PATTERN MOTORI & CURVE DI RESISTENZA (Sintetica)
-- EVENTUALI CRITICITÀ REALI (Se non ce ne sono, scrivi "Nessuna criticità rilevata")
-- SUGGERIMENTI FACOLTATIVI (Solo se realmente migliorativi, altrimenti ometti)`;
-
-            try {
-                const feedback = await askGemini(prompt, false);
-                document.getElementById('plan-audit-content').innerText = feedback;
-                document.getElementById('modal-plan-audit').style.display = 'flex';
-                lucide.createIcons();
-            } catch(e) {
-                console.error(e);
-                alert("Errore Audit AI: " + e.message);
             } finally {
                 document.getElementById('ai-loading-overlay').style.display = 'none';
             }
