@@ -73,6 +73,9 @@
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(175, 82, 222, 0.3); } 50% { box-shadow: 0 0 25px rgba(175, 82, 222, 0.8); } 100% { box-shadow: 0 0 10px rgba(175, 82, 222, 0.3); } }
         .ds-btn { transition: all 0.2s; }
         .ds-btn.active { background-color: rgba(255, 59, 48, 0.15); color: #FF3B30; border-color: rgba(255, 59, 48, 0.4); }
+        
+        /* Regole fisse di sicurezza per overlay */
+        #modal-hiit-timer, #ai-loading-overlay { display: none; }
     </style>
 </head>
 <body class="pt-safe">
@@ -82,7 +85,7 @@
     <input type="file" id="global-photo-input" accept="image/*" class="hidden">
 
     <!-- Loading AI -->
-    <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex-col items-center justify-center text-center">
+    <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] flex-col items-center justify-center text-center" style="display: none;">
         <div class="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center ai-glow border border-purple-500/50 mb-6">
             <i data-lucide="sparkles" class="w-10 h-10 text-purple-400 animate-pulse"></i>
         </div>
@@ -91,7 +94,7 @@
     </div>
 
     <!-- OVERLAY TIMER HIIT A SCHERMO INTERO -->
-    <div id="modal-hiit-timer" class="fixed inset-0 bg-black z-[300] hidden flex-col justify-between p-6 select-none">
+    <div id="modal-hiit-timer" class="fixed inset-0 bg-black z-[300] flex-col justify-between p-6 select-none" style="display: none;">
         <div class="flex justify-between items-center pt-safe">
             <span id="hiit-round-badge" class="bg-white/10 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-widest text-gray-300">
                 Esercizio 1 di 5
@@ -742,16 +745,18 @@
             'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Barra dritta al pulley basso. Tira allo sterno allargando i gomiti a 90°.", target: "Deltoidi posteriori e muscoli interscapolari.", tempo: "1s tirata, 1s pausa, 2s ritorno" } }
         };
 
-        const customExDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-        Object.assign(exerciseData, customExDb);
-        
-        const renamedExDb = JSON.parse(localStorage.getItem('renamed_exercises_v5')) || {};
-        Object.keys(renamedExDb).forEach(id => {
-            if (exerciseData[id]) exerciseData[id].name = renamedExDb[id];
-        });
-
-        const deletedExDb = JSON.parse(localStorage.getItem('deleted_exercises_v5')) || [];
-        deletedExDb.forEach(id => { delete exerciseData[id]; });
+        try {
+            const customExDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+            Object.assign(exerciseData, customExDb);
+            const renamedExDb = JSON.parse(localStorage.getItem('renamed_exercises_v5')) || {};
+            Object.keys(renamedExDb).forEach(id => {
+                if (exerciseData[id]) exerciseData[id].name = renamedExDb[id];
+            });
+            const deletedExDb = JSON.parse(localStorage.getItem('deleted_exercises_v5')) || [];
+            deletedExDb.forEach(id => { delete exerciseData[id]; });
+        } catch(e) {
+            console.error("Errore lettura database personalizzati", e);
+        }
 
         const defaultPlan = {
             1: { title: 'PUSH (Forza)', color: '#007AFF', goal: 'massa', items: ['panca_piana', 'lento_avanti', 'chest_press_g1', 'alzate_lat', 'french_press', 'pushdown'], overrides: { 3: { isDropSet: true } } },
@@ -769,12 +774,30 @@
             return `${year}-${month}-${day}`;
         }
 
-        let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v5')) || defaultPlan;
-        
-        // Auto-migrazione: se non è presente una scheda HIIT nei dati salvati, la aggiunge automaticamente
-        if (!userPlan[5] && !Object.values(userPlan).some(p => p.isHIIT)) {
-            userPlan[5] = defaultPlan[5];
-            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
+        let userPlan = defaultPlan;
+        try {
+            const saved = localStorage.getItem('user_workout_plan_v5');
+            if (saved) {
+                userPlan = JSON.parse(saved);
+            }
+        } catch(e) {
+            userPlan = defaultPlan;
+        }
+
+        // Auto-migrazione difensiva per la scheda HIIT
+        try {
+            let hasHIIT = false;
+            if (userPlan && typeof userPlan === 'object') {
+                Object.values(userPlan).forEach(p => {
+                    if (p && (p.isHIIT || (p.title && p.title.includes('HIIT')))) hasHIIT = true;
+                });
+                if (!hasHIIT) {
+                    userPlan[5] = defaultPlan[5];
+                    localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
+                }
+            }
+        } catch(e) {
+            console.warn("Errore auto-migrazione HIIT:", e);
         }
 
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v5')) || {};
@@ -825,7 +848,6 @@
             const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
             if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
             
-            // 1. Chiamata primaria su gemini-3.8-flash via Interactions API
             try {
                 const url = `[https://generativelanguage.googleapis.com/v1beta/interactions?key=$](https://generativelanguage.googleapis.com/v1beta/interactions?key=$){apiKey}`;
                 const reqBody = { model: "gemini-3.8-flash", input: promptText };
@@ -846,7 +868,6 @@
                 console.warn("Interactions API 3.8 fallback...", err);
             }
 
-            // 2. Fallback su generateContent
             const fallbackModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
             let lastErr = null;
 
@@ -977,7 +998,6 @@
         }
 
         function startHIITCircuit() {
-            // Inizializza audio gesture per iOS Safari
             try {
                 if (!hiitAudioCtx) hiitAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (hiitAudioCtx.state === 'suspended') hiitAudioCtx.resume();
@@ -986,7 +1006,6 @@
             const plan = userPlan[currentWorkoutId];
             const items = plan?.items || [];
             
-            // Popola gli esercizi dalla scheda corrente o default HIIT
             hiitExercises = items.map(id => ({
                 id: id,
                 name: exerciseData[id]?.name || id
@@ -1004,7 +1023,7 @@
 
             hiitCurrentIndex = 0;
             hiitState = 'PREPARE';
-            hiitTimeRemaining = 20; // 20 secondi preparazione iniziale
+            hiitTimeRemaining = 20;
             hiitIsPaused = false;
 
             document.getElementById('modal-hiit-timer').style.display = 'flex';
@@ -1012,7 +1031,7 @@
             
             updateHIITUI();
             startHIITInterval();
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
 
         function startHIITInterval() {
@@ -1039,14 +1058,14 @@
         function advanceHIITPhase() {
             if (hiitState === 'PREPARE') {
                 hiitState = 'WORK';
-                hiitTimeRemaining = 20; // 20 secondi esercizio
+                hiitTimeRemaining = 20;
             } else if (hiitState === 'WORK') {
                 if (hiitCurrentIndex >= hiitExercises.length - 1) {
                     finishHIITCircuit();
                     return;
                 } else {
                     hiitState = 'REST';
-                    hiitTimeRemaining = 10; // 10 secondi recupero
+                    hiitTimeRemaining = 10;
                 }
             } else if (hiitState === 'REST') {
                 hiitCurrentIndex++;
@@ -1158,7 +1177,7 @@
         }
 
         let confirmCallback = null;
-        function openConfirm(title, msg, callback) { document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-msg').innerText = msg; confirmCallback = callback; document.getElementById('modal-confirm').style.display = 'flex'; lucide.createIcons(); }
+        function openConfirm(title, msg, callback) { document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-msg').innerText = msg; confirmCallback = callback; document.getElementById('modal-confirm').style.display = 'flex'; if (window.lucide) lucide.createIcons(); }
         function closeConfirm() { document.getElementById('modal-confirm').style.display = 'none'; confirmCallback = null; }
         document.getElementById('confirm-btn').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirm(); };
 
@@ -1189,7 +1208,7 @@
                 actionRow.style.display = 'none'; 
             }
             document.querySelectorAll('.color-dot').forEach(el => { if (el.getAttribute('data-color') === selectedProgColor) el.classList.add('selected'); else el.classList.remove('selected'); });
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
         function closeProgramModal() { document.getElementById('modal-program').style.display = 'none'; }
         function selectColor(el) { document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); selectedProgColor = el.getAttribute('data-color'); }
@@ -1246,7 +1265,7 @@
         function toggleSupersetLocal() { tempSuperset = !tempSuperset; updateLocalToggleUI(); }
         function updateLocalToggleUI() {
             const btnDrop = document.getElementById('toggle-drop'); btnDrop.innerText = `DROP SET: ${tempDropSet ? 'ATTIVO' : 'OFF'}`; btnDrop.style.backgroundColor = tempDropSet ? 'rgba(255, 59, 48, 0.15)' : 'transparent'; btnDrop.style.borderColor = tempDropSet ? 'rgba(255, 59, 48, 0.3)' : 'rgba(255,255,255,0.1)'; btnDrop.style.color = tempDropSet ? '#FF3B30' : 'white';
-            const btnSuper = document.getElementById('toggle-superset'); btnSuper.innerHTML = `<i data-lucide="link" class="w-4 h-4"></i> SUPER SET: ${tempSuperset ? 'ATTIVO' : 'OFF'}`; btnSuper.style.backgroundColor = tempSuperset ? 'rgba(175, 82, 222, 0.15)' : 'transparent'; btnSuper.style.borderColor = tempSuperset ? 'rgba(175, 82, 222, 0.3)' : 'rgba(255,255,255,0.1)'; btnSuper.style.color = tempSuperset ? '#AF52DE' : 'white'; lucide.createIcons();
+            const btnSuper = document.getElementById('toggle-superset'); btnSuper.innerHTML = `<i data-lucide="link" class="w-4 h-4"></i> SUPER SET: ${tempSuperset ? 'ATTIVO' : 'OFF'}`; btnSuper.style.backgroundColor = tempSuperset ? 'rgba(175, 82, 222, 0.15)' : 'transparent'; btnSuper.style.borderColor = tempSuperset ? 'rgba(175, 82, 222, 0.3)' : 'rgba(255,255,255,0.1)'; btnSuper.style.color = tempSuperset ? '#AF52DE' : 'white'; if (window.lucide) lucide.createIcons();
         }
         function saveExerciseParams() {
             if (!userPlan[currentWorkoutId].overrides) userPlan[currentWorkoutId].overrides = {};
@@ -1262,7 +1281,7 @@
             const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastSession = h.length > 0 ? h[h.length-1] : null;
             let wPh = lastSession && lastSession.w ? lastSession.w : ''; let rPh = lastSession && lastSession.r ? lastSession.r : '30';
             document.getElementById('cardio-min').value = rVal; document.getElementById('cardio-min').placeholder = `es. ${rPh}`; document.getElementById('cardio-dist').value = wVal; document.getElementById('cardio-dist').placeholder = wPh ? `es. ${wPh}` : "es. 8.5";
-            document.getElementById('modal-log-cardio').style.display = 'flex'; lucide.createIcons();
+            document.getElementById('modal-log-cardio').style.display = 'flex'; if (window.lucide) lucide.createIcons();
         }
         function closeCardioModal() { document.getElementById('modal-log-cardio').style.display = 'none'; }
         function confirmCardioLogs() {
@@ -1325,7 +1344,7 @@
                 html += `<div><input type="number" id="log-r-${i}" value="${rVal}" placeholder="${rPh}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>`;
                 html += `<button id="log-ds-${i}" onclick="toggleRowDS(${i})" class="ds-btn h-full rounded-xl border border-white/10 text-[10px] font-black ${isDs ? 'active' : 'text-gray-500'}">DS</button></div>`;
             }
-            document.getElementById('log-rows-container').innerHTML = html; document.getElementById('modal-log-sets').style.display = 'flex'; lucide.createIcons();
+            document.getElementById('log-rows-container').innerHTML = html; document.getElementById('modal-log-sets').style.display = 'flex'; if (window.lucide) lucide.createIcons();
         }
 
         function closeLogModal() { document.getElementById('modal-log-sets').style.display = 'none'; }
@@ -1357,7 +1376,12 @@
 
         function renderWorkout(id, isHistory = false, hist = null) {
             const container = document.getElementById('exercise-list'); 
+            if (!container) return;
             const plan = userPlan[id];
+            if (!plan) {
+                container.innerHTML = `<div class="text-center p-10 text-gray-500 font-bold">Scheda non trovata.</div>`;
+                return;
+            }
             const items = plan.items || []; 
             const overrides = plan.overrides || {};
             const isHIIT = plan.isHIIT === true;
@@ -1431,7 +1455,7 @@
                             let bestSet = histValid[0]; 
                             for (let l of histValid) { if (l.w > bestSet.w) bestSet = l; else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l; } 
                             let bestSetStr = (bestSet.w > 0 && !ex.isBW) ? `${bestSet.w} <span class="text-sm text-blue-400">kg x${bestSet.r}</span>` : `${bestSet.r} <span class="text-sm text-blue-400">reps</span>`; 
-                            historyVolHTML = `<div class="bg-blue-500/15 p-6 rounded-2xl text-center border border-blue-500/20"><span class="text-3xl font-black text-white">${bestSetStr}</span>${!ex.isBW ? `<div class="text-xs text-blue-400/70 uppercase font-black tracking-widest mt-2">Volume: ${hVol}kg in ${histValid.length} serie</div>` : ''}</div>`; 
+                            historyVolHTML = `<div class="bg-blue-500/15 p-6 rounded-2xl text-center border border-blue-500/20"><span class="text-3xl font-black text-white">${bestSetStr}</span>${!ex.isBW ? `<div class="text-xs text-blue-400/70 uppercase font-black tracking-widest mt-2">Volume: ${hVol}kg in${histValid.length} serie</div>` : ''}</div>`; 
                         }
                     }
                 }
@@ -1471,835 +1495,4 @@
                             ${isHistory ? historyVolHTML : `
                                 ${summaryHTML}
                                 <div class="flex gap-3">
-                                    <button onclick="openLogModal('${exId}', ${sets}, '${reps}')" class="flex-1 ${isCardio ? 'bg-orange-600 hover:bg-orange-500' : 'bg-blue-600 hover:bg-blue-500'} text-white rounded-xl py-3.5 font-black text-sm tracking-widest shadow-lg transition-transform active:scale-95 uppercase">Registra</button>
-                                    <div class="min-w-[80px] px-3 bg-[#2C2C2E] rounded-xl flex flex-col items-center justify-center cursor-pointer active:bg-white/10 transition-colors" onclick="showChart('${exId}', '${ex.name}')">
-                                        <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Ultimo</span>
-                                        <span class="text-sm font-black text-white whitespace-nowrap">${last}</span>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2 mt-5 pt-5 border-t border-white/5">
-                                    <div class="drag-handle w-14 bg-[#2C2C2E] hover:bg-[#3a3a3c] text-white rounded-xl flex justify-center items-center transition-colors"><i data-lucide="grip-horizontal" class="w-5 h-5 text-gray-400"></i></div>
-                                    <button onclick="openLibrary(${idx}, '${ex.category}')" class="flex-1 bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-[10px] font-black uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Cambia</button>
-                                    <button onclick="removeExerciseUI(${idx})" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i> Rimuovi</button>
-                                </div>
-                            `}
-                        </div>
-                    </div>
-                    ${isSuper && idx < visibleItems.length - 1 ? `<div class="superset-connector"></div>` : ''}
-                </div>`;
-            }).join('');
-
-            container.innerHTML = hiitBanner + exercisesHTML;
-            lucide.createIcons();
-
-            if (!isHistory) {
-                if (workoutSortable) workoutSortable.destroy();
-                workoutSortable = new Sortable(document.getElementById('exercise-list'), {
-                    handle: '.drag-handle', animation: 150, forceFallback: true, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
-                    onEnd: function (evt) {
-                        const oldIdx = evt.oldIndex; const newIdx = evt.newIndex; if (oldIdx === newIdx) return;
-                        const planItems = [...userPlan[currentWorkoutId].items]; const planOverrides = { ...(userPlan[currentWorkoutId].overrides || {}) };
-                        let arr = planItems.map((id, i) => ({ id, ov: planOverrides[i] })); const moved = arr.splice(oldIdx, 1)[0]; arr.splice(newIdx, 0, moved);
-                        userPlan[currentWorkoutId].items = arr.map(a => a.id); const newOverrides = {}; arr.forEach((a, i) => { if (a.ov) newOverrides[i] = a.ov; }); userPlan[currentWorkoutId].overrides = newOverrides;
-                        localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); renderWorkout(currentWorkoutId);
-                    }
-                });
-            }
-        }
-
-        function updateNav(active) { ['home', 'calendar', 'body', 'settings'].forEach(n => { const btn = document.getElementById(`nav-${n}`); if (btn) { btn.classList.toggle('text-blue-500', active === n); btn.classList.toggle('text-gray-500', active !== n); } }); }
-        function switchView(viewId) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(`view-${viewId}`).classList.remove('hidden'); updateNav(viewId); window.scrollTo(0,0); }
-        function goHome() { switchView('home'); renderHomeCards(); }
-        function openSettings() { switchView('settings'); document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || ''; }
-        
-        function openWorkout(id) { 
-            currentWorkoutId = id; 
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
-            document.getElementById('view-workout').classList.remove('hidden'); 
-            document.getElementById('workout-title-text').innerText = userPlan[id].title; 
-            renderWorkout(id); 
-            window.scrollTo(0,0); 
-        }
-
-        function renderHomeCards() {
-            const container = document.getElementById('workout-cards-container');
-            const archiveContainer = document.getElementById('archived-cards-container');
-            const archiveToggle = document.getElementById('archive-toggle-container');
-            
-            const colorGradients = { '#007AFF': 'from-blue-600 to-blue-900', '#AF52DE': 'from-purple-600 to-purple-900', '#34C759': 'from-emerald-500 to-green-900', '#FF9500': 'from-orange-500 to-red-800', '#FF3B30': 'from-red-600 to-red-900' };
-            
-            let activeHtml = '';
-            let archivedHtml = '';
-            let hasArchived = false;
-
-            Object.entries(userPlan).forEach(([id, p]) => {
-                const grad = colorGradients[p.color] || 'from-gray-700 to-gray-900';
-                const isArchived = p.archived || false;
-                
-                const htmlStr = `
-                <div onclick="openWorkout('${id}')" class="relative h-44 rounded-[32px] overflow-hidden shadow-xl active:scale-[0.98] transition-transform cursor-pointer border border-white/10 ${isArchived ? 'opacity-50 grayscale' : ''}">
-                    <div class="absolute inset-0 bg-gradient-to-br ${grad} opacity-95"></div>
-                    <div class="absolute inset-0 p-7 flex flex-col justify-end">
-                        <span class="text-white/60 text-[11px] font-black uppercase tracking-widest mb-1.5">${isArchived ? 'Archiviata' : (p.isHIIT ? 'Circuito Cardio' : 'Programma')}</span>
-                        <h3 class="text-3xl font-black text-white leading-none w-[80%]">${p.title}</h3>
-                    </div>
-                    <div class="absolute top-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 shadow-lg"><i data-lucide="${isArchived ? 'archive' : (p.isHIIT ? 'flame' : 'play')}" class="w-6 h-6 text-white ml-0.5"></i></div>
-                </div>`;
-
-                if (isArchived) { 
-                    archivedHtml += htmlStr; 
-                    hasArchived = true; 
-                } else { 
-                    activeHtml += htmlStr; 
-                }
-            });
-
-            container.innerHTML = activeHtml || `<p class="text-gray-500 text-sm font-bold text-center py-4">Nessuna scheda attiva.</p>`;
-            archiveContainer.innerHTML = archivedHtml;
-            
-            if (hasArchived) {
-                archiveToggle.style.display = 'block';
-            } else {
-                archiveToggle.style.display = 'none';
-                archiveContainer.classList.add('hidden');
-                isArchiveViewOpen = false;
-            }
-            
-            updateArchiveToggleBtn();
-            lucide.createIcons();
-        }
-
-        function toggleArchiveView() {
-            isArchiveViewOpen = !isArchiveViewOpen;
-            const archiveContainer = document.getElementById('archived-cards-container');
-            if (isArchiveViewOpen) archiveContainer.classList.remove('hidden');
-            else archiveContainer.classList.add('hidden');
-            updateArchiveToggleBtn();
-        }
-        
-        function updateArchiveToggleBtn() {
-            const btn = document.getElementById('btn-toggle-archive');
-            if(btn) {
-                if(isArchiveViewOpen) btn.innerHTML = '<i data-lucide="chevron-up" class="w-3 h-3"></i> Nascondi Archivio';
-                else btn.innerHTML = '<i data-lucide="archive" class="w-3 h-3"></i> Mostra Archivio';
-                lucide.createIcons();
-            }
-        }
-
-        function finishWorkout() { document.getElementById('session-kcal').value = ''; document.getElementById('modal-finish').style.display = 'flex'; lucide.createIcons(); }
-        function closeFinishModal() { document.getElementById('modal-finish').style.display = 'none'; }
-
-        async function preSaveWorkoutFinal(skipKcal, requestAI) {
-            document.getElementById('modal-finish').style.display = 'none';
-            let totalVolume = 0; let sessionDataForAI = {};
-            
-            let isAIGenerated = currentWorkoutId.startsWith('AI_');
-
-            Object.keys(activeSession).forEach(exId => {
-                const isCardio = exerciseData[exId]?.category === 'aerobica';
-                const exName = exerciseData[exId].name;
-                
-                const planIdx = userPlan[currentWorkoutId].items.indexOf(exId);
-                const override = userPlan[currentWorkoutId].overrides[planIdx] || {};
-                const targetSets = override.sets || exerciseData[exId].sets;
-                const targetReps = override.reps || exerciseData[exId].reps;
-
-                sessionDataForAI[exName] = {
-                    obiettivo: isCardio ? targetReps : `${targetSets} set x ${targetReps}`,
-                    risultato_reale: activeSession[exId]
-                };
-
-                if (!isCardio) { activeSession[exId].forEach(set => { if (set.w !== null && set.r !== null) totalVolume += ((set.w||0) * set.r); }); }
-            });
-
-            const kcalValue = skipKcal ? 0 : (parseInt(document.getElementById('session-kcal').value) || 0);
-            const sessionNotes = document.getElementById('session-note').value; 
-
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            const key = getLocalYYYYMMDD();
-            journal[key] = { id: currentWorkoutId, title: userPlan[currentWorkoutId].title, isAIGenerated: isAIGenerated, exercises: { ...activeSession }, volume: totalVolume, kcal: kcalValue, notes: sessionNotes };
-            localStorage.setItem('workout_journal', JSON.stringify(journal));
-            activeSession = {}; localStorage.removeItem('active_session_buffer_v5'); document.getElementById('session-note').value = ''; 
-
-            if (requestAI && localStorage.getItem('gemini_api_key') && Object.keys(sessionDataForAI).length > 0) {
-                document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
-                document.getElementById('ai-loading-desc').innerText = "Analisi biomeccanica della sessione in corso...";
-                document.getElementById('ai-loading-overlay').style.display = 'flex';
-                try {
-                    let notesContext = sessionNotes ? ` Il cliente ha lasciato questa nota: "${sessionNotes}". Tienine conto.` : '';
-                    let workoutTitle = userPlan[currentWorkoutId].title;
-                    let aiContext = isAIGenerated ? "NOTA: Questa scheda l'hai creata TU tramite il generatore AI. Verifica severamente se il cliente ha rispettato i carichi e i volumi che gli avevi prescritto." : "";
-                    
-                    const prompt = `Agisci come uno strength coach severo. ${aiContext} Analizza questa sessione denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato del risultato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale". 2. Se isDrop=true, è un Drop Set voluto. 3. I carichi (w) sono SEMPRE IL PESO TOTALE. Valuta i volumi in modo realistico in base allo scopo della scheda. Dammi un feedback TECNICO di 2-3 frasi dirette. Sii spietato.`;
-                    
-                    const feedback = await askGemini(prompt, false);
-                    document.getElementById('ai-loading-overlay').style.display = 'none';
-                    document.getElementById('ai-feedback-text').innerText = feedback; document.getElementById('modal-ai-feedback').style.display = 'flex';
-                } catch (e) { 
-                    console.error(e); 
-                    document.getElementById('ai-loading-overlay').style.display = 'none'; 
-                    showMessage("Sessione Salvata (Errore AI)"); 
-                    goHome(); 
-                }
-            } else { 
-                showMessage("Sessione Salvata!"); 
-                goHome(); 
-            }
-        }
-
-        async function analyzePastWorkout(key) {
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            const entry = journal[key];
-            if (!entry || !entry.exercises) return;
-
-            if (!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; }
-
-            document.getElementById('ai-loading-title').innerText = "Coach AI in elaborazione";
-            document.getElementById('ai-loading-desc').innerText = "Revisione allenamento storico...";
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-            try {
-                let sessionDataForAI = {};
-                const planId = entry.id;
-                const isAIGenerated = entry.isAIGenerated || (planId && planId.startsWith('AI_'));
-
-                Object.keys(entry.exercises).forEach(exId => {
-                    const ex = exerciseData[exId];
-                    if(ex) {
-                        let targetSets = ex.sets;
-                        let targetReps = ex.reps;
-                        if (planId && userPlan[planId]) {
-                            const planIdx = userPlan[planId].items.indexOf(exId);
-                            if (planIdx !== -1 && userPlan[planId].overrides[planIdx]) {
-                                targetSets = userPlan[planId].overrides[planIdx].sets || targetSets;
-                                targetReps = userPlan[planId].overrides[planIdx].reps || targetReps;
-                            }
-                        }
-                        sessionDataForAI[ex.name] = {
-                            obiettivo: `${targetSets} set x ${targetReps}`,
-                            risultato_reale: entry.exercises[exId]
-                        };
-                    }
-                });
-
-                let notesContext = entry.notes ? ` Il cliente ha lasciato questa nota: "${entry.notes}". Tienine conto.` : '';
-                let workoutTitle = entry.title;
-                let aiContext = isAIGenerated ? "NOTA: Questa scheda l'hai creata TU tramite il generatore AI in passato. Controlla se il cliente aveva rispettato i TUOI parametri." : "";
-
-                const prompt = `Agisci come uno strength coach severo. Rivedi questa sessione passata denominata "${workoutTitle}": ${JSON.stringify(sessionDataForAI)}.${notesContext} Il formato reale è [{"w": peso, "r": reps, "isDrop": true/false}]. NOTE: 1. Confronta l'"obiettivo" con il "risultato_reale" in base allo scopo della scheda. ${aiContext} 2. Se isDrop=true, è un Drop Set corretto. 3. I carichi (w) sono IL PESO TOTALE. Dammi un feedback TECNICO di 2-3 frasi. Sii spietato.`;
-
-                const feedback = await askGemini(prompt, false);
-                document.getElementById('ai-loading-overlay').style.display = 'none';
-                document.getElementById('ai-feedback-text').innerText = feedback;
-                document.getElementById('modal-ai-feedback').style.display = 'flex';
-            } catch (e) { console.error(e); document.getElementById('ai-loading-overlay').style.display = 'none'; showMessage("Errore connessione AI."); }
-        }
-
-        function closeAIFeedback() { document.getElementById('modal-ai-feedback').style.display = 'none'; }
-        function finishWorkoutFinal() { closeAIFeedback(); showMessage("Sessione Salvata!"); goHome(); }
-
-        // AUDIT BIOMECCANICO SCHEDA CON SALVATAGGIO
-        function closePlanAudit() {
-            const modal = document.getElementById('modal-plan-audit');
-            if (modal) modal.style.display = 'none';
-        }
-
-        function showAuditModal(plan) {
-            const audit = plan.audit;
-            if (!audit) return;
-
-            const modal = document.getElementById('modal-plan-audit');
-            const content = document.getElementById('plan-audit-content');
-            const meta = document.getElementById('audit-meta');
-
-            if (!modal || !content) return;
-
-            const goalName = (audit.goal || plan.goal || 'ipertrofia').toUpperCase();
-            const goalBadgeClass = goalName === 'MASSA' 
-                ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' 
-                : 'bg-purple-500/20 text-purple-400 border-purple-500/30';
-
-            if (meta) {
-                meta.innerHTML = `
-                    <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-md border ${goalBadgeClass}">
-                        ${goalName}
-                    </span>
-                    ${audit.date ? `<span class="text-[11px] text-gray-400 font-bold">• ${audit.date}</span>` : ''}
-                `;
-            }
-
-            content.innerText = audit.text;
-            modal.style.display = 'flex';
-            lucide.createIcons();
-        }
-
-        async function analyzePlanComposition(forceRegenerate = false) {
-            if (!currentWorkoutId || !userPlan[currentWorkoutId]) return;
-            const plan = userPlan[currentWorkoutId];
-            const items = plan.items || [];
-            const goal = plan.goal || 'ipertrofia';
-
-            if (items.length < 2) {
-                showMessage("Aggiungi almeno 2 esercizi per analizzare la scheda!");
-                return;
-            }
-
-            if (plan.audit && plan.audit.text && !forceRegenerate) {
-                showAuditModal(plan);
-                return;
-            }
-
-            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
-            if (!apiKey) {
-                showMessage("Inserisci l'API Key nelle Opzioni!");
-                return;
-            }
-
-            document.getElementById('ai-loading-title').innerText = "Audit Biomeccanico Scheda...";
-            document.getElementById('ai-loading-desc').innerText = `Analisi per obiettivo: ${goal.toUpperCase()}...`;
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-
-            const exDetails = items.map((id, index) => {
-                const ex = exerciseData[id] || { name: id, category: 'altro' };
-                const ov = (plan.overrides && plan.overrides[index]) || {};
-                return {
-                    nome: ex.name,
-                    distretto: ex.category,
-                    sets_reps: `${ov.sets || ex.sets}x${ov.reps || ex.reps}`,
-                    target: ex.coach?.target || 'Non specificato',
-                    note: ex.hint || ''
-                };
-            });
-
-            const prompt = `Sei un biomeccanico e preparatore atletico specializzato nell'allenamento con sovraccarichi.
-Analizza la seguente scheda di allenamento:
-- Titolo Scheda: "${plan.title}"
-- Obiettivo Dichiarato: "${goal.toUpperCase()}"
-- Composizione Esercizi:
-${JSON.stringify(exDetails, null, 2)}
-
-PARAMETRI DI VALUTAZIONE IN BASE ALL'OBIETTIVO "${goal.toUpperCase()}":
-${goal === 'massa' ? `
-- OBIETTIVO MASSA / FORZA:
-  * Priorità alla tensione meccanica, al sovraccarico progressivo e ai grandi esercizi multiarticolari (bilancieri, manubri pesanti, macchine a carico libero).
-  * Non penalizzare la scheda se mancano angolazioni di isolamento o cavi, purché i pattern motori fondamentali siano coperti senza sovraccaricare le medesime articolazioni (es. evitare conflitti di compressione lombare o sulle spalle).
-  * Valuta favorevolmente la presenza di movimenti base all'inizio e un volume sostenibile ad alta intensità di carico.
-` : `
-- OBIETTIVO IPERTROFIA PURA:
-  * Priorità al rapporto stimolo/fatica (SFR), alla varietà delle curve di resistenza (sovraccarico in allungamento vs contrazione di picco) e alla tensione continua (cavi, macchine isotoniche guidate).
-  * Verifica che non ci siano esercizi ridondanti sullo stesso identico profilo di resistenza per lo stesso distretto.
-  * Valuta favorevolmente la completezza degli angoli di lavoro e la sicurezza articolare per massimizzare il pump e l'accumulo metabolico.
-`}
-
-REGOLE CRITICHE:
-1. NON forzare sostituzioni se la scheda è già coerente con l'obiettivo "${goal.toUpperCase()}". Dichiarala ottimale se non ha conflitti reali.
-2. Segnala SOLO reali ridondanze biomeccaniche o eccessi di stress articolare cumulativo.
-
-STRUTTURA RISPOSTA:
-- VERDETTO GENERALE (In linea con l'obiettivo / Ottimizzabile / Da rivedere)
-- ANALISI DELLA STRUTTURA & CURVE DI RESISTENZA (Sintetica)
-- CONFLITTI O RIDONDANZE (Se nessuno, scrivi "Nessuna criticità rilevata")
-- SUGGERIMENTI SPECIFICI (Solo se migliorano l'obiettivo ${goal.toUpperCase()}, altrimenti ometti)`;
-
-            try {
-                const feedback = await askGemini(prompt, false);
-                
-                const now = new Date();
-                const dateStr = now.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }) + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-                
-                plan.audit = {
-                    text: feedback,
-                    goal: goal,
-                    date: dateStr
-                };
-                userPlan[currentWorkoutId] = plan;
-                localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
-
-                showAuditModal(plan);
-                showMessage("Audit completato e memorizzato!");
-            } catch(e) {
-                console.error(e);
-                showMessage("Errore Audit AI: " + e.message);
-            } finally {
-                document.getElementById('ai-loading-overlay').style.display = 'none';
-            }
-        }
-
-        function openCustomEx() { 
-            creationPhotoBase64 = null;
-            document.getElementById('custom-photo-btn-text').innerText = "Scegli Foto dal Rullino (Opzionale)";
-            document.getElementById('modal-custom-ex').style.display = 'flex'; 
-            lucide.createIcons(); 
-        }
-        function closeCustomEx() { document.getElementById('modal-custom-ex').style.display = 'none'; }
-        
-        async function saveCustomEx() {
-            const name = document.getElementById('custom-ex-name').value.trim();
-            const cat = document.getElementById('custom-ex-cat').value;
-            const hint = document.getElementById('custom-ex-hint').value.trim();
-            const isBW = document.getElementById('custom-ex-isbw').checked;
-            if(!name) { showMessage("Inserisci il nome dell'esercizio!"); return; }
-            
-            const safeName = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-            const newId = 'c_' + safeName;
-            
-            let coachData = { 
-                esecuzione: "Esercizio personalizzato.", 
-                target: `Distretto muscolare: ${cat}.`, 
-                tempo: "Controllato" 
-            };
-            
-            let photoUrl = creationPhotoBase64 || `img/${newId}.png`;
-            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
-
-            if (!apiKey) {
-                showMessage("Attenzione: Inserisci l'API Key nelle Opzioni per la guida AI!");
-                coachData.esecuzione = hint || "Esercizio personalizzato senza guida AI.";
-            } else {
-                document.getElementById('ai-loading-title').innerText = "Coach AI Biomeccanico...";
-                document.getElementById('ai-loading-desc').innerText = "Elaborazione guida tecnica specialistica...";
-                document.getElementById('ai-loading-overlay').style.display = 'flex';
-                
-                try {
-                    const prompt = `Sei un biomeccanico e docente di scienze motorie specializzato in bodybuilding e ipertrofia muscolare.
-Analizza in modo approfondito questo esercizio: "${name}" per la categoria muscolare "${cat}".
-${hint ? `Dettagli e vincoli di setup specificati dall'atleta: "${hint}".` : ''}
-
-ISTRUZIONI TASSATIVE:
-1. NON ricopiare o parafrasare semplicemente le parole dell'atleta!
-2. Sviluppa una GUIDA TECNICA COMPLETA in 3 sezioni descrittive:
-   - SETUP & ASSETTO ARTICOLARE: Posizionamento corporeo, regolazione panca/attrezzo, stabilità del tronco, blocco scapolare e angoli di lavoro.
-   - FASE CONCENTRICA: Traiettoria esatta del carico, punto di massima contrazione isometrica (senza slanci o compensi).
-   - FASE ECCENTRICA & RESPIRO: Discesa controllata e frenata (3 secondi), gestione dello stiramento miofasciale e respirazione.
-3. In "target", elenca i muscoli primari (focus) e secondari (sinergici/stabilizzatori).
-4. In "tempo", definisci il timing esatto in secondi (es. "1s salita, 1s picco, 3s discesa").
-
-Restituisci ESCLUSIVAMENTE un JSON valido con questa struttura esatta:
-{
-  "esecuzione": "Testo completo della guida biomeccanica suddivisa in paragrafi...",
-  "target": "Muscoli primari e secondari coinvolti...",
-  "tempo": "Timing in secondi (es. 1s salita, 1s picco, 3s discesa)"
-}`;
-
-                    const responseText = await askGemini(prompt, true);
-                    const parsed = parseAIResponse(responseText);
-                    if (parsed && parsed.esecuzione) { 
-                        coachData = parsed; 
-                    }
-                } catch (e) {
-                    console.error("Errore AI Coach", e);
-                    alert("Avviso Coach AI: " + e.message + "\n\nL'esercizio è stato comunque salvato.");
-                    coachData.esecuzione = hint || "Esercizio personalizzato.";
-                } finally {
-                    document.getElementById('ai-loading-overlay').style.display = 'none';
-                }
-            }
-            
-            const newEx = {
-                name: name, category: cat, sets: '3', reps: '10', img: photoUrl, coach: coachData, isBW: isBW, hint: hint
-            };
-            
-            const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-            customDb[newId] = newEx;
-            localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
-            exerciseData[newId] = newEx;
-            
-            document.getElementById('custom-ex-name').value = '';
-            document.getElementById('custom-ex-hint').value = '';
-            document.getElementById('custom-ex-isbw').checked = false;
-            creationPhotoBase64 = null;
-            closeCustomEx();
-            renderLibrary(cat); 
-            showMessage("Esercizio aggiunto al catalogo!");
-        }
-
-        async function regenerateCoachAI(exId) {
-            const ex = exerciseData[exId];
-            if (!ex) return;
-            const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
-            if (!apiKey) { 
-                showMessage("Inserisci l'API Key nelle Opzioni!"); 
-                return; 
-            }
-            
-            const newHint = prompt("Vuoi aggiungere vincoli biomeccanici per guidare l'AI? (es. panca inclinata a 45°, gomiti bloccati, cavo basso):", ex.hint || "");
-            if (newHint !== null) ex.hint = newHint.trim();
-
-            document.getElementById('ai-loading-title').innerText = "Coach AI Biomeccanico...";
-            document.getElementById('ai-loading-desc').innerText = "Elaborazione guida tecnica specialistica...";
-            document.getElementById('ai-loading-overlay').style.display = 'flex';
-            
-            try {
-                const prompt = `Sei un biomeccanico e docente di scienze motorie specializzato in bodybuilding e ipertrofia muscolare.
-Scrivi una guida tecnica rigorosa per l'esercizio: "${ex.name}" (categoria muscolare: "${ex.category}").
-${ex.hint ? `Dettagli e vincoli di setup specificati dall'atleta: "${ex.hint}".` : ''}
-
-ISTRUZIONI TASSATIVE:
-1. NON ricopiare o parafrasare semplicemente le parole dell'atleta!
-2. Sviluppa una GUIDA TECNICA COMPLETA in 3 sezioni descrittive:
-   - SETUP & ASSETTO ARTICOLARE: Posizionamento corporeo, regolazione panca/attrezzo, stabilità del tronco, blocco scapolare e angoli di lavoro.
-   - FASE CONCENTRICA: Traiettoria esatta del carico, punto di massima contrazione isometrica (senza slanci o compensi).
-   - FASE ECCENTRICA & RESPIRO: Discesa controllata e frenata (3 secondi), gestione dello stiramento miofasciale e respirazione.
-3. In "target", elenca i muscoli primari (focus) e secondari (sinergici/stabilizzatori).
-4. In "tempo", definisci il timing esatto in secondi (es. "1s spinta, 1s picco, 3s eccentrica controllata").
-
-Restituisci ESCLUSIVAMENTE un JSON valido con questa struttura esatta:
-{
-  "esecuzione": "Testo completo della guida biomeccanica suddivisa in paragrafi...",
-  "target": "Muscoli primari e secondari coinvolti...",
-  "tempo": "Timing in secondi..."
-}`;
-                
-                const responseText = await askGemini(prompt, true);
-                const parsed = parseAIResponse(responseText);
-                if (parsed && parsed.esecuzione) {
-                    ex.coach = parsed;
-                    if (exId.startsWith('c_')) {
-                        const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-                        customDb[exId] = ex;
-                        localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
-                    }
-                    openInfo(exId);
-                    showMessage("Guida tecnica Coach AI aggiornata!");
-                }
-            } catch(e) {
-                console.error(e);
-                alert("Errore Coach AI: " + e.message);
-            } finally {
-                document.getElementById('ai-loading-overlay').style.display = 'none';
-            }
-        }
-
-        function copyPromptNanobanana(exId) {
-            const ex = exerciseData[exId];
-            if (!ex) return;
-            const promptStr = `Hyper-realistic fitness photography, Apple Fitness Plus aesthetic, muscular male model with defined V-taper physique performing ${ex.name}${ex.hint ? ', ' + ex.hint : ''}. Cinematic studio lighting, clean dark modern gym background, dramatic rim light highlighting muscle definition. Shot on 85mm prime lens, sharp focus, photorealistic, 8k --ar 1:1`;
-            navigator.clipboard.writeText(promptStr).then(() => {
-                showMessage("Prompt Nanobanana copiato negli appunti!");
-            }).catch(() => {
-                prompt("Copia manualmente il prompt:", promptStr);
-            });
-        }
-
-        function renameExercise(exId) {
-            const ex = exerciseData[exId];
-            if (!ex) return;
-            const newName = prompt("Modifica il nome dell'esercizio:", ex.name);
-            if (!newName || newName.trim() === "" || newName.trim() === ex.name) return;
-            
-            ex.name = newName.trim();
-            
-            if (exId.startsWith('c_')) {
-                const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-                if (customDb[exId]) {
-                    customDb[exId].name = ex.name;
-                    localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
-                }
-            } else {
-                const renamedDb = JSON.parse(localStorage.getItem('renamed_exercises_v5')) || {};
-                renamedDb[exId] = ex.name;
-                localStorage.setItem('renamed_exercises_v5', JSON.stringify(renamedDb));
-            }
-            
-            document.getElementById('info-title').innerText = ex.name;
-            if (currentWorkoutId) renderWorkout(currentWorkoutId);
-            renderLibrary(ex.category);
-            showMessage("Nome aggiornato!");
-        }
-
-        function openLibrary(index, cat) { swappingIndex = index; renderLibrary(cat); document.getElementById('modal-library').style.display = 'flex'; }
-        function renderLibrary(filter) {
-            const cats = [...new Set(Object.values(exerciseData).map(e => e.category))].sort(); const activeCat = filter || cats[0];
-            document.getElementById('library-categories').innerHTML = cats.map(c => `<button onclick="renderLibrary('${c}')" class="px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${activeCat === c ? 'bg-blue-600 text-white' : 'bg-[#2C2C2E] text-gray-400'}">${c}</button>`).join('');
-            renderLibraryList(activeCat);
-        }
-        function renderLibraryList(cat) {
-            const list = document.getElementById('library-list'); const items = userPlan[currentWorkoutId] ? userPlan[currentWorkoutId].items || [] : [];
-            list.innerHTML = Object.entries(exerciseData).filter(([id, data]) => data.category === cat).map(([id, ex]) => {
-                const isCardio = cat === 'aerobica';
-                return `<div onclick="processSelection('${id}')" class="bg-[#1C1C1E] p-4 rounded-2xl flex items-center gap-4 border border-white/5 active:bg-[#2C2C2E] cursor-pointer transition-colors shadow-md">
-                    <div class="img-thumb bg-[#2C2C2E] relative overflow-hidden flex items-center justify-center">
-                        <i data-lucide="dumbbell" class="w-6 h-6 text-white/20 absolute z-0"></i>
-                        <img src="${ex.img}" loading="lazy" decoding="async" onerror="this.style.display='none'" class="w-full h-full object-cover relative z-10 transition-opacity">
-                    </div>
-                    <div class="flex-1 text-left">
-                        <h4 class="font-bold text-[16px] text-white leading-tight">${ex.name}</h4>
-                        <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mt-1">${isCardio ? 'CARDIO' : `${ex.sets}x${ex.reps}`}${ex.isBW ? ' • CORPO LIBERO' : ''}</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div class="w-10 h-10 flex items-center justify-center rounded-full ${items.includes(id) ? 'bg-orange-500/10 border border-orange-500/20' : 'bg-blue-500/10 border border-blue-500/20'}">
-                            <i data-lucide="${items.includes(id) ? 'check' : 'plus'}" class="${items.includes(id) ? 'text-orange-500' : 'text-blue-500'} w-5 h-5"></i>
-                        </div>
-                        <button onclick="deleteExerciseFromLibrary(event, '${id}', '${cat}')" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500/30 active:scale-90 transition-transform">
-                            <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
-                        </button>
-                    </div>
-                </div>`;
-            }).join(''); lucide.createIcons();
-        }
-
-        function deleteExerciseFromLibrary(e, exId, cat) {
-            e.stopPropagation();
-            openConfirm("Elimina Esercizio", "Vuoi rimuovere questo esercizio dal catalogo?", () => {
-                if (exId.startsWith('c_')) {
-                    const customDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-                    delete customDb[exId];
-                    localStorage.setItem('custom_exercises_v5', JSON.stringify(customDb));
-                } else {
-                    const deletedExDb = JSON.parse(localStorage.getItem('deleted_exercises_v5')) || [];
-                    if (!deletedExDb.includes(exId)) deletedExDb.push(exId);
-                    localStorage.setItem('deleted_exercises_v5', JSON.stringify(deletedExDb));
-                }
-                delete exerciseData[exId];
-                renderLibrary(cat);
-                showMessage("Esercizio rimosso dal catalogo.");
-                if (currentWorkoutId) renderWorkout(currentWorkoutId);
-            });
-        }
-
-        function processSelection(newId) { if (!userPlan[currentWorkoutId].items) userPlan[currentWorkoutId].items = []; if (userPlan[currentWorkoutId].items.includes(newId)) { showMessage("Esercizio già in scheda!"); return; } if (swappingIndex === null) userPlan[currentWorkoutId].items.push(newId); else { userPlan[currentWorkoutId].items[swappingIndex] = newId; if(userPlan[currentWorkoutId].overrides) delete userPlan[currentWorkoutId].overrides[swappingIndex]; } localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeLibrary(); renderWorkout(currentWorkoutId); }
-        function closeLibrary() { document.getElementById('modal-library').style.display = 'none'; }
-        function openAddMenu() { swappingIndex = null; renderLibrary('aerobica'); document.getElementById('modal-library').style.display = 'flex'; }
-
-        function openInfo(exId) {
-            const ex = exerciseData[exId]; if (!ex) return;
-            const modal = document.getElementById('modal-info'); const content = document.getElementById('info-content'); 
-            document.getElementById('info-title').innerText = ex.name;
-            
-            document.getElementById('btn-rename-ex').onclick = () => renameExercise(exId);
-            
-            const esecuzione = ex.coach?.esecuzione || "Nessuna istruzione registrata.";
-            const suggerimenti = ex.coach?.target || `Distretto: ${ex.category}.`;
-            const tempo = ex.coach?.tempo || "Controllato.";
-            
-            let customActions = '';
-            if (exId.startsWith('c_')) {
-                customActions = `
-                <div class="grid grid-cols-2 gap-3 mt-4">
-                    <button onclick="regenerateCoachAI('${exId}')" class="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i> Guida Coach AI
-                    </button>
-                    <button onclick="triggerPhotoUploadForExisting('${exId}')" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 transition-all active:scale-95">
-                        <i data-lucide="camera" class="w-4 h-4"></i> Carica Foto
-                    </button>
-                </div>
-                <button onclick="copyPromptNanobanana('${exId}')" class="w-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-2 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copia Prompt per Nanobanana
-                </button>`;
-            }
-
-            content.innerHTML = `
-            <div class="space-y-4">
-                <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
-                    <h4 class="text-blue-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> Distretto Muscolare</h4>
-                    <p class="text-sm font-bold text-white uppercase">${ex.category}</p>
-                </div>
-                <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
-                    <h4 class="text-emerald-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Esecuzione Tecnica</h4>
-                    <p class="text-sm leading-relaxed text-gray-300 whitespace-pre-line">${esecuzione}</p>
-                </div>
-                <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
-                    <h4 class="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> Focus & Tempo</h4>
-                    <p class="text-sm leading-relaxed text-gray-300 mb-2">${suggerimenti}</p>
-                    <p class="text-xs font-bold text-gray-400 mt-2 flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 inline"></i> ${tempo}</p>
-                </div>
-                ${customActions}
-            </div>`;
-            modal.style.display = 'flex'; lucide.createIcons();
-        }
-        function closeInfo() { document.getElementById('modal-info').style.display = 'none'; }
-
-        function showChart(id, name) {
-            document.getElementById('chart-modal').style.display = 'flex'; document.getElementById('chart-title').innerText = name;
-            const isCardio = exerciseData[id].category === 'aerobica';
-            document.getElementById('chart-subtitle-session').innerHTML = `<i data-lucide="activity" class="w-3.5 h-3.5 text-orange-500"></i> ${isCardio ? 'Ultimo Allenamento' : 'Ultima Sessione (Fatica)'}`;
-            document.getElementById('chart-subtitle-history').innerHTML = `<i data-lucide="trending-up" class="w-3.5 h-3.5 text-blue-500"></i> ${isCardio ? 'Storico (Tempo e Distanza)' : 'Storico (Forza e Volume)'}`;
-            lucide.createIcons();
-            
-            if (sessionChart) sessionChart.destroy(); if (historyChart) historyChart.destroy();
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; const dates = Object.keys(journal).sort((a,b) => new Date(a) - new Date(b));
-            let historicalData = []; let lastSessionSets = [];
-
-            dates.forEach(date => {
-                const entry = journal[date];
-                if (entry.exercises && entry.exercises[id]) {
-                    const sets = entry.exercises[id].filter(s => s.r !== null && s.r > 0);
-                    if (sets.length > 0) {
-                        if (isCardio) { historicalData.push({ date: date.split('-').reverse().join('/').substring(0, 5), dist: parseFloat(sets[0].w) || 0, time: parseInt(sets[0].r) || 0 }); } 
-                        else { let vol = 0; let top1RM = 0; sets.forEach(s => { if(!s.isDrop) { const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0; vol += (w * r); const est1RM = w > 0 ? w * (1 + r/30) : r; if (est1RM > top1RM) top1RM = est1RM; } }); historicalData.push({ date: date.split('-').reverse().join('/').substring(0, 5), volume: vol, top1RM: Math.round(top1RM), isBW: sets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0) }); }
-                        lastSessionSets = sets;
-                    }
-                }
-            });
-
-            let activeSets = (activeSession[id] || []).filter(s => s.r !== null && s.r > 0);
-            if (activeSets.length > 0) {
-                lastSessionSets = activeSets;
-                if (isCardio) { historicalData.push({ date: 'Oggi', dist: parseFloat(activeSets[0].w) || 0, time: parseInt(activeSets[0].r) || 0 }); } 
-                else { let vol = 0; let top1RM = 0; activeSets.forEach(s => { if(!s.isDrop) { const w = parseFloat(s.w) || 0; const r = parseInt(s.r) || 0; vol += (w * r); const est1RM = w > 0 ? w * (1 + r/30) : r; if (est1RM > top1RM) top1RM = est1RM; } }); historicalData.push({ date: 'Oggi', volume: vol, top1RM: Math.round(top1RM), isBW: activeSets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0) }); }
-            }
-
-            if (isCardio) { document.getElementById('chart-container-session').style.display = 'none'; } 
-            else {
-                document.getElementById('chart-container-session').style.display = 'block';
-                if (lastSessionSets.length > 0) {
-                    const isBW = lastSessionSets.every(s => !parseFloat(s.w) || parseFloat(s.w) === 0);
-                    const sData = lastSessionSets.map(s => isBW ? parseInt(s.r) : parseFloat(s.w)); const sReps = lastSessionSets.map(s => parseInt(s.r));
-                    sessionChart = new Chart(document.getElementById('sessionChart').getContext('2d'), { type: 'line', data: { labels: lastSessionSets.map((_, i) => `Set ${i+1}`), datasets: [{ label: isBW ? 'Reps' : 'Carico (Kg)', data: sData, borderColor: '#FF9500', backgroundColor: 'rgba(255, 149, 0, 0.1)', fill: true, tension: 0.3, pointBackgroundColor: '#FF9500', pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { afterLabel: (ctx) => isBW ? '' : `Ripetizioni: ${sReps[ctx.dataIndex]}` } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93' } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } } } });
-                }
-            }
-
-            if (historicalData.length > 0) {
-                let datasets = []; let y1Title = ''; let y2Title = '';
-                if (isCardio) { datasets = [ { type: 'line', label: 'Distanza / Livello', data: historicalData.map(d => d.dist), borderColor: '#0A84FF', tension: 0.3, yAxisID: 'y', pointRadius: 4 }, { type: 'bar', label: 'Tempo (Min)', data: historicalData.map(d => d.time), backgroundColor: 'rgba(255, 149, 0, 0.3)', borderRadius: 4, yAxisID: 'y1' } ]; y1Title = 'Km/Livello'; y2Title = 'Minuti'; } 
-                else { const isHistoryBW = historicalData.every(d => d.isBW); datasets = [ { type: 'line', label: isHistoryBW ? 'Max Reps' : 'Forza Max (1RM Stimato)', data: historicalData.map(d => d.top1RM), borderColor: '#0A84FF', tension: 0.3, yAxisID: 'y', pointRadius: 4 }, { type: 'bar', label: isHistoryBW ? 'Totale Reps' : 'Volume Tot. (Kg)', data: historicalData.map(d => d.volume), backgroundColor: 'rgba(52, 199, 89, 0.2)', borderRadius: 4, yAxisID: 'y1' } ]; y1Title = 'Forza'; y2Title = 'Volume'; }
-                historyChart = new Chart(document.getElementById('historyChart').getContext('2d'), { type: 'line', data: { labels: historicalData.map(d => d.date), datasets: datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', labels: { color: '#8E8E93', boxWidth: 10, font: {size: 10} } } }, scales: { y: { type: 'linear', display: true, position: 'left', grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#0A84FF' }, title: { display: true, text: y1Title, color: '#0A84FF', font: {size: 9} } }, y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: isCardio ? '#FF9500' : '#34C759' }, title: { display: true, text: y2Title, color: isCardio ? '#FF9500' : '#34C759', font: {size: 9} } }, x: { grid: { display: false }, ticks: { color: '#8E8E93' } } } } });
-            }
-        }
-        function closeChart() { document.getElementById('chart-modal').style.display = 'none'; }
-        
-        async function exportData() { 
-            let dump = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                let key = localStorage.key(i);
-                dump[key] = localStorage.getItem(key);
-            }
-            const dataStr = JSON.stringify(dump); 
-            const blob = new Blob([dataStr], {type: "application/json"}); 
-            const file = new File([blob], "powerlog_backup.json", {type: "application/json"});
-            if (navigator.canShare && navigator.canShare({ files: [file] })) { 
-                try { await navigator.share({ files: [file], title: 'Backup PowerLog', text: 'Backup.' }); } 
-                catch (e) { console.log("Condivisione annullata.", e); } 
-            } else { 
-                const dl = document.createElement('a'); dl.href = URL.createObjectURL(blob); dl.download = "powerlog_backup.json"; dl.click(); 
-            }
-        }
-
-        function importData(e) { 
-            const r = new FileReader(); 
-            r.onload = (ev) => { 
-                try {
-                    const d = JSON.parse(ev.target.result); 
-                    Object.keys(d).forEach(k => localStorage.setItem(k, d[k])); 
-                    location.reload(); 
-                } catch(err) { alert("Il file non è valido o è corrotto."); }
-            }; 
-            r.readAsText(e.target.files[0]); 
-        }
-
-        function resetAllData() { openConfirm("Attenzione!", "Cancellare tutto lo storico e i programmi salvati?", () => { localStorage.clear(); location.reload(); }); }
-
-        function openCalendar() { switchView('calendar'); renderCalendarGrid(); updateCalendarStats(); showDayDetails(selectedDateStr, false); }
-        
-        function changeMonth(dir) {
-            calendarDate.setDate(1); 
-            calendarDate.setMonth(calendarDate.getMonth() + dir);
-            const y = calendarDate.getFullYear();
-            const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
-            selectedDateStr = `${y}-${m}-01`;
-            renderCalendarGrid();
-            updateCalendarStats();
-            showDayDetails(selectedDateStr, false); 
-        }
-
-        function renderDashboardCharts() {
-            const cats = ['volume', 'petto', 'dorso', 'spalle', 'gambe', 'bicipiti', 'tricipiti'];
-            const entries = Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).sort((a,b) => new Date(a[0]) - new Date(b[0])).slice(-10);
-            cats.forEach(cat => {
-                const canvas = document.getElementById(`chart-${cat}`); if (!canvas) return;
-                if (homeCharts[cat]) homeCharts[cat].destroy();
-                let pts = entries.map(e => {
-                    if (cat === 'volume') return e[1].volume || 0;
-                    let sum = 0; Object.entries(e[1].exercises || {}).forEach(([id, logs]) => { if (exerciseData[id]?.category === cat) { logs.forEach(l => sum += ((l.w||0) * (l.r||0))); } });
-                    return sum;
-                });
-                if (pts.length < 5) while(pts.length < 5) pts.unshift(0);
-                homeCharts[cat] = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: pts.map((_,i)=>i), datasets: [{ data: pts, borderColor: '#0A84FF', borderWidth: 2.5, pointRadius: 0, tension: 0.4, spanGaps: true }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { display: false } }, plugins: { legend: { display: false } } } });
-            });
-
-            const radarCanvas = document.getElementById('chart-radar');
-            if (!radarCanvas) return;
-            if (radarChart) radarChart.destroy();
-            
-            const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            let radarData = { petto: 0, dorso: 0, gambe: 0, spalle: 0, bicipiti: 0, tricipiti: 0 };
-            let totalVol = 0;
-            
-            Object.entries(JSON.parse(localStorage.getItem('workout_journal')) || {}).forEach(([dateStr, entry]) => {
-                if (new Date(dateStr) >= thirtyDaysAgo) {
-                    Object.entries(entry.exercises || {}).forEach(([exId, logs]) => {
-                        const c = exerciseData[exId]?.category;
-                        if (radarData[c] !== undefined) { 
-                            logs.forEach(l => { let vol = ((l.w||0) * (l.r||0)); radarData[c] += vol; totalVol += vol; }); 
-                        }
-                    });
-                }
-            });
-
-            let radarDataPct = [0,0,0,0,0,0];
-            if (totalVol > 0) {
-                radarDataPct = [ (radarData.petto / totalVol * 100).toFixed(1), (radarData.dorso / totalVol * 100).toFixed(1), (radarData.gambe / totalVol * 100).toFixed(1), (radarData.spalle / totalVol * 100).toFixed(1), (radarData.bicipiti / totalVol * 100).toFixed(1), (radarData.tricipiti / totalVol * 100).toFixed(1) ];
-            }
-
-            radarChart = new Chart(radarCanvas.getContext('2d'), { type: 'radar', data: { labels: ['Petto', 'Dorso', 'Gambe', 'Spalle', 'Bicipiti', 'Tricipiti'], datasets: [{ label: 'Distribuzione %', data: radarDataPct, backgroundColor: 'rgba(10, 132, 255, 0.2)', borderColor: '#0A84FF', pointBackgroundColor: '#0A84FF', pointBorderColor: '#fff', pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#0A84FF' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: '#8E8E93', font: {family: 'Inter', size: 10, weight: 'bold'} }, ticks: { display: false } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.raw + '%'; } } } } } });
-        }
-
-        function saveBiometrics() {
-            const data = {
-                date: getLocalYYYYMMDD(),
-                height: parseFloat(document.getElementById('bio-height').value) || null, weight: parseFloat(document.getElementById('bio-weight').value) || null,
-                lean: parseFloat(document.getElementById('bio-lean').value) || null, fat: parseFloat(document.getElementById('bio-fat').value) || null,
-                shoulders: parseFloat(document.getElementById('bio-shoulders').value) || null, chest: parseFloat(document.getElementById('bio-chest').value) || null,
-                waist: parseFloat(document.getElementById('bio-waist').value) || null, 
-                arm_sx: parseFloat(document.getElementById('bio-arm-sx').value) || null, arm_dx: parseFloat(document.getElementById('bio-arm-dx').value) || null,
-                leg_sx: parseFloat(document.getElementById('bio-leg-sx').value) || null, leg_dx: parseFloat(document.getElementById('bio-leg-dx').value) || null,
-                calf_sx: parseFloat(document.getElementById('bio-calf-sx').value) || null, calf_dx: parseFloat(document.getElementById('bio-calf-dx').value) || null
-            };
-            if(!data.weight && !data.waist && !data.arm_sx && !data.shoulders && !data.chest) { showMessage("Inserisci almeno un dato."); return; }
-            const existingIndex = biometricsHistory.findIndex(b => b.date === data.date);
-            if (existingIndex !== -1) { biometricsHistory[existingIndex] = { ...biometricsHistory[existingIndex], ...Object.fromEntries(Object.entries(data).filter(([_, v]) => v != null)) }; } 
-            else { biometricsHistory.push(data); }
-            biometricsHistory.sort((a,b) => new Date(a.date) - new Date(b.date));
-            localStorage.setItem('biometrics_history', JSON.stringify(biometricsHistory));
-            document.querySelectorAll('#view-body input').forEach(i => i.value = '');
-            showMessage("Misurazioni Salvate!"); renderBodyStats();
-        }
-
-        function renderBodyStats() {
-            if (biometricsHistory.length === 0) return;
-            const latest = biometricsHistory[biometricsHistory.length - 1]; const previous = biometricsHistory.length > 1 ? biometricsHistory[biometricsHistory.length - 2] : null;
-            const getRatio = (entry) => { if (!entry || !entry.waist) return null; const upper = entry.shoulders || entry.chest; return upper ? (upper / entry.waist) : null; };
-            let currentRatio = getRatio(latest); let previousRatio = getRatio(previous);
-
-            const statusEl = document.getElementById('vshape-status'); const subtextEl = document.getElementById('vshape-subtext');
-            const iconEl = document.getElementById('vshape-icon'); const iconContainer = document.getElementById('vshape-icon-container');
-
-            if (currentRatio) {
-                let statusText = "In Costruzione"; let iconName = "activity"; let colorClass = "text-blue-500"; let bgClass = "bg-blue-500/20 border-blue-500/30";
-                if (currentRatio >= 1.6) { statusText = "V-Shape Eccellente"; iconName = "triangle"; colorClass = "text-yellow-400"; bgClass = "bg-yellow-400/20 border-yellow-400/30"; iconEl.classList.add("rotate-180"); } 
-                else if (currentRatio >= 1.4) { statusText = "Ottimo V-Shape"; iconName = "trending-up"; colorClass = "text-emerald-400"; bgClass = "bg-emerald-400/20 border-emerald-400/30"; iconEl.classList.remove("rotate-180"); }
-                let subText = `Rapporto Upper/Vita: ${currentRatio.toFixed(2)}`;
-                if (previousRatio) { if (currentRatio > previousRatio) subText += " (In Crescita )"; else if (currentRatio < previousRatio) subText += " (In Calo )"; }
-                statusEl.innerText = statusText; subtextEl.innerText = subText;
-                iconEl.setAttribute('data-lucide', iconName); iconEl.className = `w-7 h-7 ${colorClass}`; iconContainer.className = `w-14 h-14 rounded-full flex items-center justify-center border ${bgClass}`;
-            } else { statusEl.innerText = "Dati Insufficienti"; subtextEl.innerText = "Inserisci spalle/petto e vita per l'analisi"; }
-            lucide.createIcons();
-
-            const canvas = document.getElementById('chart-body-measurements');
-            if(bodyChart) bodyChart.destroy();
-            const labels = biometricsHistory.map(b => b.date.substring(5)); 
-            const dataShoulders = biometricsHistory.map(b => b.shoulders || null); const dataChest = biometricsHistory.map(b => b.chest || null); const dataWaist = biometricsHistory.map(b => b.waist || null);
-
-            bodyChart = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels: labels, datasets: [ { label: 'Spalle', data: dataShoulders, borderColor: '#0A84FF', backgroundColor: '#0A84FF', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Petto', data: dataChest, borderColor: '#AF52DE', backgroundColor: '#AF52DE', tension: 0.3, spanGaps: true, borderWidth: 3 }, { label: 'Vita', data: dataWaist, borderColor: '#34C759', backgroundColor: '#34C759', tension: 0.3, spanGaps: true, borderWidth: 3 } ] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'bottom', labels: { color: '#8E8E93', boxWidth: 10, font: {family: 'Inter', weight:'bold'} } } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {family: 'Inter'} } } } } });
-        }
-
-        function renderRecoveryHeatmap() {
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-            const dates = Object.keys(journal).sort((a, b) => new Date(b) - new Date(a));
-            
-            const lastTrained = { petto: Infinity, dorso: Infinity, spalle: Infinity, gambe: Infinity, bicipiti: Infinity, tricipiti: Infinity, core: Infinity };
-            const today = new Date(); today.setHours(0, 0, 0, 0);
-
-            dates.forEach(dateStr => {
-                const entryDate = new Date(dateStr); entryDate.setHours(0, 0, 0, 0);
-                const diffTime = Math.abs(today - entryDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 *
+                                    <button onclick="openLogModal('${exId}',${sets}, '${reps}')" class="flex-1 ${isCardio ? 'bg-orange-600 hover:bg-orange-500' : 'bg-blue-600 hover:bg-blue-500'} text-white rounded-xl py-3.5 font-black text-sm tracking-widest shadow-lg transition
