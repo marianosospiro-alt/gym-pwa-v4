@@ -73,9 +73,6 @@
         @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(175, 82, 222, 0.3); } 50% { box-shadow: 0 0 25px rgba(175, 82, 222, 0.8); } 100% { box-shadow: 0 0 10px rgba(175, 82, 222, 0.3); } }
         .ds-btn { transition: all 0.2s; }
         .ds-btn.active { background-color: rgba(255, 59, 48, 0.15); color: #FF3B30; border-color: rgba(255, 59, 48, 0.4); }
-        
-        /* Regole fisse di sicurezza per overlay */
-        #modal-hiit-timer, #ai-loading-overlay { display: none; }
     </style>
 </head>
 <body class="pt-safe">
@@ -85,7 +82,7 @@
     <input type="file" id="global-photo-input" accept="image/*" class="hidden">
 
     <!-- Loading AI -->
-    <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] flex-col items-center justify-center text-center" style="display: none;">
+    <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex-col items-center justify-center text-center">
         <div class="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center ai-glow border border-purple-500/50 mb-6">
             <i data-lucide="sparkles" class="w-10 h-10 text-purple-400 animate-pulse"></i>
         </div>
@@ -94,7 +91,7 @@
     </div>
 
     <!-- OVERLAY TIMER HIIT A SCHERMO INTERO -->
-    <div id="modal-hiit-timer" class="fixed inset-0 bg-black z-[300] flex-col justify-between p-6 select-none" style="display: none;">
+    <div id="modal-hiit-timer" class="fixed inset-0 bg-black z-[300] hidden flex-col justify-between p-6 select-none">
         <div class="flex justify-between items-center pt-safe">
             <span id="hiit-round-badge" class="bg-white/10 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-widest text-gray-300">
                 Esercizio 1 di 5
@@ -168,7 +165,7 @@
             <section id="archived-cards-container" class="space-y-5 mt-4 hidden"></section>
         </div>
 
-        <!-- VISTA WORKOUT -->
+        <!-- VISTA WORKOUT (HEADER SINGOLO PULITO) -->
         <div id="view-workout" class="view hidden pb-40">
             <header class="p-4 pt-safe glass flex justify-between items-center sticky top-0 z-50 border-b border-white/5">
                 <button onclick="goHome()" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-white active:scale-95 transition-transform">
@@ -634,6 +631,14 @@
     </div>
 
     <script>
+        function safeCreateIcons() {
+            try {
+                if (window.lucide && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+            } catch(e) {}
+        }
+
         const exerciseData = {
             'corsa': { name: 'Corsa / Tapis Roulant', sets: '1', reps: '30m', img: 'img/corsa.png', category: 'aerobica', coach: { esecuzione: "Mantieni una postura eretta, sguardo dritto. Non aggrapparti ai corrimano del tapis roulant.", target: "Sistema cardiovascolare, resistenza e consumo calorico.", tempo: "Andatura costante o interval training (HIIT)" } },
             'spin_bike': { name: 'Spin Bike / Cyclette', sets: '1', reps: '30m', img: 'img/spin_bike.png', category: 'aerobica', coach: { esecuzione: "Regola il sellino ad altezza anca. Mantieni una pedalata fluida e rotonda, spingendo e 'tirando' i pedali.", target: "Flessori dell'anca, quadricipiti e sistema cardiovascolare. Ottimo a basso impatto articolare.", tempo: "RPM costante tra 70 e 90" } },
@@ -745,17 +750,17 @@
             'row_wide_cavi': { name: 'Pulley Presa Larga', sets: '3', reps: '10-12', img: 'img/row_wide_cavi.png', category: 'dorso', coach: { esecuzione: "Barra dritta al pulley basso. Tira allo sterno allargando i gomiti a 90°.", target: "Deltoidi posteriori e muscoli interscapolari.", tempo: "1s tirata, 1s pausa, 2s ritorno" } }
         };
 
-        try {
-            const customExDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
-            Object.assign(exerciseData, customExDb);
-            const renamedExDb = JSON.parse(localStorage.getItem('renamed_exercises_v5')) || {};
-            Object.keys(renamedExDb).forEach(id => {
-                if (exerciseData[id]) exerciseData[id].name = renamedExDb[id];
-            });
-            const deletedExDb = JSON.parse(localStorage.getItem('deleted_exercises_v5')) || [];
+        const customExDb = JSON.parse(localStorage.getItem('custom_exercises_v5')) || {};
+        Object.assign(exerciseData, customExDb);
+        
+        const renamedExDb = JSON.parse(localStorage.getItem('renamed_exercises_v5')) || {};
+        Object.keys(renamedExDb).forEach(id => {
+            if (exerciseData[id]) exerciseData[id].name = renamedExDb[id];
+        });
+
+        const deletedExDb = JSON.parse(localStorage.getItem('deleted_exercises_v5')) || [];
+        if (Array.isArray(deletedExDb)) {
             deletedExDb.forEach(id => { delete exerciseData[id]; });
-        } catch(e) {
-            console.error("Errore lettura database personalizzati", e);
         }
 
         const defaultPlan = {
@@ -763,7 +768,7 @@
             2: { title: 'PULL (Forza)', color: '#AF52DE', goal: 'massa', items: ['trazioni_supine', 'tbar_row', 'pullover_cavi', 'alzate_90', 'curl_ez', 'hammer_curl', 'hanging_leg'], overrides: { 3: { isDropSet: true } } },
             3: { title: 'LEGS (Volume)', color: '#34C759', goal: 'ipertrofia', items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'leg_curl', 'polpacci'], overrides: { 4: { isDropSet: true }, 5: { isDropSet: true } } },
             4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', goal: 'ipertrofia', items: ['chest_press_g1', 'pec_deck', 'lat_larga', 'crossover', 'alzate_cavi', 'curl_cavi', 'pushdown_corda'], overrides: { 4: { isDropSet: true } } },
-            5: { title: 'HIIT BRUCIACALORIE (5 Min)', color: '#FF3B30', goal: 'ipertrofia', isHIIT: true, items: ['jumping_jacks', 'mountain_climbers', 'pop_squat', 'high_knee_claps', 'alt_front_kicks'], overrides: {} }
+            'hiit': { title: 'HIIT BRUCIACALORIE (5 Min)', color: '#FF3B30', goal: 'ipertrofia', isHIIT: true, items: ['jumping_jacks', 'mountain_climbers', 'pop_squat', 'high_knee_claps', 'alt_front_kicks'], overrides: {} }
         };
 
         function getLocalYYYYMMDD() {
@@ -774,34 +779,23 @@
             return `${year}-${month}-${day}`;
         }
 
-        let userPlan = defaultPlan;
+        let userPlan = {};
         try {
-            const saved = localStorage.getItem('user_workout_plan_v5');
-            if (saved) {
-                userPlan = JSON.parse(saved);
-            }
+            userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v5')) || defaultPlan;
+            if (typeof userPlan !== 'object' || userPlan === null) userPlan = defaultPlan;
         } catch(e) {
             userPlan = defaultPlan;
         }
 
-        // Auto-migrazione difensiva per la scheda HIIT
-        try {
-            let hasHIIT = false;
-            if (userPlan && typeof userPlan === 'object') {
-                Object.values(userPlan).forEach(p => {
-                    if (p && (p.isHIIT || (p.title && p.title.includes('HIIT')))) hasHIIT = true;
-                });
-                if (!hasHIIT) {
-                    userPlan[5] = defaultPlan[5];
-                    localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
-                }
-            }
-        } catch(e) {
-            console.warn("Errore auto-migrazione HIIT:", e);
+        // Aggiunge la scheda HIIT se non ancora presente
+        if (!userPlan['hiit'] && !Object.values(userPlan).some(p => p && p.isHIIT)) {
+            userPlan['hiit'] = defaultPlan['hiit'];
+            try { localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); } catch(e){}
         }
 
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v5')) || {};
         let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || [];
+        if (!Array.isArray(biometricsHistory)) biometricsHistory = [];
         let selectedDateStr = getLocalYYYYMMDD();
         
         let homeCharts = {}; let bodyChart = null; let chartKcalTrend = null; let workoutSortable = null; let radarChart = null;
@@ -816,7 +810,7 @@
         let hiitTimerId = null;
         let hiitTimeRemaining = 20;
         let hiitCurrentIndex = 0;
-        let hiitState = 'PREPARE'; // 'PREPARE' (20s) | 'WORK' (20s) | 'REST' (10s)
+        let hiitState = 'PREPARE';
         let hiitIsPaused = false;
         let hiitAudioCtx = null;
         let hiitExercises = [];
@@ -848,6 +842,7 @@
             const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
             if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
             
+            // 1. Chiamata primaria su gemini-3.8-flash via Interactions API
             try {
                 const url = `[https://generativelanguage.googleapis.com/v1beta/interactions?key=$](https://generativelanguage.googleapis.com/v1beta/interactions?key=$){apiKey}`;
                 const reqBody = { model: "gemini-3.8-flash", input: promptText };
@@ -864,10 +859,9 @@
                     const text = data.output_text || data.outputs?.[0]?.text || data.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (text) return text;
                 }
-            } catch (err) {
-                console.warn("Interactions API 3.8 fallback...", err);
-            }
+            } catch (err) {}
 
+            // 2. Fallback su generateContent
             const fallbackModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
             let lastErr = null;
 
@@ -971,17 +965,17 @@
             e.target.value = '';
         });
 
-        // ==========================================
         // MOTORE TIMER HIIT CON AUDIO SINTETICO
-        // ==========================================
         function playHIITBeep(isHigh = false) {
             try {
                 if (!hiitAudioCtx) {
-                    hiitAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) hiitAudioCtx = new AudioCtx();
                 }
-                if (hiitAudioCtx.state === 'suspended') {
+                if (hiitAudioCtx && hiitAudioCtx.state === 'suspended') {
                     hiitAudioCtx.resume();
                 }
+                if (!hiitAudioCtx) return;
                 const osc = hiitAudioCtx.createOscillator();
                 const gain = hiitAudioCtx.createGain();
                 osc.type = 'sine';
@@ -992,15 +986,16 @@
                 gain.connect(hiitAudioCtx.destination);
                 osc.start();
                 osc.stop(hiitAudioCtx.currentTime + (isHigh ? 0.35 : 0.15));
-            } catch(e) {
-                console.warn("Audio non disponibile", e);
-            }
+            } catch(e) {}
         }
 
         function startHIITCircuit() {
             try {
-                if (!hiitAudioCtx) hiitAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (hiitAudioCtx.state === 'suspended') hiitAudioCtx.resume();
+                if (!hiitAudioCtx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) hiitAudioCtx = new AudioCtx();
+                }
+                if (hiitAudioCtx && hiitAudioCtx.state === 'suspended') hiitAudioCtx.resume();
             } catch(e) {}
 
             const plan = userPlan[currentWorkoutId];
@@ -1031,7 +1026,7 @@
             
             updateHIITUI();
             startHIITInterval();
-            if (window.lucide) lucide.createIcons();
+            safeCreateIcons();
         }
 
         function startHIITInterval() {
@@ -1086,7 +1081,7 @@
             countdownEl.innerText = hiitTimeRemaining;
             roundBadge.innerText = `Esercizio ${hiitCurrentIndex + 1} di ${hiitExercises.length}`;
 
-            const currentEx = hiitExercises[hiitCurrentIndex];
+            const currentEx = hiitExercises[hiitCurrentIndex] || { name: 'Esercizio' };
             const nextEx = hiitExercises[hiitCurrentIndex + 1];
 
             if (hiitState === 'PREPARE') {
@@ -1177,7 +1172,7 @@
         }
 
         let confirmCallback = null;
-        function openConfirm(title, msg, callback) { document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-msg').innerText = msg; confirmCallback = callback; document.getElementById('modal-confirm').style.display = 'flex'; if (window.lucide) lucide.createIcons(); }
+        function openConfirm(title, msg, callback) { document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-msg').innerText = msg; confirmCallback = callback; document.getElementById('modal-confirm').style.display = 'flex'; safeCreateIcons(); }
         function closeConfirm() { document.getElementById('modal-confirm').style.display = 'none'; confirmCallback = null; }
         document.getElementById('confirm-btn').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirm(); };
 
@@ -1186,10 +1181,10 @@
         function openProgramModal(id = null) {
             editingProgramId = id; document.getElementById('modal-program').style.display = 'flex'; 
             const actionRow = document.getElementById('prog-actions-row');
-            if (id) { 
+            if (id && userPlan[id]) { 
                 document.getElementById('modal-prog-title').innerText = "Modifica Programma"; 
                 document.getElementById('prog-name').value = userPlan[id].title; 
-                selectedProgColor = userPlan[id].color; 
+                selectedProgColor = userPlan[id].color || '#0A84FF'; 
                 document.getElementById('prog-goal').value = userPlan[id].goal || 'ipertrofia';
                 actionRow.style.display = 'flex'; 
                 const archiveBtn = document.getElementById('btn-archive-prog');
@@ -1208,7 +1203,7 @@
                 actionRow.style.display = 'none'; 
             }
             document.querySelectorAll('.color-dot').forEach(el => { if (el.getAttribute('data-color') === selectedProgColor) el.classList.add('selected'); else el.classList.remove('selected'); });
-            if (window.lucide) lucide.createIcons();
+            safeCreateIcons();
         }
         function closeProgramModal() { document.getElementById('modal-program').style.display = 'none'; }
         function selectColor(el) { document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); selectedProgColor = el.getAttribute('data-color'); }
@@ -1217,7 +1212,7 @@
             const title = document.getElementById('prog-name').value.trim(); 
             const goal = document.getElementById('prog-goal').value;
             if (!title) { showMessage("Inserisci un nome!"); return; }
-            if (editingProgramId) { 
+            if (editingProgramId && userPlan[editingProgramId]) { 
                 userPlan[editingProgramId].title = title; 
                 userPlan[editingProgramId].color = selectedProgColor; 
                 userPlan[editingProgramId].goal = goal;
@@ -1232,7 +1227,7 @@
         function deleteProgram() { openConfirm("Elimina", "Eliminare questa intera scheda?", () => { delete userPlan[editingProgramId]; localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); closeProgramModal(); goHome(); }); }
 
         function cloneProgram() {
-            if (!editingProgramId) return;
+            if (!editingProgramId || !userPlan[editingProgramId]) return;
             const source = userPlan[editingProgramId];
             const newId = 'CLONE_' + Date.now().toString();
             const clonedPlan = JSON.parse(JSON.stringify(source));
@@ -1246,7 +1241,7 @@
         }
 
         function toggleArchiveProgram() {
-            if (!editingProgramId) return;
+            if (!editingProgramId || !userPlan[editingProgramId]) return;
             const isArchived = userPlan[editingProgramId].archived || false;
             userPlan[editingProgramId].archived = !isArchived;
             localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
@@ -1257,7 +1252,7 @@
 
         function openEditParams(idx) {
             editingIdx = idx; const exId = userPlan[currentWorkoutId].items[idx]; const override = userPlan[currentWorkoutId].overrides[idx] || {};
-            document.getElementById('edit-sets').value = override.sets || exerciseData[exId].sets; document.getElementById('edit-reps').value = override.reps || exerciseData[exId].reps; 
+            document.getElementById('edit-sets').value = override.sets || exerciseData[exId]?.sets || '3'; document.getElementById('edit-reps').value = override.reps || exerciseData[exId]?.reps || '10'; 
             tempDropSet = override.isDropSet || false; tempSuperset = override.isSuperset || false;
             updateLocalToggleUI(); document.getElementById('modal-edit-params').style.display = 'flex';
         }
@@ -1265,7 +1260,7 @@
         function toggleSupersetLocal() { tempSuperset = !tempSuperset; updateLocalToggleUI(); }
         function updateLocalToggleUI() {
             const btnDrop = document.getElementById('toggle-drop'); btnDrop.innerText = `DROP SET: ${tempDropSet ? 'ATTIVO' : 'OFF'}`; btnDrop.style.backgroundColor = tempDropSet ? 'rgba(255, 59, 48, 0.15)' : 'transparent'; btnDrop.style.borderColor = tempDropSet ? 'rgba(255, 59, 48, 0.3)' : 'rgba(255,255,255,0.1)'; btnDrop.style.color = tempDropSet ? '#FF3B30' : 'white';
-            const btnSuper = document.getElementById('toggle-superset'); btnSuper.innerHTML = `<i data-lucide="link" class="w-4 h-4"></i> SUPER SET: ${tempSuperset ? 'ATTIVO' : 'OFF'}`; btnSuper.style.backgroundColor = tempSuperset ? 'rgba(175, 82, 222, 0.15)' : 'transparent'; btnSuper.style.borderColor = tempSuperset ? 'rgba(175, 82, 222, 0.3)' : 'rgba(255,255,255,0.1)'; btnSuper.style.color = tempSuperset ? '#AF52DE' : 'white'; if (window.lucide) lucide.createIcons();
+            const btnSuper = document.getElementById('toggle-superset'); btnSuper.innerHTML = `<i data-lucide="link" class="w-4 h-4"></i> SUPER SET: ${tempSuperset ? 'ATTIVO' : 'OFF'}`; btnSuper.style.backgroundColor = tempSuperset ? 'rgba(175, 82, 222, 0.15)' : 'transparent'; btnSuper.style.borderColor = tempSuperset ? 'rgba(175, 82, 222, 0.3)' : 'rgba(255,255,255,0.1)'; btnSuper.style.color = tempSuperset ? '#AF52DE' : 'white'; safeCreateIcons();
         }
         function saveExerciseParams() {
             if (!userPlan[currentWorkoutId].overrides) userPlan[currentWorkoutId].overrides = {};
@@ -1276,12 +1271,12 @@
         function removeExerciseUI(idx) { openConfirm("Rimuovi", "Rimuovere l'esercizio?", () => { userPlan[currentWorkoutId].items.splice(idx, 1); if(userPlan[currentWorkoutId].overrides) { const newOverrides = {}; Object.keys(userPlan[currentWorkoutId].overrides).forEach(k => { const keyIdx = parseInt(k); if(keyIdx < idx) newOverrides[keyIdx] = userPlan[currentWorkoutId].overrides[k]; else if(keyIdx > idx) newOverrides[keyIdx - 1] = userPlan[currentWorkoutId].overrides[k]; }); userPlan[currentWorkoutId].overrides = newOverrides; } localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); renderWorkout(currentWorkoutId); }); }
 
         function openCardioModal(exId) {
-            currentLoggingExId = exId; document.getElementById('cardio-title').innerText = exerciseData[exId].name;
+            currentLoggingExId = exId; document.getElementById('cardio-title').innerText = exerciseData[exId]?.name || 'Cardio';
             let existingData = activeSession[exId] || []; let wVal = existingData[0] && existingData[0].w !== null ? existingData[0].w : ''; let rVal = existingData[0] && existingData[0].r !== null ? existingData[0].r : '';
             const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastSession = h.length > 0 ? h[h.length-1] : null;
             let wPh = lastSession && lastSession.w ? lastSession.w : ''; let rPh = lastSession && lastSession.r ? lastSession.r : '30';
             document.getElementById('cardio-min').value = rVal; document.getElementById('cardio-min').placeholder = `es. ${rPh}`; document.getElementById('cardio-dist').value = wVal; document.getElementById('cardio-dist').placeholder = wPh ? `es. ${wPh}` : "es. 8.5";
-            document.getElementById('modal-log-cardio').style.display = 'flex'; if (window.lucide) lucide.createIcons();
+            document.getElementById('modal-log-cardio').style.display = 'flex'; safeCreateIcons();
         }
         function closeCardioModal() { document.getElementById('modal-log-cardio').style.display = 'none'; }
         function confirmCardioLogs() {
@@ -1298,11 +1293,11 @@
         }
 
         function openLogModal(exId, expectedSets, expectedReps) {
-            const isCardio = exerciseData[exId].category === 'aerobica';
+            const isCardio = exerciseData[exId]?.category === 'aerobica';
             if (isCardio) { openCardioModal(exId); return; }
 
-            const isBW = exerciseData[exId].isBW === true;
-            currentLoggingExId = exId; document.getElementById('log-title').innerText = exerciseData[exId].name;
+            const isBW = exerciseData[exId]?.isBW === true;
+            currentLoggingExId = exId; document.getElementById('log-title').innerText = exerciseData[exId]?.name || 'Esercizio';
             let existingData = activeSession[exId] || []; let html = '';
             const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastSessionSet = h.length > 0 ? h[h.length-1] : null;
 
@@ -1323,7 +1318,7 @@
             if (!isBW) html += `<div class="text-center">Kg</div>`;
             html += `<div class="text-center">Reps</div><div class="text-center"></div></div>`;
             
-            let phReps = expectedReps.split('-')[0]; 
+            let phReps = String(expectedReps).split('-')[0]; 
 
             for (let i = 0; i < expectedSets; i++) {
                 let wVal = existingData[i] && existingData[i].w !== null ? existingData[i].w : '';
@@ -1344,7 +1339,7 @@
                 html += `<div><input type="number" id="log-r-${i}" value="${rVal}" placeholder="${rPh}" class="bg-[#1C1C1E] !py-2 !text-sm"></div>`;
                 html += `<button id="log-ds-${i}" onclick="toggleRowDS(${i})" class="ds-btn h-full rounded-xl border border-white/10 text-[10px] font-black ${isDs ? 'active' : 'text-gray-500'}">DS</button></div>`;
             }
-            document.getElementById('log-rows-container').innerHTML = html; document.getElementById('modal-log-sets').style.display = 'flex'; if (window.lucide) lucide.createIcons();
+            document.getElementById('log-rows-container').innerHTML = html; document.getElementById('modal-log-sets').style.display = 'flex'; safeCreateIcons();
         }
 
         function closeLogModal() { document.getElementById('modal-log-sets').style.display = 'none'; }
@@ -1376,12 +1371,8 @@
 
         function renderWorkout(id, isHistory = false, hist = null) {
             const container = document.getElementById('exercise-list'); 
-            if (!container) return;
+            if (!container || !userPlan || !userPlan[id]) return;
             const plan = userPlan[id];
-            if (!plan) {
-                container.innerHTML = `<div class="text-center p-10 text-gray-500 font-bold">Scheda non trovata.</div>`;
-                return;
-            }
             const items = plan.items || []; 
             const overrides = plan.overrides || {};
             const isHIIT = plan.isHIIT === true;
@@ -1443,7 +1434,7 @@
                 }
 
                 let historyVolHTML = '';
-                if(isHistory && hist[exId]) {
+                if(isHistory && hist && hist[exId]) {
                     const histValid = hist[exId].filter(l => l.r !== null && l.r > 0);
                     if(histValid.length > 0) {
                         if (isCardio) { 
@@ -1495,4 +1486,126 @@
                             ${isHistory ? historyVolHTML : `
                                 ${summaryHTML}
                                 <div class="flex gap-3">
-                                    <button onclick="openLogModal('${exId}',${sets}, '${reps}')" class="flex-1 ${isCardio ? 'bg-orange-600 hover:bg-orange-500' : 'bg-blue-600 hover:bg-blue-500'} text-white rounded-xl py-3.5 font-black text-sm tracking-widest shadow-lg transition
+                                    <button onclick="openLogModal('${exId}',${sets}, '${reps}')" class="flex-1 ${isCardio ? 'bg-orange-600 hover:bg-orange-500' : 'bg-blue-600 hover:bg-blue-500'} text-white rounded-xl py-3.5 font-black text-sm tracking-widest shadow-lg transition-transform active:scale-95 uppercase">Registra</button>
+                                    <div class="min-w-[80px] px-3 bg-[#2C2C2E] rounded-xl flex flex-col items-center justify-center cursor-pointer active:bg-white/10 transition-colors" onclick="showChart('${exId}', '${ex.name}')">
+                                        <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Ultimo</span>
+                                        <span class="text-sm font-black text-white whitespace-nowrap">${last}</span>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 mt-5 pt-5 border-t border-white/5">
+                                    <div class="drag-handle w-14 bg-[#2C2C2E] hover:bg-[#3a3a3c] text-white rounded-xl flex justify-center items-center transition-colors"><i data-lucide="grip-horizontal" class="w-5 h-5 text-gray-400"></i></div>
+                                    <button onclick="openLibrary(${idx}, '${ex.category}')" class="flex-1 bg-[#2C2C2E] hover:bg-[#3a3a3c] text-blue-400 text-[10px] font-black uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Cambia</button>
+                                    <button onclick="removeExerciseUI(${idx})" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i> Rimuovi</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                    ${isSuper && idx < visibleItems.length - 1 ? `<div class="superset-connector"></div>` : ''}
+                </div>`;
+            }).join('');
+
+            container.innerHTML = hiitBanner + exercisesHTML;
+            safeCreateIcons();
+
+            if (!isHistory && window.Sortable) {
+                if (workoutSortable) workoutSortable.destroy();
+                workoutSortable = new Sortable(document.getElementById('exercise-list'), {
+                    handle: '.drag-handle', animation: 150, forceFallback: true, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
+                    onEnd: function (evt) {
+                        const oldIdx = evt.oldIndex; const newIdx = evt.newIndex; if (oldIdx === newIdx) return;
+                        const planItems = [...userPlan[currentWorkoutId].items]; const planOverrides = { ...(userPlan[currentWorkoutId].overrides || {}) };
+                        let arr = planItems.map((id, i) => ({ id, ov: planOverrides[i] })); const moved = arr.splice(oldIdx, 1)[0]; arr.splice(newIdx, 0, moved);
+                        userPlan[currentWorkoutId].items = arr.map(a => a.id); const newOverrides = {}; arr.forEach((a, i) => { if (a.ov) newOverrides[i] = a.ov; }); userPlan[currentWorkoutId].overrides = newOverrides;
+                        localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan)); renderWorkout(currentWorkoutId);
+                    }
+                });
+            }
+        }
+
+        function updateNav(active) { ['home', 'calendar', 'body', 'settings'].forEach(n => { const btn = document.getElementById(`nav-${n}`); if (btn) { btn.classList.toggle('text-blue-500', active === n); btn.classList.toggle('text-gray-500', active !== n); } }); }
+        function switchView(viewId) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); const activeEl = document.getElementById(`view-${viewId}`); if (activeEl) activeEl.classList.remove('hidden'); updateNav(viewId); window.scrollTo(0,0); }
+        function goHome() { switchView('home'); renderHomeCards(); }
+        function openSettings() { switchView('settings'); document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || ''; }
+        
+        function openWorkout(id) { 
+            if (!userPlan || !userPlan[id]) return;
+            currentWorkoutId = id; 
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+            document.getElementById('view-workout').classList.remove('hidden'); 
+            document.getElementById('workout-title-text').innerText = userPlan[id].title; 
+            renderWorkout(id); 
+            window.scrollTo(0,0); 
+        }
+
+        function renderHomeCards() {
+            const container = document.getElementById('workout-cards-container');
+            const archiveContainer = document.getElementById('archived-cards-container');
+            const archiveToggle = document.getElementById('archive-toggle-container');
+            if (!container) return;
+            
+            const colorGradients = { '#007AFF': 'from-blue-600 to-blue-900', '#AF52DE': 'from-purple-600 to-purple-900', '#34C759': 'from-emerald-500 to-green-900', '#FF9500': 'from-orange-500 to-red-800', '#FF3B30': 'from-red-600 to-red-900' };
+            
+            let activeHtml = '';
+            let archivedHtml = '';
+            let hasArchived = false;
+
+            Object.entries(userPlan).forEach(([id, p]) => {
+                if (!p || typeof p !== 'object') return;
+                const grad = colorGradients[p.color] || 'from-gray-700 to-gray-900';
+                const isArchived = p.archived || false;
+                
+                const htmlStr = `
+                <div onclick="openWorkout('${id}')" class="relative h-44 rounded-[32px] overflow-hidden shadow-xl active:scale-[0.98] transition-transform cursor-pointer border border-white/10 ${isArchived ? 'opacity-50 grayscale' : ''}">
+                    <div class="absolute inset-0 bg-gradient-to-br ${grad} opacity-95"></div>
+                    <div class="absolute inset-0 p-7 flex flex-col justify-end">
+                        <span class="text-white/60 text-[11px] font-black uppercase tracking-widest mb-1.5">${isArchived ? 'Archiviata' : (p.isHIIT ? 'Circuito Cardio' : 'Programma')}</span>
+                        <h3 class="text-3xl font-black text-white leading-none w-[80%]">${p.title}</h3>
+                    </div>
+                    <div class="absolute top-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 shadow-lg"><i data-lucide="${isArchived ? 'archive' : (p.isHIIT ? 'flame' : 'play')}" class="w-6 h-6 text-white ml-0.5"></i></div>
+                </div>`;
+
+                if (isArchived) { 
+                    archivedHtml += htmlStr; 
+                    hasArchived = true; 
+                } else { 
+                    activeHtml += htmlStr; 
+                }
+            });
+
+            container.innerHTML = activeHtml || `<p class="text-gray-500 text-sm font-bold text-center py-4">Nessuna scheda attiva.</p>`;
+            if (archiveContainer) archiveContainer.innerHTML = archivedHtml;
+            
+            if (archiveToggle) {
+                if (hasArchived) {
+                    archiveToggle.style.display = 'block';
+                } else {
+                    archiveToggle.style.display = 'none';
+                    if (archiveContainer) archiveContainer.classList.add('hidden');
+                    isArchiveViewOpen = false;
+                }
+            }
+            
+            updateArchiveToggleBtn();
+            safeCreateIcons();
+        }
+
+        function toggleArchiveView() {
+            isArchiveViewOpen = !isArchiveViewOpen;
+            const archiveContainer = document.getElementById('archived-cards-container');
+            if (archiveContainer) {
+                if (isArchiveViewOpen) archiveContainer.classList.remove('hidden');
+                else archiveContainer.classList.add('hidden');
+            }
+            updateArchiveToggleBtn();
+        }
+        
+        function updateArchiveToggleBtn() {
+            const btn = document.getElementById('btn-toggle-archive');
+            if(btn) {
+                if(isArchiveViewOpen) btn.innerHTML = '<i data-lucide="chevron-up" class="w-3 h-3"></i> Nascondi Archivio';
+                else btn.innerHTML = '<i data-lucide="archive" class="w-3 h-3"></i> Mostra Archivio';
+                safeCreateIcons();
+            }
+        }
+
+        function finishWorkout() { document.getElementById('session-kcal').value = ''; document.
