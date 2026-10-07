@@ -81,12 +81,55 @@
     <!-- Input foto fotocamera/galleria -->
     <input type="file" id="global-photo-input" accept="image/*" class="hidden">
 
+    <!-- Loading AI -->
     <div id="ai-loading-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[1000] hidden flex-col items-center justify-center text-center">
         <div class="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center ai-glow border border-purple-500/50 mb-6">
             <i data-lucide="sparkles" class="w-10 h-10 text-purple-400 animate-pulse"></i>
         </div>
         <h2 id="ai-loading-title" class="text-2xl font-black text-white tracking-tight mb-2">Coach AI in elaborazione</h2>
         <p id="ai-loading-desc" class="text-sm text-gray-400 font-medium">Questa operazione richiede qualche secondo...</p>
+    </div>
+
+    <!-- OVERLAY TIMER HIIT A SCHERMO INTERO -->
+    <div id="modal-hiit-timer" class="fixed inset-0 bg-black z-[300] hidden flex-col justify-between p-6 select-none">
+        <div class="flex justify-between items-center pt-safe">
+            <span id="hiit-round-badge" class="bg-white/10 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-widest text-gray-300">
+                Esercizio 1 di 5
+            </span>
+            <button onclick="stopHIITTimer()" class="w-11 h-11 bg-white/10 rounded-full flex items-center justify-center text-white active:scale-90 transition-transform">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <div class="flex flex-col items-center justify-center my-auto text-center">
+            <p id="hiit-phase-label" class="text-xs font-black uppercase tracking-[0.25em] px-4 py-1.5 rounded-full mb-4 border transition-colors bg-orange-500/20 text-orange-400 border-orange-500/30">
+                PREPARATI
+            </p>
+
+            <h2 id="hiit-exercise-name" class="text-3xl sm:text-4xl font-black text-white leading-tight min-h-[70px] flex items-center justify-center px-4">
+                Inizio Circuito
+            </h2>
+
+            <div class="relative my-6 flex items-center justify-center">
+                <span id="hiit-countdown-number" class="text-8xl sm:text-9xl font-black tracking-tighter tabular-nums drop-shadow-2xl text-orange-400">
+                    20
+                </span>
+            </div>
+
+            <div id="hiit-next-box" class="bg-white/5 border border-white/10 px-5 py-2.5 rounded-2xl max-w-xs">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Prossimo</span>
+                <p id="hiit-next-name" class="text-sm font-bold text-gray-200 truncate">Jumping Jack</p>
+            </div>
+        </div>
+
+        <div class="pb-safe flex gap-4">
+            <button id="hiit-btn-pause" onclick="togglePauseHIIT()" class="flex-1 bg-white/15 hover:bg-white/20 py-4 rounded-2xl font-black text-white uppercase tracking-widest text-xs active:scale-95 transition-all">
+                Pausa
+            </button>
+            <button onclick="skipHIITInterval()" class="w-24 bg-white/10 hover:bg-white/15 py-4 rounded-2xl font-black text-gray-300 uppercase tracking-widest text-xs active:scale-95 transition-all">
+                Salta
+            </button>
+        </div>
     </div>
 
     <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden text-white">
@@ -122,7 +165,7 @@
             <section id="archived-cards-container" class="space-y-5 mt-4 hidden"></section>
         </div>
 
-        <!-- VISTA WORKOUT (HEADER SINGOLO PULITO) -->
+        <!-- VISTA WORKOUT -->
         <div id="view-workout" class="view hidden pb-40">
             <header class="p-4 pt-safe glass flex justify-between items-center sticky top-0 z-50 border-b border-white/5">
                 <button onclick="goHome()" class="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full text-white active:scale-95 transition-transform">
@@ -595,6 +638,13 @@
             'vogatore': { name: 'Vogatore', sets: '1', reps: '20m', img: 'img/vogatore.png', category: 'aerobica', coach: { esecuzione: "Fase 1: Spingi forte con le gambe. Fase 2: Apri il busto leggermente indietro. Fase 3: Tira con le braccia allo sterno.", target: "Straordinario lavoro cardiovascolare che recluta attivamente dorso e core.", tempo: "Spinta esplosiva indietro, ritorno lento e controllato" } },
             'step': { name: 'Stair Climber (Step)', sets: '1', reps: '20m', img: 'img/step.png', category: 'aerobica', coach: { esecuzione: "Appoggia tutto il piede sul gradino e spingi dal tallone. Mantieni il busto dritto, non afflosciarti sulle maniglie.", target: "Glutei, polpacci e quadricipiti sotto estremo sforzo metabolico.", tempo: "Passo costante e profondo" } },
             
+            // I 5 ESERCIZI HIIT BRUCIACALORIE A CORPO LIBERO
+            'jumping_jacks': { name: 'Jumping Jack', sets: '1', reps: '20s', img: 'img/jumping_jacks.png', category: 'aerobica', isBW: true, coach: { esecuzione: "Salta aprendo contemporaneamente gambe e braccia sopra la testa. Atterra dolcemente sugli avampiedi ammortizzando il carico.", target: "Sistema cardiovascolare, polpacci e coordinazione.", tempo: "Ritmo rapido e continuo" } },
+            'mountain_climbers': { name: 'Mountain Climbers', sets: '1', reps: '20s', img: 'img/mountain_climbers.png', category: 'aerobica', isBW: true, coach: { esecuzione: "Posizione di plank alto con braccia tese. Porta le ginocchia verso il petto alternandole in corsa rapida senza sollevare il bacino.", target: "Core, retto addominale, spalle e frequenza cardiaca.", tempo: "Cadenza veloce e controllata" } },
+            'pop_squat': { name: 'Pop Squat', sets: '1', reps: '20s', img: 'img/pop_squat.png', category: 'aerobica', isBW: true, coach: { esecuzione: "Parti a piedi uniti, salta allargando le gambe e scendi in accosciata toccando il suolo, poi torna esplodendo verso l'alto a piedi uniti.", target: "Quadricipiti, glutei e reattività elastica.", tempo: "Discesa dinamica, salto reattivo" } },
+            'high_knee_claps': { name: 'High Knee Claps', sets: '1', reps: '20s', img: 'img/high_knee_claps.png', category: 'aerobica', isBW: true, coach: { esecuzione: "Corsa sul posto a ginocchia alte, battendo le mani sotto la coscia a ogni sollevamento. Mantieni il busto eretto.", target: "Flessori dell'anca, addome basso e resistenza metabolica.", tempo: "Massima elevazione del ginocchio" } },
+            'alt_front_kicks': { name: 'Alt Front Kicks', sets: '1', reps: '20s', img: 'img/alt_front_kicks.png', category: 'aerobica', isBW: true, coach: { esecuzione: "Calci frontali alternati all'altezza dell'addome/petto con guardia pugilistica attiva. Espira violentemente a ogni calcio.", target: "Catena cinetica anteriore, glutei, stabilità del tronco.", tempo: "Calcio rapido, richiamo immediato" } },
+
             'alzate_90': { name: 'Alzate a 90°', sets: '3', reps: '12-15', img: 'img/alzate_90.png', category: 'spalle', coach: { esecuzione: "Fletti il busto in avanti quasi parallelo al pavimento. Mantieni la schiena dritta e solleva i manubri lateralmente strizzando le scapole.", target: "Focus sul deltoide posteriore. Pensa ad allontanare i manubri, non solo ad alzarli.", tempo: "1s salita, 1s picco, 3s discesa" } },
             'alzate_cavi': { name: 'Alzate Laterali ai Cavi', sets: '3', reps: '12-15', img: 'img/alzate_cavi.png', category: 'spalle', coach: { esecuzione: "Afferra il cavo basso incrociando davanti al corpo o passandolo dietro. Tieni il petto in fuori e solleva il braccio lateralmente.", target: "Tensione continua sul deltoide laterale grazie al cavo.", tempo: "1s salita, 2-3s discesa controllata" } },
             'alzate_cavi_dietro': { name: 'Alzate Posteriori ai Cavi', sets: '3', reps: '12-15', img: 'img/alzate_cavi_dietro.png', category: 'spalle', coach: { esecuzione: "Incrocia i cavi alti davanti a te. Tira i cavi all'indietro e verso l'esterno, aprendo le braccia come per un abbraccio inverso.", target: "Deltoide posteriore e romboidi. Non incassare il collo.", tempo: "1s salita, 1s picco, 2s discesa" } },
@@ -707,7 +757,8 @@
             1: { title: 'PUSH (Forza)', color: '#007AFF', goal: 'massa', items: ['panca_piana', 'lento_avanti', 'chest_press_g1', 'alzate_lat', 'french_press', 'pushdown'], overrides: { 3: { isDropSet: true } } },
             2: { title: 'PULL (Forza)', color: '#AF52DE', goal: 'massa', items: ['trazioni_supine', 'tbar_row', 'pullover_cavi', 'alzate_90', 'curl_ez', 'hammer_curl', 'hanging_leg'], overrides: { 3: { isDropSet: true } } },
             3: { title: 'LEGS (Volume)', color: '#34C759', goal: 'ipertrofia', items: ['squat', 'hack_squat', 'leg_press', 'hip_thrust', 'leg_ext', 'leg_curl', 'polpacci'], overrides: { 4: { isDropSet: true }, 5: { isDropSet: true } } },
-            4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', goal: 'ipertrofia', items: ['chest_press_g1', 'pec_deck', 'lat_larga', 'crossover', 'alzate_cavi', 'curl_cavi', 'pushdown_corda'], overrides: { 4: { isDropSet: true } } }
+            4: { title: 'UPPER (Ipertrofia)', color: '#FF9500', goal: 'ipertrofia', items: ['chest_press_g1', 'pec_deck', 'lat_larga', 'crossover', 'alzate_cavi', 'curl_cavi', 'pushdown_corda'], overrides: { 4: { isDropSet: true } } },
+            5: { title: 'HIIT BRUCIACALORIE (5 Min)', color: '#FF3B30', goal: 'ipertrofia', isHIIT: true, items: ['jumping_jacks', 'mountain_climbers', 'pop_squat', 'high_knee_claps', 'alt_front_kicks'], overrides: {} }
         };
 
         function getLocalYYYYMMDD() {
@@ -719,6 +770,13 @@
         }
 
         let userPlan = JSON.parse(localStorage.getItem('user_workout_plan_v5')) || defaultPlan;
+        
+        // Auto-migrazione: se non è presente una scheda HIIT nei dati salvati, la aggiunge automaticamente
+        if (!userPlan[5] && !Object.values(userPlan).some(p => p.isHIIT)) {
+            userPlan[5] = defaultPlan[5];
+            localStorage.setItem('user_workout_plan_v5', JSON.stringify(userPlan));
+        }
+
         let activeSession = JSON.parse(localStorage.getItem('active_session_buffer_v5')) || {};
         let biometricsHistory = JSON.parse(localStorage.getItem('biometrics_history')) || [];
         let selectedDateStr = getLocalYYYYMMDD();
@@ -730,6 +788,15 @@
         let isArchiveViewOpen = false;
         let targetExForUpload = null;
         let creationPhotoBase64 = null;
+
+        // Variabili Motore Timer HIIT
+        let hiitTimerId = null;
+        let hiitTimeRemaining = 20;
+        let hiitCurrentIndex = 0;
+        let hiitState = 'PREPARE'; // 'PREPARE' (20s) | 'WORK' (20s) | 'REST' (10s)
+        let hiitIsPaused = false;
+        let hiitAudioCtx = null;
+        let hiitExercises = [];
 
         function saveApiKey() {
             const key = document.getElementById('api-key-input').value.trim();
@@ -758,19 +825,11 @@
             const apiKey = (localStorage.getItem('gemini_api_key') || '').trim();
             if (!apiKey) throw new Error("API Key mancante nelle Opzioni!");
             
-            // 1. Endpoint ufficiale per Gemini 3.8 Flash (Interactions API)
+            // 1. Chiamata primaria su gemini-3.8-flash via Interactions API
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/interactions?key=${apiKey}`;
-                const reqBody = {
-                    model: "gemini-3.8-flash",
-                    input: promptText
-                };
-                if (isJson) {
-                    reqBody.response_format = {
-                        type: "text",
-                        mime_type: "application/json"
-                    };
-                }
+                const url = `[https://generativelanguage.googleapis.com/v1beta/interactions?key=$](https://generativelanguage.googleapis.com/v1beta/interactions?key=$){apiKey}`;
+                const reqBody = { model: "gemini-3.8-flash", input: promptText };
+                if (isJson) reqBody.response_format = { type: "text", mime_type: "application/json" };
                 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -784,16 +843,16 @@
                     if (text) return text;
                 }
             } catch (err) {
-                console.warn("Interactions API 3.8 non riuscita, tento fallback...", err);
+                console.warn("Interactions API 3.8 fallback...", err);
             }
 
-            // 2. Fallback di sicurezza su generateContent (es. gemini-2.5-flash)
-            const fallbackModels = ['gemini-2.5-flash', 'gemini-2.5-pro'];
+            // 2. Fallback su generateContent
+            const fallbackModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
             let lastErr = null;
 
             for (const model of fallbackModels) {
                 try {
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    const url = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){model}:generateContent?key=${apiKey}`;
                     const reqBody = { contents: [{ parts: [{ text: promptText }] }] };
                     if (isJson) reqBody.generationConfig = { response_mime_type: "application/json" };
                     
@@ -890,6 +949,180 @@
             reader.readAsDataURL(file);
             e.target.value = '';
         });
+
+        // ==========================================
+        // MOTORE TIMER HIIT CON AUDIO SINTETICO
+        // ==========================================
+        function playHIITBeep(isHigh = false) {
+            try {
+                if (!hiitAudioCtx) {
+                    hiitAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (hiitAudioCtx.state === 'suspended') {
+                    hiitAudioCtx.resume();
+                }
+                const osc = hiitAudioCtx.createOscillator();
+                const gain = hiitAudioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(isHigh ? 880 : 440, hiitAudioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, hiitAudioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, hiitAudioCtx.currentTime + (isHigh ? 0.35 : 0.15));
+                osc.connect(gain);
+                gain.connect(hiitAudioCtx.destination);
+                osc.start();
+                osc.stop(hiitAudioCtx.currentTime + (isHigh ? 0.35 : 0.15));
+            } catch(e) {
+                console.warn("Audio non disponibile", e);
+            }
+        }
+
+        function startHIITCircuit() {
+            // Inizializza audio gesture per iOS Safari
+            try {
+                if (!hiitAudioCtx) hiitAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (hiitAudioCtx.state === 'suspended') hiitAudioCtx.resume();
+            } catch(e) {}
+
+            const plan = userPlan[currentWorkoutId];
+            const items = plan?.items || [];
+            
+            // Popola gli esercizi dalla scheda corrente o default HIIT
+            hiitExercises = items.map(id => ({
+                id: id,
+                name: exerciseData[id]?.name || id
+            }));
+
+            if (hiitExercises.length === 0) {
+                hiitExercises = [
+                    { id: 'jumping_jacks', name: 'Jumping Jack' },
+                    { id: 'mountain_climbers', name: 'Mountain Climbers' },
+                    { id: 'pop_squat', name: 'Pop Squat' },
+                    { id: 'high_knee_claps', name: 'High Knee Claps' },
+                    { id: 'alt_front_kicks', name: 'Alt Front Kicks' }
+                ];
+            }
+
+            hiitCurrentIndex = 0;
+            hiitState = 'PREPARE';
+            hiitTimeRemaining = 20; // 20 secondi preparazione iniziale
+            hiitIsPaused = false;
+
+            document.getElementById('modal-hiit-timer').style.display = 'flex';
+            document.getElementById('hiit-btn-pause').innerText = "Pausa";
+            
+            updateHIITUI();
+            startHIITInterval();
+            lucide.createIcons();
+        }
+
+        function startHIITInterval() {
+            if (hiitTimerId) clearInterval(hiitTimerId);
+            hiitTimerId = setInterval(() => {
+                if (hiitIsPaused) return;
+
+                hiitTimeRemaining--;
+
+                if (hiitTimeRemaining === 3 || hiitTimeRemaining === 2 || hiitTimeRemaining === 1) {
+                    playHIITBeep(false);
+                } else if (hiitTimeRemaining === 0) {
+                    playHIITBeep(true);
+                }
+
+                if (hiitTimeRemaining < 0) {
+                    advanceHIITPhase();
+                } else {
+                    updateHIITUI();
+                }
+            }, 1000);
+        }
+
+        function advanceHIITPhase() {
+            if (hiitState === 'PREPARE') {
+                hiitState = 'WORK';
+                hiitTimeRemaining = 20; // 20 secondi esercizio
+            } else if (hiitState === 'WORK') {
+                if (hiitCurrentIndex >= hiitExercises.length - 1) {
+                    finishHIITCircuit();
+                    return;
+                } else {
+                    hiitState = 'REST';
+                    hiitTimeRemaining = 10; // 10 secondi recupero
+                }
+            } else if (hiitState === 'REST') {
+                hiitCurrentIndex++;
+                hiitState = 'WORK';
+                hiitTimeRemaining = 20;
+            }
+            updateHIITUI();
+        }
+
+        function updateHIITUI() {
+            const phaseLabel = document.getElementById('hiit-phase-label');
+            const exName = document.getElementById('hiit-exercise-name');
+            const countdownEl = document.getElementById('hiit-countdown-number');
+            const roundBadge = document.getElementById('hiit-round-badge');
+            const nextBox = document.getElementById('hiit-next-box');
+            const nextName = document.getElementById('hiit-next-name');
+
+            countdownEl.innerText = hiitTimeRemaining;
+            roundBadge.innerText = `Esercizio ${hiitCurrentIndex + 1} di ${hiitExercises.length}`;
+
+            const currentEx = hiitExercises[hiitCurrentIndex];
+            const nextEx = hiitExercises[hiitCurrentIndex + 1];
+
+            if (hiitState === 'PREPARE') {
+                phaseLabel.innerText = "PREPARATI";
+                phaseLabel.className = "text-xs font-black uppercase tracking-[0.25em] px-4 py-1.5 rounded-full mb-4 border transition-colors bg-orange-500/20 text-orange-400 border-orange-500/30";
+                countdownEl.className = "text-8xl sm:text-9xl font-black tracking-tighter tabular-nums drop-shadow-2xl text-orange-400";
+                exName.innerText = "Inizio Circuito";
+                nextBox.style.display = 'block';
+                nextName.innerText = currentEx.name;
+            } else if (hiitState === 'WORK') {
+                phaseLabel.innerText = "LAVORO";
+                phaseLabel.className = "text-xs font-black uppercase tracking-[0.25em] px-4 py-1.5 rounded-full mb-4 border transition-colors bg-green-500/20 text-green-400 border-green-500/30 animate-pulse";
+                countdownEl.className = "text-8xl sm:text-9xl font-black tracking-tighter tabular-nums drop-shadow-2xl text-green-400";
+                exName.innerText = currentEx.name;
+                
+                if (nextEx) {
+                    nextBox.style.display = 'block';
+                    nextName.innerText = nextEx.name;
+                } else {
+                    nextBox.style.display = 'block';
+                    nextName.innerText = "Ultimo esercizio!";
+                }
+            } else if (hiitState === 'REST') {
+                phaseLabel.innerText = "RECUPERO";
+                phaseLabel.className = "text-xs font-black uppercase tracking-[0.25em] px-4 py-1.5 rounded-full mb-4 border transition-colors bg-blue-500/20 text-blue-400 border-blue-500/30";
+                countdownEl.className = "text-8xl sm:text-9xl font-black tracking-tighter tabular-nums drop-shadow-2xl text-blue-400";
+                exName.innerText = "Respira e rilassa";
+                
+                if (nextEx) {
+                    nextBox.style.display = 'block';
+                    nextName.innerText = nextEx.name;
+                }
+            }
+        }
+
+        function togglePauseHIIT() {
+            hiitIsPaused = !hiitIsPaused;
+            document.getElementById('hiit-btn-pause').innerText = hiitIsPaused ? "Riprendi" : "Pausa";
+        }
+
+        function skipHIITInterval() {
+            advanceHIITPhase();
+        }
+
+        function stopHIITTimer() {
+            if (hiitTimerId) clearInterval(hiitTimerId);
+            hiitTimerId = null;
+            document.getElementById('modal-hiit-timer').style.display = 'none';
+        }
+
+        function finishHIITCircuit() {
+            stopHIITTimer();
+            showMessage("Circuito HIIT completato! Ottimo lavoro!");
+            finishWorkout();
+        }
 
         function openAIGenerator() { if(!localStorage.getItem('gemini_api_key')) { showMessage("Inserisci l'API Key nelle Opzioni!"); return; } document.getElementById('modal-ai-gen').style.display = 'flex'; }
         function closeAIGenerator() { document.getElementById('modal-ai-gen').style.display = 'none'; }
@@ -1123,32 +1356,83 @@
         }
 
         function renderWorkout(id, isHistory = false, hist = null) {
-            const container = document.getElementById('exercise-list'); const items = userPlan[id].items || []; const overrides = userPlan[id].overrides || {};
-            const finishBtn = document.getElementById('finish-btn'); if (finishBtn) finishBtn.style.display = isHistory ? 'none' : 'block';
+            const container = document.getElementById('exercise-list'); 
+            const plan = userPlan[id];
+            const items = plan.items || []; 
+            const overrides = plan.overrides || {};
+            const isHIIT = plan.isHIIT === true;
+            
+            const finishBtn = document.getElementById('finish-btn'); 
+            if (finishBtn) finishBtn.style.display = isHistory ? 'none' : 'block';
             if (document.getElementById('notes-area')) document.getElementById('notes-area').style.display = isHistory ? 'none' : 'block';
             
             const visibleItems = items.filter(exId => exerciseData[exId] !== undefined);
-            if(visibleItems.length === 0) { container.innerHTML = `<div class="text-center p-10 text-gray-500 font-bold">Nessun esercizio presente. Clicca su + in basso per iniziare!</div>`; return; }
+            if(visibleItems.length === 0) { 
+                container.innerHTML = `<div class="text-center p-10 text-gray-500 font-bold">Nessun esercizio presente. Clicca su + in basso per iniziare!</div>`; 
+                return; 
+            }
 
-            container.innerHTML = visibleItems.map((exId, idx) => {
-                const ex = exerciseData[exId]; const isCardio = ex.category === 'aerobica';
-                const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; const lastEntry = h.length > 0 ? h[h.length-1] : null; let last = '--';
-                if (lastEntry) { if (isCardio) last = lastEntry.w > 0 ? `${lastEntry.w}km / ${lastEntry.r}m` : `${lastEntry.r} min`; else { if (lastEntry.w > 0 && !ex.isBW) last = `${lastEntry.w}kg x${lastEntry.r}`; else if (lastEntry.r > 0) last = `${lastEntry.r} reps`; } }
+            let hiitBanner = '';
+            if (isHIIT && !isHistory) {
+                hiitBanner = `
+                <div class="bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 p-6 rounded-[32px] mb-6 shadow-2xl flex items-center justify-between border border-white/20">
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-white/80 block mb-1">Circuito Bruciacalorie</span>
+                        <h3 class="text-2xl font-black text-white leading-tight">Timer HIIT Guidato</h3>
+                        <p class="text-xs text-white/80 mt-1 font-medium">5 Stazioni: 20s Lavoro • 10s Rest</p>
+                    </div>
+                    <button onclick="startHIITCircuit()" class="bg-white text-black px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-transform shadow-xl flex items-center gap-2">
+                        <i data-lucide="play" class="w-4 h-4 fill-current"></i> START
+                    </button>
+                </div>`;
+            }
+
+            const exercisesHTML = visibleItems.map((exId, idx) => {
+                const ex = exerciseData[exId]; 
+                const isCardio = ex.category === 'aerobica';
+                const h = JSON.parse(localStorage.getItem(`h_${exId}`)) || []; 
+                const lastEntry = h.length > 0 ? h[h.length-1] : null; 
+                let last = '--';
+                if (lastEntry) { 
+                    if (isCardio) last = lastEntry.w > 0 ? `${lastEntry.w}km / ${lastEntry.r}m` : `${lastEntry.r} min`; 
+                    else { if (lastEntry.w > 0 && !ex.isBW) last = `${lastEntry.w}kg x${lastEntry.r}`; else if (lastEntry.r > 0) last = `${lastEntry.r} reps`; } 
+                }
                 
-                const ov = overrides[idx] || {}; const sets = ov.sets || ex.sets; const reps = ov.reps || ex.reps; const isDrop = ov.isDropSet || false; const isSuper = ov.isSuperset || false;
-                const logs = activeSession[exId] || []; const validLogs = logs.filter(l => l.r !== null && l.r > 0); const logCount = validLogs.length; let summaryHTML = '';
+                const ov = overrides[idx] || {}; 
+                const sets = ov.sets || ex.sets; 
+                const reps = ov.reps || ex.reps; 
+                const isDrop = ov.isDropSet || false; 
+                const isSuper = ov.isSuperset || false;
+                const logs = activeSession[exId] || []; 
+                const validLogs = logs.filter(l => l.r !== null && l.r > 0); 
+                const logCount = validLogs.length; 
+                let summaryHTML = '';
                 
                 if (logCount > 0 && !isHistory) {
-                    if (isCardio) { const rec = validLogs[0]; summaryHTML = `<div class="bg-orange-500/10 border border-orange-500/20 px-4 py-2.5 rounded-xl text-center mb-4"><span class="text-orange-500 font-black text-xs uppercase tracking-widest">Registrato: ${rec.r} min${rec.w > 0 ? ` / ${rec.w} Km` : ''}</span></div>`; } 
-                    else { let exVol = validLogs.reduce((acc, curr) => acc + ((curr.w||0) * curr.r), 0); summaryHTML = `<div class="bg-green-500/10 border border-green-500/20 px-4 py-2.5 rounded-xl text-center mb-4"><span class="text-green-500 font-black text-xs uppercase tracking-widest">${logCount}/${sets} Serie completate${!ex.isBW ? ` (Vol: ${exVol}kg)` : ''}</span></div>`; }
+                    if (isCardio) { 
+                        const rec = validLogs[0]; 
+                        summaryHTML = `<div class="bg-orange-500/10 border border-orange-500/20 px-4 py-2.5 rounded-xl text-center mb-4"><span class="text-orange-500 font-black text-xs uppercase tracking-widest">Registrato: ${rec.r} min${rec.w > 0 ? ` / ${rec.w} Km` : ''}</span></div>`; 
+                    } else { 
+                        let exVol = validLogs.reduce((acc, curr) => acc + ((curr.w||0) * curr.r), 0); 
+                        summaryHTML = `<div class="bg-green-500/10 border border-green-500/20 px-4 py-2.5 rounded-xl text-center mb-4"><span class="text-green-500 font-black text-xs uppercase tracking-widest">${logCount}/${sets} Serie completate${!ex.isBW ? ` (Vol: ${exVol}kg)` : ''}</span></div>`; 
+                    }
                 }
 
                 let historyVolHTML = '';
                 if(isHistory && hist[exId]) {
                     const histValid = hist[exId].filter(l => l.r !== null && l.r > 0);
                     if(histValid.length > 0) {
-                        if (isCardio) { const rec = histValid[0]; let str = rec.w > 0 ? `${rec.w} <span class="text-sm text-orange-400">km in ${rec.r} min</span>` : `${rec.r} <span class="text-sm text-orange-400">minuti</span>`; historyVolHTML = `<div class="bg-orange-500/15 p-6 rounded-2xl text-center border border-orange-500/20"><span class="text-3xl font-black text-white">${str}</span></div>`; } 
-                        else { let hVol = histValid.reduce((acc, curr) => acc + ((curr.w||0) * curr.r), 0); let bestSet = histValid[0]; for (let l of histValid) { if (l.w > bestSet.w) bestSet = l; else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l; } let bestSetStr = (bestSet.w > 0 && !ex.isBW) ? `${bestSet.w} <span class="text-sm text-blue-400">kg x${bestSet.r}</span>` : `${bestSet.r} <span class="text-sm text-blue-400">reps</span>`; historyVolHTML = `<div class="bg-blue-500/15 p-6 rounded-2xl text-center border border-blue-500/20"><span class="text-3xl font-black text-white">${bestSetStr}</span>${!ex.isBW ? `<div class="text-xs text-blue-400/70 uppercase font-black tracking-widest mt-2">Volume: ${hVol}kg in ${histValid.length} serie</div>` : ''}</div>`; }
+                        if (isCardio) { 
+                            const rec = histValid[0]; 
+                            let str = rec.w > 0 ? `${rec.w} <span class="text-sm text-orange-400">km in ${rec.r} min</span>` : `${rec.r} <span class="text-sm text-orange-400">minuti</span>`; 
+                            historyVolHTML = `<div class="bg-orange-500/15 p-6 rounded-2xl text-center border border-orange-500/20"><span class="text-3xl font-black text-white">${str}</span></div>`; 
+                        } else { 
+                            let hVol = histValid.reduce((acc, curr) => acc + ((curr.w||0) * curr.r), 0); 
+                            let bestSet = histValid[0]; 
+                            for (let l of histValid) { if (l.w > bestSet.w) bestSet = l; else if (l.w === bestSet.w && l.r > bestSet.r) bestSet = l; } 
+                            let bestSetStr = (bestSet.w > 0 && !ex.isBW) ? `${bestSet.w} <span class="text-sm text-blue-400">kg x${bestSet.r}</span>` : `${bestSet.r} <span class="text-sm text-blue-400">reps</span>`; 
+                            historyVolHTML = `<div class="bg-blue-500/15 p-6 rounded-2xl text-center border border-blue-500/20"><span class="text-3xl font-black text-white">${bestSetStr}</span>${!ex.isBW ? `<div class="text-xs text-blue-400/70 uppercase font-black tracking-widest mt-2">Volume: ${hVol}kg in ${histValid.length} serie</div>` : ''}</div>`; 
+                        }
                     }
                 }
 
@@ -1204,6 +1488,8 @@
                     ${isSuper && idx < visibleItems.length - 1 ? `<div class="superset-connector"></div>` : ''}
                 </div>`;
             }).join('');
+
+            container.innerHTML = hiitBanner + exercisesHTML;
             lucide.createIcons();
 
             if (!isHistory) {
@@ -1254,10 +1540,10 @@
                 <div onclick="openWorkout('${id}')" class="relative h-44 rounded-[32px] overflow-hidden shadow-xl active:scale-[0.98] transition-transform cursor-pointer border border-white/10 ${isArchived ? 'opacity-50 grayscale' : ''}">
                     <div class="absolute inset-0 bg-gradient-to-br ${grad} opacity-95"></div>
                     <div class="absolute inset-0 p-7 flex flex-col justify-end">
-                        <span class="text-white/60 text-[11px] font-black uppercase tracking-widest mb-1.5">${isArchived ? 'Archiviata' : 'Programma'}</span>
+                        <span class="text-white/60 text-[11px] font-black uppercase tracking-widest mb-1.5">${isArchived ? 'Archiviata' : (p.isHIIT ? 'Circuito Cardio' : 'Programma')}</span>
                         <h3 class="text-3xl font-black text-white leading-none w-[80%]">${p.title}</h3>
                     </div>
-                    <div class="absolute top-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 shadow-lg"><i data-lucide="${isArchived ? 'archive' : 'play'}" class="w-6 h-6 text-white ml-1"></i></div>
+                    <div class="absolute top-6 right-6 w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 shadow-lg"><i data-lucide="${isArchived ? 'archive' : (p.isHIIT ? 'flame' : 'play')}" class="w-6 h-6 text-white ml-0.5"></i></div>
                 </div>`;
 
                 if (isArchived) { 
@@ -1457,7 +1743,6 @@
                 return;
             }
 
-            // Se l'audit esiste già e non chiediamo il refresh forzato, mostralo all'istante
             if (plan.audit && plan.audit.text && !forceRegenerate) {
                 showAuditModal(plan);
                 return;
@@ -1518,7 +1803,6 @@ STRUTTURA RISPOSTA:
             try {
                 const feedback = await askGemini(prompt, false);
                 
-                // Salvataggio permanente nel database della scheda
                 const now = new Date();
                 const dateStr = now.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }) + ' alle ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                 
@@ -2018,183 +2302,4 @@ Restituisci ESCLUSIVAMENTE un JSON valido con questa struttura esatta:
             dates.forEach(dateStr => {
                 const entryDate = new Date(dateStr); entryDate.setHours(0, 0, 0, 0);
                 const diffTime = Math.abs(today - entryDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                const entry = journal[dateStr];
-                Object.keys(entry.exercises || {}).forEach(exId => {
-                    const cat = exerciseData[exId]?.category;
-                    if (cat && lastTrained[cat] !== undefined) { if (diffDays < lastTrained[cat]) lastTrained[cat] = diffDays; }
-                });
-            });
-
-            const container = document.getElementById('recovery-heatmap');
-            if(!container) return;
-
-            const categories = [
-                { id: 'petto', name: 'Petto', icon: 'square' }, { id: 'dorso', name: 'Dorso', icon: 'shield' },
-                { id: 'spalle', name: 'Spalle', icon: 'triangle' }, { id: 'gambe', name: 'Gambe', icon: 'circle' },
-                { id: 'bicipiti', name: 'Bicipiti', icon: 'activity' }, { id: 'tricipiti', name: 'Tricipiti', icon: 'activity' },
-                { id: 'core', name: 'Core', icon: 'disc' }
-            ];
-
-            container.innerHTML = categories.map(c => {
-                const days = lastTrained[c.id];
-                let status = "Rilassato"; let colorClass = "text-green-500"; let bgClass = "bg-green-500/10 border-green-500/20"; let dotClass = "bg-green-500";
-                
-                if (days <= 1) { status = "Affaticato"; colorClass = "text-red-500"; bgClass = "bg-red-500/10 border-red-500/20"; dotClass = "bg-red-500 shadow-[0_0_10px_rgba(255,59,48,0.8)]"; } 
-                else if (days <= 3) { status = "In Recupero"; colorClass = "text-orange-500"; bgClass = "bg-orange-500/10 border-orange-500/20"; dotClass = "bg-orange-500 shadow-[0_0_10px_rgba(255,149,0,0.8)]"; }
-
-                return `<div class="flex items-center justify-between p-3 rounded-2xl border ${bgClass}"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center bg-black/20"><i data-lucide="${c.icon}" class="w-4 h-4 ${colorClass}"></i></div><div><p class="text-sm font-bold text-white capitalize">${c.name}</p><p class="text-[10px] uppercase tracking-widest font-black ${colorClass}">${status}</p></div></div><div class="w-3 h-3 rounded-full ${dotClass}"></div></div>`;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        function updateCalendarStats() {
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; 
-            let monthlyKcal = 0; let weeklyKcal = 0;
-            const year = calendarDate.getFullYear(); 
-            const month = calendarDate.getMonth(); 
-            
-            const today = new Date(); today.setHours(23, 59, 59, 999);
-            const currentDayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; 
-            const startOfWeek = new Date(today); 
-            startOfWeek.setDate(today.getDate() - currentDayOfWeek); 
-            startOfWeek.setHours(0, 0, 0, 0);
-            
-            const labels = []; const data = []; 
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
-            for(let d=1; d<=daysInMonth; d++) { 
-                labels.push(d); 
-                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; 
-                const dailyKcal = (journal[key] && journal[key].kcal) ? journal[key].kcal : 0; 
-                data.push(dailyKcal); 
-                
-                if (dailyKcal > 0) { 
-                    monthlyKcal += dailyKcal; 
-                    const entryDate = new Date(year, month, d); 
-                    if (entryDate >= startOfWeek && entryDate <= today) { weeklyKcal += dailyKcal; } 
-                } 
-            }
-            document.getElementById('kcal-week').innerText = weeklyKcal; 
-            document.getElementById('kcal-month').innerText = monthlyKcal;
-            
-            const canvas = document.getElementById('chart-kcal'); 
-            if(chartKcalTrend) chartKcalTrend.destroy();
-            chartKcalTrend = new Chart(canvas.getContext('2d'), { 
-                type: 'bar', 
-                data: { labels: labels, datasets: [{ label: 'Kcal', data: data, backgroundColor: '#FF9500', borderRadius: 4, barPercentage: 0.6 }] }, 
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false }, ticks: { color: '#8E8E93', font: {size: 10, family: 'Inter'} } } } } 
-            });
-        }
-
-        function renderCalendarGrid() {
-            const container = document.getElementById('calendar-days'); 
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; 
-            container.innerHTML = '';
-            
-            const year = calendarDate.getFullYear(); 
-            const month = calendarDate.getMonth(); 
-            
-            const meseNomi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
-            document.getElementById('calendar-month').innerText = `${meseNomi[month]} ${year}`;
-            
-            const firstDay = new Date(year, month, 1).getDay(); 
-            const offset = firstDay === 0 ? 6 : firstDay - 1;
-            const today = getLocalYYYYMMDD();
-
-            for(let i=0; i<offset; i++) container.innerHTML += `<div></div>`;
-            for(let d=1; d<=new Date(year, month + 1, 0).getDate(); d++) { 
-                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; 
-                const isToday = today === key;
-                const isSelected = selectedDateStr === key;
-                const hasWorkout = journal[key] ? 'workout' : '';
-                container.innerHTML += `<div id="cal-day-${key}" class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasWorkout}" onclick="showDayDetails('${key}')">${d}</div>`; 
-            }
-        }
-
-        function showDayDetails(key, updateGridUI = true) {
-            selectedDateStr = key;
-            
-            if (updateGridUI) {
-                document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
-                const activeDay = document.getElementById(`cal-day-${key}`);
-                if (activeDay) activeDay.classList.add('selected');
-            }
-            
-            const journal = JSON.parse(localStorage.getItem('workout_journal')) || {}; 
-            const entry = journal[key]; 
-            const selContainer = document.getElementById('calendar-selection');
-            
-            if (!entry) { 
-                selContainer.innerHTML = `<div class="bg-[#1C1C1E] p-6 rounded-3xl border border-white/5 text-center"><p class="text-sm text-gray-500">Nessun allenamento registrato il ${key.split('-').reverse().join('/')}.</p></div>`; 
-                return; 
-            }
-            
-            selContainer.innerHTML = `
-            <div class="apple-card p-6 border border-white/5 relative overflow-hidden shadow-lg animate-slide">
-                <button onclick="deleteValidatedWorkout('${key}')" class="absolute top-4 right-4 text-red-500/40 hover:text-red-500 transition-colors z-20"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                <div class="absolute -right-6 -top-6 opacity-[0.03]"><i data-lucide="dumbbell" class="w-40 h-40"></i></div>
-                <div class="relative z-10">
-                    <span class="text-blue-500 font-black text-[10px] uppercase tracking-widest block mb-1">${key.split('-').reverse().join('/')}</span>
-                    <h3 class="text-2xl font-black text-white mb-6 leading-tight">${entry.title}</h3>
-                    <div class="flex gap-4 mb-4">
-                        <div class="bg-[#2C2C2E] px-4 py-3 rounded-2xl flex-1 text-center border border-white/5">
-                            <span class="block text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1.5">Volume Pesi</span>
-                            <span class="text-lg font-black text-white">${entry.volume} <span class="text-[10px] text-gray-500">kg</span></span>
-                        </div>
-                        <div class="bg-orange-500/10 border border-orange-500/20 px-4 py-3 rounded-2xl flex-1 text-center">
-                            <span class="block text-[9px] text-orange-400 font-black uppercase tracking-widest mb-1.5">Calorie</span>
-                            <span class="text-lg font-black text-orange-500 flex items-center justify-center gap-1.5"><i data-lucide="flame" class="w-4 h-4"></i> ${entry.kcal || 0}</span>
-                        </div>
-                    </div>
-                    ${entry.notes ? `<div class="bg-[#2C2C2E] p-4 rounded-2xl border border-white/5 text-left mt-2"><span class="block text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1.5"><i data-lucide="file-text" class="w-3 h-3 inline"></i> Note</span><p class="text-sm text-gray-300 italic">"${entry.notes}"</p></div>` : ''}
-                    
-                    <button onclick="analyzePastWorkout('${key}')" class="w-full bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] mt-4 flex items-center justify-center gap-2 transition-colors">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i> Richiedi Analisi AI
-                    </button>
-                </div>
-            </div>`;
-            lucide.createIcons();
-        }
-
-        function deleteValidatedWorkout(key) {
-            openConfirm("Elimina Allenamento", "Sei sicuro di voler rimuovere questa sessione dal diario?", () => {
-                const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-                delete journal[key];
-                localStorage.setItem('workout_journal', JSON.stringify(journal));
-                renderCalendarGrid(); 
-                updateCalendarStats();
-                showDayDetails(key, false);
-                showMessage("Allenamento eliminato.");
-            });
-        }
-
-        function openBody() { switchView('body'); renderRecoveryHeatmap(); renderDashboardCharts(); renderBodyStats(); }
-
-        window.onload = () => {
-            const options = { weekday: 'long', day: 'numeric', month: 'long' }; const today = new Date(); const dateStr = today.toLocaleDateString('it-IT', options);
-            document.getElementById('date-label').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-            goHome(); lucide.createIcons();
-            if(localStorage.getItem('gemini_api_key')) document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key');
-            
-            window.addEventListener('focusin', (e) => {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                    const nav = document.querySelector('.glass-nav');
-                    if (nav) nav.style.setProperty('display', 'none', 'important');
-                    setTimeout(() => {
-                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 300);
-                }
-            });
-            window.addEventListener('focusout', (e) => {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                    setTimeout(() => {
-                        const nav = document.querySelector('.glass-nav');
-                        if (nav) nav.style.removeProperty('display');
-                    }, 150);
-                }
-            });
-        };
-    </script>
-</body>
-</html>
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 *
